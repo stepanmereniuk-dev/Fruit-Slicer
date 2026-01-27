@@ -14,6 +14,10 @@ class FruitObject:
         self.collision_range = 10
         self.collider:pygame.Rect  = None
         self.collider_visibility: bool = collider_visibility# <---- just for test
+        self.is_cated = False
+
+        #self.list_of_images = pygame.image.load().convert_alpha()
+
         
         pass
     
@@ -24,10 +28,28 @@ class FruitObject:
     def collision(self):
         #TODO: Change it to colliderect not collide
         mouse_pos = pygame.mouse.get_pos()
+        #Calcululate pints
+        
+        
+        px = self.position[0]
+        py = self.position[1]
+        
+        distance_x_to_mouse = mouse_pos[0] - px
+        distance_y_to_mouse = mouse_pos[1] - py
+        
+        find_radius = self.collider()       
+        
+        
+        
+        
+        
+        
+        
         if self.collider.collidepoint(mouse_pos):
             print("COLLIDE")
         
-            
+        
+
         pass
     
     def draw_self():

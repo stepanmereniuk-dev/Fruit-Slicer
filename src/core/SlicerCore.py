@@ -9,7 +9,7 @@ class SlicerCore():
         self.screen:Surface  = screen
         self.max_points = 20
         self.list_of_point = []
-        self.cursor_image = pygame.image.load("src/public/images/Katana.png").convert_alpha()
+        self.cursor_image = pygame.image.load("src/assets/images/Katana.png").convert_alpha()
         self.cursor_image = pygame.transform.scale(self.cursor_image, (52, 52))
         
     def update(self):
