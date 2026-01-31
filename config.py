@@ -185,6 +185,9 @@ DIFFICULTY = {
         'freeze_duration': 3.0,
     },
     'challenge': {
+        'speed_y': (-600, -500),
+        'speed_x': (-100, 100),
+        'gravity': 500,
         'duration': 60,
         'spawn_delay': (0.8, 1.2),
         'fruits_per_spawn': (1, 3),
