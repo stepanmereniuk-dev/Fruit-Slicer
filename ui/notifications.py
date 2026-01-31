@@ -1,364 +1,200 @@
 """
-NotificationManager - Gestionnaire des notifications de succès
-Jour 3 - Dev 3
+NotificationManager - Affiche les succès débloqués.
 
-Affiche les notifications quand un succès est débloqué :
-- Animation d'apparition/disparition
-- Icône étoile dorée style Mario
-- Son de célébration (1-UP)
+Selon la doc :
+- Position : bas gauche de l'écran
+- Une seule notification visible à la fois
+- File d'attente si plusieurs succès débloqués
+- Durée : 3 secondes par notification
 """
 
 import pygame
 import math
 from typing import List, Optional
 from dataclasses import dataclass
+
 from core.achievements import Achievement
+from core import lang_manager
 
 
-# Couleurs thème Mario/Yoshi
+# Palette thème Mario/Yoshi
 COLORS = {
-    'background': (50, 50, 50, 230),    # Fond semi-transparent
-    'border': (255, 193, 7),            # Or étoile #FFC107
-    'title': (255, 213, 79),            # Jaune pièces #FFD54F
-    'description': (255, 255, 255),     # Blanc
-    'star': (255, 193, 7),              # Or étoile
+    'background': (50, 50, 50, 230),
+    'border': (255, 193, 7),       # Or
+    'title': (255, 213, 79),       # Jaune
+    'text': (255, 255, 255),
+    'star': (255, 193, 7),
 }
 
 
 @dataclass
-class NotificationItem:
-    """Représente une notification en cours d'affichage"""
+class Notification:
+    """Une notification en cours d'affichage."""
     achievement: Achievement
-    time_remaining: float
-    animation_phase: str  # 'enter', 'display', 'exit'
-    animation_progress: float  # 0.0 à 1.0
-    y_offset: int  # Position verticale (pour empiler)
+    timer: float        # Temps restant en phase 'display'
+    phase: str          # 'enter' -> 'display' -> 'exit'
+    progress: float     # 0.0 à 1.0 pour les animations enter/exit
 
 
 class NotificationManager:
     """
-    Gestionnaire des notifications de succès.
-    Affiche les succès débloqués avec une animation style Nintendo.
+    Gère l'affichage des notifications de succès.
+    Utilisation :
+        manager.add(achievement)      # Ajoute à la file
+        manager.update(dt)            # Appelé chaque frame
+        manager.render(screen)        # Affiche si notification active
     """
     
     # Configuration
-    NOTIFICATION_DURATION = 3.0  # Durée d'affichage en secondes
-    ENTER_DURATION = 0.3        # Durée de l'animation d'entrée
-    EXIT_DURATION = 0.3         # Durée de l'animation de sortie
-    
-    NOTIFICATION_WIDTH = 350
-    NOTIFICATION_HEIGHT = 80
-    NOTIFICATION_MARGIN = 10
-    
-    MAX_NOTIFICATIONS = 3       # Nombre max de notifications simultanées
+    DURATION = 3.0      # Durée d'affichage (secondes)
+    FADE_TIME = 0.3     # Durée animation enter/exit
+    WIDTH = 300
+    HEIGHT = 60
+    MARGIN = 20         # Distance depuis les bords
     
     def __init__(self):
-        self.notifications: List[NotificationItem] = []
-        self.pending_achievements: List[Achievement] = []
-        
-        # Fonts (initialisées au premier render)
-        self.font_title: Optional[pygame.font.Font] = None
-        self.font_desc: Optional[pygame.font.Font] = None
-        self.fonts_initialized = False
-        
-        # Son (à charger par le jeu)
-        self.sound_achievement: Optional[pygame.mixer.Sound] = None
+        self.current: Optional[Notification] = None  # Notification affichée
+        self.queue: List[Achievement] = []           # File d'attente
+        self.font: Optional[pygame.font.Font] = None
+        self.font_small: Optional[pygame.font.Font] = None
+        self.sound: Optional[pygame.mixer.Sound] = None
     
-    def set_achievement_sound(self, sound: pygame.mixer.Sound):
-        """Définit le son à jouer lors d'un succès"""
-        self.sound_achievement = sound
+    def set_sound(self, sound: pygame.mixer.Sound):
+        """Définit le son joué lors d'un nouveau succès."""
+        self.sound = sound
     
-    def add_notification(self, achievement: Achievement):
-        """
-        Ajoute une notification à afficher.
-        
-        Args:
-            achievement: Le succès débloqué à afficher
-        """
-        self.pending_achievements.append(achievement)
+    def add(self, achievement: Achievement):
+        """Ajoute un succès à la file d'attente."""
+        self.queue.append(achievement)
     
-    def add_notifications(self, achievements: List[Achievement]):
-        """
-        Ajoute plusieurs notifications à afficher.
-        
-        Args:
-            achievements: Liste des succès débloqués
-        """
-        self.pending_achievements.extend(achievements)
-    
-    def _init_fonts(self):
-        """Initialise les fonts si ce n'est pas déjà fait"""
-        if not self.fonts_initialized:
-            pygame.font.init()
-            self.font_title = pygame.font.Font(None, 28)
-            self.font_desc = pygame.font.Font(None, 20)
-            self.fonts_initialized = True
+    def add_many(self, achievements: List[Achievement]):
+        """Ajoute plusieurs succès à la file."""
+        self.queue.extend(achievements)
     
     def update(self, dt: float):
-        """
-        Met à jour les notifications.
+        """Met à jour l'état de la notification (appelé chaque frame)."""
         
-        Args:
-            dt: Temps écoulé depuis la dernière frame (en secondes)
-        """
-        # Ajouter les notifications en attente
-        while self.pending_achievements and len(self.notifications) < self.MAX_NOTIFICATIONS:
-            achievement = self.pending_achievements.pop(0)
-            y_offset = len(self.notifications) * (self.NOTIFICATION_HEIGHT + self.NOTIFICATION_MARGIN)
-            
-            notification = NotificationItem(
-                achievement=achievement,
-                time_remaining=self.NOTIFICATION_DURATION,
-                animation_phase='enter',
-                animation_progress=0.0,
-                y_offset=y_offset
+        # Prendre le prochain succès si aucune notification active
+        if not self.current and self.queue:
+            self.current = Notification(
+                achievement=self.queue.pop(0),
+                timer=self.DURATION,
+                phase='enter',
+                progress=0.0
             )
-            self.notifications.append(notification)
-            
-            # Jouer le son
-            if self.sound_achievement:
-                self.sound_achievement.play()
+            if self.sound:
+                self.sound.play()
         
-        # Mettre à jour les notifications actives
-        notifications_to_remove = []
+        if not self.current:
+            return
         
-        for notification in self.notifications:
-            if notification.animation_phase == 'enter':
-                # Animation d'entrée
-                notification.animation_progress += dt / self.ENTER_DURATION
-                if notification.animation_progress >= 1.0:
-                    notification.animation_progress = 1.0
-                    notification.animation_phase = 'display'
-            
-            elif notification.animation_phase == 'display':
-                # Affichage normal
-                notification.time_remaining -= dt
-                if notification.time_remaining <= 0:
-                    notification.animation_phase = 'exit'
-                    notification.animation_progress = 0.0
-            
-            elif notification.animation_phase == 'exit':
-                # Animation de sortie
-                notification.animation_progress += dt / self.EXIT_DURATION
-                if notification.animation_progress >= 1.0:
-                    notifications_to_remove.append(notification)
+        # Machine à états : enter -> display -> exit -> None
+        n = self.current
         
-        # Supprimer les notifications terminées
-        for notification in notifications_to_remove:
-            self.notifications.remove(notification)
+        if n.phase == 'enter':
+            n.progress += dt / self.FADE_TIME
+            if n.progress >= 1.0:
+                n.progress = 1.0
+                n.phase = 'display'
         
-        # Réorganiser les positions Y
-        for i, notification in enumerate(self.notifications):
-            target_y = i * (self.NOTIFICATION_HEIGHT + self.NOTIFICATION_MARGIN)
-            # Animation douce vers la position cible
-            notification.y_offset += (target_y - notification.y_offset) * min(1.0, dt * 10)
+        elif n.phase == 'display':
+            n.timer -= dt
+            if n.timer <= 0:
+                n.phase = 'exit'
+                n.progress = 0.0
+        
+        elif n.phase == 'exit':
+            n.progress += dt / self.FADE_TIME
+            if n.progress >= 1.0:
+                self.current = None  # Notification terminée
     
     def render(self, screen: pygame.Surface):
-        """
-        Affiche les notifications.
+        """Affiche la notification active (si présente)."""
+        if not self.current:
+            return
         
-        Args:
-            screen: Surface Pygame sur laquelle dessiner
-        """
         self._init_fonts()
         
-        screen_width = screen.get_width()
+        # Position cible : bas gauche
+        screen_h = screen.get_height()
+        target_x = self.MARGIN
+        target_y = screen_h - self.HEIGHT - self.MARGIN
         
-        for notification in self.notifications:
-            self._render_notification(screen, notification, screen_width)
-    
-    def _render_notification(self, screen: pygame.Surface, notification: NotificationItem, screen_width: int):
-        """Affiche une notification individuelle"""
-        # Calculer la position X avec animation
-        target_x = screen_width - self.NOTIFICATION_WIDTH - 20
-        
-        if notification.animation_phase == 'enter':
-            # Slide depuis la droite
-            progress = self._ease_out_cubic(notification.animation_progress)
-            x = screen_width + (target_x - screen_width) * progress
-        elif notification.animation_phase == 'exit':
-            # Slide vers la droite
-            progress = self._ease_in_cubic(notification.animation_progress)
-            x = target_x + (screen_width - target_x) * progress
+        # Animation slide horizontal
+        if self.current.phase == 'enter':
+            # Slide depuis la gauche (hors écran -> position finale)
+            x = -self.WIDTH + (target_x + self.WIDTH) * self._ease_out(self.current.progress)
+        elif self.current.phase == 'exit':
+            # Slide vers la gauche (position finale -> hors écran)
+            x = target_x - (target_x + self.WIDTH) * self._ease_in(self.current.progress)
         else:
             x = target_x
         
-        y = 20 + notification.y_offset
+        self._draw(screen, int(x), target_y)
+    
+    def _draw(self, screen: pygame.Surface, x: int, y: int):
+        """Dessine la notification à la position donnée."""
+        surface = pygame.Surface((self.WIDTH, self.HEIGHT), pygame.SRCALPHA)
         
-        # Créer une surface avec transparence
-        notification_surface = pygame.Surface(
-            (self.NOTIFICATION_WIDTH, self.NOTIFICATION_HEIGHT),
-            pygame.SRCALPHA
-        )
+        # Fond + bordure dorée
+        pygame.draw.rect(surface, COLORS['background'], (0, 0, self.WIDTH, self.HEIGHT), border_radius=8)
+        pygame.draw.rect(surface, COLORS['border'], (0, 0, self.WIDTH, self.HEIGHT), 2, border_radius=8)
         
-        # Fond arrondi
-        pygame.draw.rect(
-            notification_surface,
-            COLORS['background'],
-            (0, 0, self.NOTIFICATION_WIDTH, self.NOTIFICATION_HEIGHT),
-            border_radius=10
-        )
-        
-        # Bordure dorée
-        pygame.draw.rect(
-            notification_surface,
-            COLORS['border'],
-            (0, 0, self.NOTIFICATION_WIDTH, self.NOTIFICATION_HEIGHT),
-            3,
-            border_radius=10
-        )
-        
-        # Étoile animée
-        star_x = 40
-        star_y = self.NOTIFICATION_HEIGHT // 2
-        star_size = 20
-        
-        # Animation de pulsation de l'étoile
-        if notification.animation_phase == 'display':
-            pulse = 1.0 + 0.1 * math.sin(notification.time_remaining * 8)
-            star_size = int(20 * pulse)
-        
-        self._draw_star(notification_surface, star_x, star_y, star_size, COLORS['star'])
+        # Étoile animée (pulsation pendant 'display')
+        star_size = 15
+        if self.current.phase == 'display':
+            pulse = 1.0 + 0.15 * math.sin(self.current.timer * 10)
+            star_size = int(15 * pulse)
+        self._draw_star(surface, 25, self.HEIGHT // 2, star_size)
         
         # Texte "Succès débloqué !"
-        header_text = self.font_desc.render("★ Succès débloqué !", True, COLORS['title'])
-        notification_surface.blit(header_text, (70, 12))
+        header = lang_manager.get("achievements.unlocked_notification")
+        header_surf = self.font_small.render(header, True, COLORS['title'])
+        surface.blit(header_surf, (50, 10))
         
-        # Nom du succès
-        name_text = self.font_title.render(notification.achievement.name, True, COLORS['description'])
-        # Tronquer si trop long
-        max_width = self.NOTIFICATION_WIDTH - 90
-        if name_text.get_width() > max_width:
-            name = notification.achievement.name
-            while name_text.get_width() > max_width and len(name) > 3:
-                name = name[:-4] + "..."
-                name_text = self.font_title.render(name, True, COLORS['description'])
-        notification_surface.blit(name_text, (70, 32))
+        # Nom du succès (tronqué si trop long)
+        name = self.current.achievement.name
+        name_surf = self.font.render(name, True, COLORS['text'])
+        max_width = self.WIDTH - 60
         
-        # Description courte
-        desc_text = self.font_desc.render(notification.achievement.description[:50], True, COLORS['description'])
-        if len(notification.achievement.description) > 50:
-            desc = notification.achievement.description[:47] + "..."
-            desc_text = self.font_desc.render(desc, True, COLORS['description'])
-        notification_surface.blit(desc_text, (70, 55))
+        while name_surf.get_width() > max_width and len(name) > 3:
+            name = name[:-4] + "..."
+            name_surf = self.font.render(name, True, COLORS['text'])
         
-        # Dessiner sur l'écran principal
-        screen.blit(notification_surface, (int(x), int(y)))
+        surface.blit(name_surf, (50, 32))
+        screen.blit(surface, (x, y))
     
-    def _draw_star(self, surface: pygame.Surface, cx: int, cy: int, size: int, color):
-        """Dessine une étoile à 5 branches"""
+    def _draw_star(self, surface: pygame.Surface, cx: int, cy: int, size: int):
+        """Dessine une étoile à 5 branches."""
         points = []
         for i in range(10):
             angle = math.pi / 2 + i * math.pi / 5
-            if i % 2 == 0:
-                r = size
-            else:
-                r = size * 0.4
-            px = cx + r * math.cos(angle)
-            py = cy - r * math.sin(angle)
-            points.append((px, py))
+            r = size if i % 2 == 0 else size * 0.4
+            points.append((cx + r * math.cos(angle), cy - r * math.sin(angle)))
         
-        pygame.draw.polygon(surface, color, points)
-        pygame.draw.polygon(surface, (0, 0, 0), points, 2)
+        pygame.draw.polygon(surface, COLORS['star'], points)
+        pygame.draw.polygon(surface, (0, 0, 0), points, 1)
     
-    def _ease_out_cubic(self, t: float) -> float:
-        """Fonction d'easing pour animation fluide (sortie)"""
+    def _init_fonts(self):
+        """Initialise les fonts au premier rendu."""
+        if not self.font:
+            pygame.font.init()
+            self.font = pygame.font.Font(None, 24)
+            self.font_small = pygame.font.Font(None, 18)
+    
+    def _ease_out(self, t: float) -> float:
+        """Courbe d'accélération pour animation fluide."""
         return 1 - pow(1 - t, 3)
     
-    def _ease_in_cubic(self, t: float) -> float:
-        """Fonction d'easing pour animation fluide (entrée)"""
+    def _ease_in(self, t: float) -> float:
+        """Courbe de décélération pour animation fluide."""
         return t * t * t
     
-    def has_notifications(self) -> bool:
-        """Retourne True s'il y a des notifications actives ou en attente"""
-        return len(self.notifications) > 0 or len(self.pending_achievements) > 0
+    def has_pending(self) -> bool:
+        """Retourne True si notification active ou en attente."""
+        return self.current is not None or len(self.queue) > 0
     
-    def clear_all(self):
-        """Supprime toutes les notifications"""
-        self.notifications.clear()
-        self.pending_achievements.clear()
-
-
-# ==================== EXEMPLE D'UTILISATION ====================
-
-if __name__ == "__main__":
-    """Test du système de notifications"""
-    pygame.init()
-    screen = pygame.display.set_mode((800, 600))
-    pygame.display.set_caption("Test Notifications")
-    clock = pygame.time.Clock()
-    
-    # Créer le manager
-    notification_manager = NotificationManager()
-    
-    # Créer des succès de test
-    test_achievements = [
-        Achievement(
-            id="test1",
-            name="Premier Repas",
-            description="Yoshi a goûté à ses premiers fruits !",
-            category="fruits_total",
-            condition_type="total_fruits_gte",
-            condition_value=10,
-            unlocked=True
-        ),
-        Achievement(
-            id="test2",
-            name="Langue Agile",
-            description="Yoshi attrape plusieurs fruits d'un coup !",
-            category="combos",
-            condition_type="combo_gte",
-            condition_value=3,
-            unlocked=True
-        ),
-        Achievement(
-            id="test3",
-            name="Bébé Yoshi",
-            description="Premiers pas dans l'aventure !",
-            category="score_partie",
-            condition_type="score_gte",
-            condition_value=10,
-            unlocked=True
-        ),
-    ]
-    
-    # Ajouter les notifications avec délai
-    notification_manager.add_notification(test_achievements[0])
-    
-    running = True
-    timer = 0
-    achievement_index = 1
-    
-    while running:
-        dt = clock.tick(60) / 1000.0
-        timer += dt
-        
-        # Ajouter une nouvelle notification toutes les 2 secondes
-        if timer > 2.0 and achievement_index < len(test_achievements):
-            notification_manager.add_notification(test_achievements[achievement_index])
-            achievement_index += 1
-            timer = 0
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and achievement_index < len(test_achievements):
-                    notification_manager.add_notification(test_achievements[achievement_index])
-                    achievement_index += 1
-        
-        # Mise à jour
-        notification_manager.update(dt)
-        
-        # Rendu
-        screen.fill((129, 212, 250))  # Bleu ciel
-        notification_manager.render(screen)
-        
-        # Instructions
-        font = pygame.font.Font(None, 30)
-        text = font.render("Appuyez sur ESPACE pour ajouter une notification", True, (0, 0, 0))
-        screen.blit(text, (200, 300))
-        
-        pygame.display.flip()
-    
-    pygame.quit()
+    def clear(self):
+        """Supprime toutes les notifications."""
+        self.current = None
+        self.queue.clear()
