@@ -1,0 +1,15 @@
+{
+  "players": {
+    "Massilia": {
+      "pseudo": "Massilia",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": false,
+      "total_games": 0
+    }
+  }
+}

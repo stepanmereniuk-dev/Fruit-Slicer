@@ -43,6 +43,14 @@ class TextColors:
     
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
+    
+    # Player Select Scene
+    PSS_PSEUDO = (255, 255, 255)     # #ffffff
+    PSS_DIFFICULTY = (202, 181, 155) # #cab59b
+    PSS_EASY = (150, 224, 227)       # #96e0e3
+    PSS_NORMAL = (255, 176, 110)     # #ffb06e
+    PSS_HARD = (255, 119, 119)       # #ff7777
+    PSS_START = (254, 237, 142)      # #feed8e
 
 
 # ==================== IMAGES ====================
@@ -115,6 +123,17 @@ class Images:
     GAUGE_RED = "scenes/game_scene/rouge gamescene 81 x 36.png"
     GAUGE_PURPLE = "scenes/game_scene/violet gamescene 81 x 36.png"
     GAUGE_BLUE = "scenes/game_scene/bleu gamescene 81 x 36.png"
+    
+    # Player Select Scene
+    PSS_BG = "scenes/player_select_scene/background pss 1920x1080.png"
+    PSS_PSEUDO_FIELD = "scenes/player_select_scene/Bouton tapez votre pseudo pss 599x88.png"
+    PSS_DIFFICULTY_LABEL = "scenes/player_select_scene/bouton difficulté pss 460x89.png"
+    PSS_BTN_EASY = "scenes/player_select_scene/bouton facile pss 353x88.png"
+    PSS_BTN_NORMAL = "scenes/player_select_scene/bouton normal pss 353x90.png"
+    PSS_BTN_HARD = "scenes/player_select_scene/Bouton difficile pss 354x90.png"
+    PSS_BTN_START = "scenes/player_select_scene/Bouton c_est parti pss 558x89.png"
+    PSS_GEAR = "scenes/player_select_scene/Engrenage pss 104x77.png"
+    PSS_CROSS = "scenes/player_select_scene/Croix pss 151x78.png"
 
 
 # ==================== POSITIONS (centre des éléments) ====================
@@ -129,6 +148,16 @@ class Layout:
     MENU_BTN_SUCCES = (960, 928)
     MENU_BTN_PARAMETRES = (309, 1015)
     MENU_BTN_QUITTER = (1588, 1015)
+    
+    # Player Select Scene (centre des éléments)
+    PSS_GEAR = (1624, 84)
+    PSS_CROSS = (1765, 84)
+    PSS_PSEUDO_FIELD = (960, 370)
+    PSS_DIFFICULTY_LABEL = (960, 584)
+    PSS_BTN_EASY = (585, 699)
+    PSS_BTN_NORMAL = (960, 699)
+    PSS_BTN_HARD = (1335, 699)
+    PSS_BTN_START = (960, 876)
 
 
 # ==================== GAMEPLAY ====================
