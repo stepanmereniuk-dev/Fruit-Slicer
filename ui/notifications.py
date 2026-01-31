@@ -14,7 +14,7 @@ from typing import List, Optional
 from dataclasses import dataclass
 
 from core.achievements import Achievement
-from core import lang_manager
+from core.lang_manager import get as lang_get  # Import direct pour éviter circulaire
 
 
 # Palette thème Mario/Yoshi
@@ -148,7 +148,7 @@ class NotificationManager:
         self._draw_star(surface, 25, self.HEIGHT // 2, star_size)
         
         # Texte "Succès débloqué !"
-        header = lang_manager.get("achievements.unlocked_notification")
+        header = lang_get("achievements.unlocked_notification")
         header_surf = self.font_small.render(header, True, COLORS['title'])
         surface.blit(header_surf, (50, 10))
         

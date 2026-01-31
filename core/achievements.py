@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Callable
 from dataclasses import dataclass, asdict
 from enum import Enum
 
-from core import lang_manager
+from core.lang_manager import get as lang_get  # Import direct pour éviter circulaire
 
 
 class AchievementCategory(Enum):
@@ -32,11 +32,11 @@ class Achievement:
     
     @property
     def name(self) -> str:
-        return lang_manager.get(f"achievement_names.{self.id}")
+        return lang_get(f"achievement_names.{self.id}")
     
     @property
     def description(self) -> str:
-        return lang_manager.get(f"achievement_descriptions.{self.id}")
+        return lang_get(f"achievement_descriptions.{self.id}")
 
 
 @dataclass
