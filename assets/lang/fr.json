@@ -131,9 +131,9 @@
     "tab_normal": "Normal",
     "tab_hard": "Difficile",
     "tab_challenge": "Challenge",
-    "rank_header": "#",
-    "pseudo_header": "Joueur",
-    "score_header": "Score",
+    "rank_header": "Rang",
+    "pseudo_header": "Pseudo",
+    "score_header": "Meilleur score",
     "no_scores": "Aucun score enregistré",
     "back_button": "Retour"
   },

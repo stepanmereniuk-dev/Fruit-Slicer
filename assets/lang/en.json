@@ -132,9 +132,9 @@
     "tab_normal": "Normal",
     "tab_hard": "Hard",
     "tab_challenge": "Challenge",
-    "rank_header": "#",
+    "rank_header": "Rank",
     "pseudo_header": "Player",
-    "score_header": "Score",
+    "score_header": "Best score",
     "no_scores": "No scores yet",
     "back_button": "Back"
   },

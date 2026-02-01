@@ -65,10 +65,19 @@ class TextColors:
 
     # Game Over Scene
     GAMEOVER_SCORE = (254, 237, 142)       # #feed8e
-    GAMEOVER_NEW_RECORD = (255, 176, 110)  # #ffb06e - couleur #ffb06e
+    GAMEOVER_NEW_RECORD = (255, 176, 110)  # #ffb06e 
     GAMEOVER_BTN_REJOUER = (254, 237, 142) # #feed8e
     GAMEOVER_BTN_MENU = (239, 183, 255)    # #efb7ff
     GAMEOVER_SUCCES = (254, 237, 142)      # #feed8e
+    
+    # Ranking Scene (Classement)
+    RANKING_TITLE = (254, 237, 142)        # #feed8e
+    RANKING_TAB_EASY = (150, 224, 227)     # #96e0e3
+    RANKING_TAB_NORMAL = (255, 176, 110)   # #ffb06e
+    RANKING_TAB_HARD = (255, 119, 119)     # #ff7777
+    RANKING_TAB_CHALLENGE = (239, 183, 255) # #efb7ff
+    RANKING_HEADER = (254, 237, 142)       # #feed8e
+    RANKING_DATA = (254, 237, 142)         # #feed8e
 
 
 # ==================== IMAGES ====================
@@ -243,6 +252,17 @@ class Images:
     # Notifications de succès en jeu (chaque mode a son propre asset)
     NOTIF_BTN_SUCCES_CLASSIC = "scenes/game_scene/Bouton succes 544x80.png"
     NOTIF_BTN_SUCCES_CHALLENGE = "scenes/challenge_scene/Bouton succes 544x80.png"
+    
+    # Ranking Scene (Classement)
+    RANKING_BG = "scenes/ranking_scene/Background classement 1920x1080.png"
+    RANKING_BLOCK = "scenes/ranking_scene/Bloc classement 1568x936.png"
+    RANKING_TITLE = "scenes/ranking_scene/Bouton classement classement 458x89.png"
+    RANKING_BTN_EASY = "scenes/ranking_scene/Bouton facile classement 281x74.png"
+    RANKING_BTN_NORMAL = "scenes/ranking_scene/Bouton normal classement 281x74.png"
+    RANKING_BTN_HARD = "scenes/ranking_scene/Bouton difficile classement 281x74.png"
+    RANKING_BTN_CHALLENGE = "scenes/ranking_scene/Bouton challenge classement 281x74.png"
+    RANKING_GEAR = "scenes/ranking_scene/Engrenage claassement 104x77.png"
+    RANKING_CROSS = "scenes/ranking_scene/Croix classement 151x78.png"
 
 
 # ==================== POSITIONS (centre des éléments) ====================
@@ -316,6 +336,30 @@ class Layout:
     # Succès débloqués
     GAMEOVER_SUCCES_TEXT = (170, 1016)     # Justifié gauche, centery
     GAMEOVER_BTN_SUCCES = (342, 1016)      # Centre du bouton succès
+    
+    # Ranking Scene (Classement)
+    RANKING_BLOCK = (960, 611)             # Centre du bloc principal
+    RANKING_TITLE = (960, 138)             # Centre du titre "Classement"
+    RANKING_GEAR = (1624, 84)              # Centre engrenage
+    RANKING_CROSS = (1765, 84)             # Centre croix
+    
+    # Onglets de difficulté (centre)
+    RANKING_TAB_EASY = (510, 235)
+    RANKING_TAB_NORMAL = (809, 235)
+    RANKING_TAB_HARD = (1110, 235)
+    RANKING_TAB_CHALLENGE = (1410, 235)
+    
+    # En-têtes du tableau (centre X, centery)
+    RANKING_HEADER_RANK = (510, 331)
+    RANKING_HEADER_PSEUDO = (810, 331)
+    RANKING_HEADER_SCORE = (1266, 331)
+    
+    # Première ligne de données (Y de départ, puis +43px par ligne environ)
+    RANKING_DATA_START_Y = 400
+    RANKING_DATA_LINE_HEIGHT = 55
+    RANKING_DATA_RANK_X = 510
+    RANKING_DATA_PSEUDO_X = 810
+    RANKING_DATA_SCORE_X = 1266
 
 
 # ==================== GAMEPLAY ====================
