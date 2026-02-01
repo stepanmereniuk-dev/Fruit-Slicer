@@ -5,7 +5,7 @@
     "glouton_vert": true,
     "estomac_sans_fond": true,
     "legende_ile": true,
-    "maitre_gourmet": false,
+    "maitre_gourmet": true,
     "bebe_yoshi": true,
     "yoshi_junior": true,
     "yoshi_confirme": true,
@@ -13,9 +13,9 @@
     "yoshi_superstar": true,
     "yoshi_legendaire": true,
     "langue_agile": true,
-    "langue_eclair": false,
+    "langue_eclair": true,
     "langue_divine": false,
-    "combo_addict": false,
+    "combo_addict": true,
     "combo_master": false,
     "fraicheur_bienvenue": true,
     "maitre_givre": true,
@@ -24,12 +24,12 @@
     "coeur_intact": true,
     "prudence": true,
     "survivant": true,
-    "perseverant": false,
+    "perseverant": true,
     "increvable": false,
     "oups": true,
     "demineur_amateur": true,
     "expert_explosifs": false,
-    "accident_travail": false,
+    "accident_travail": true,
     "bienvenue": true,
     "explorateur": false,
     "indecis": false,
@@ -40,14 +40,27 @@
     "ninja_souris": true
   },
   "global_stats": {
-    "total_fruits_sliced": 766,
-    "total_games_played": 20,
-    "total_combos": 9,
-    "total_ice_sliced": 31,
-    "total_bomb_explosions": 8,
-    "total_bombs_avoided": 103,
+    "total_fruits_sliced": 1080,
+    "total_games_played": 29,
+    "total_combos": 39,
+    "total_ice_sliced": 41,
+    "total_bomb_explosions": 12,
+    "total_bombs_avoided": 142,
     "mode_switches": 0,
     "success_screen_visited": false,
     "first_launch": false
+  },
+  "players": {
+    "massilia": {
+      "pseudo": "massilia",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    }
   }
 }

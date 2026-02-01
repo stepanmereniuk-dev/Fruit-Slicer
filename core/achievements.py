@@ -157,13 +157,22 @@ class AchievementManager:
     # ==================== SAUVEGARDE ====================
     
     def save(self):
-        data = {
-            "achievements": {aid: ach.unlocked for aid, ach in self.achievements.items()},
-            "global_stats": self.global_stats.to_dict()
-        }
+        # Charger les données existantes pour ne pas écraser les autres sections (players, etc.)
+        existing_data = {}
+        if os.path.exists(self.save_path):
+            try:
+                with open(self.save_path, 'r', encoding='utf-8') as f:
+                    existing_data = json.load(f)
+            except (IOError, json.JSONDecodeError):
+                pass
+    
+        # Mettre à jour uniquement les sections achievements et global_stats
+        existing_data["achievements"] = {aid: ach.unlocked for aid, ach in self.achievements.items()}
+        existing_data["global_stats"] = self.global_stats.to_dict()
+    
         try:
             with open(self.save_path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2)
+                json.dump(existing_data, f, indent=2, ensure_ascii=False)
         except IOError:
             pass
     

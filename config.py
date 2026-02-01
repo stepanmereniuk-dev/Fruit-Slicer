@@ -239,7 +239,7 @@ class Layout:
     GAME_GEAR = (1624, 84)
     GAME_CROSS = (1765, 84)
     GAME_TIMER = (960, 106)               # Timer challenge (centre)
-    GAME_GAUGE = (960, 1016)
+    GAME_GAUGE = (960, 1003)
     GAME_GAUGE_SEGMENTS = [
         (763, 1016),   # Jaune
         (862, 1016),   # Orange
