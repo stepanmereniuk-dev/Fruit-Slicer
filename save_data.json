@@ -19,7 +19,7 @@
     "combo_master": false,
     "fraicheur_bienvenue": true,
     "maitre_givre": true,
-    "roi_glace": false,
+    "roi_glace": true,
     "freeze_stratege": true,
     "coeur_intact": true,
     "prudence": true,
@@ -40,49 +40,14 @@
     "ninja_souris": true
   },
   "global_stats": {
-    "total_fruits_sliced": 596,
-    "total_games_played": 17,
+    "total_fruits_sliced": 680,
+    "total_games_played": 19,
     "total_combos": 0,
-    "total_ice_sliced": 18,
-    "total_bomb_explosions": 6,
-    "total_bombs_avoided": 77,
+    "total_ice_sliced": 27,
+    "total_bomb_explosions": 7,
+    "total_bombs_avoided": 91,
     "mode_switches": 0,
     "success_screen_visited": false,
     "first_launch": false
-  },
-  "players": {
-    "zef": {
-      "pseudo": "zef",
-      "high_scores": {
-        "classic_easy": 0,
-        "classic_normal": 0,
-        "classic_hard": 0,
-        "challenge": 0
-      },
-      "tutorial_seen": true,
-      "total_games": 0
-    },
-    "ZFF": {
-      "pseudo": "ZFF",
-      "high_scores": {
-        "classic_easy": 0,
-        "classic_normal": 0,
-        "classic_hard": 0,
-        "challenge": 0
-      },
-      "tutorial_seen": true,
-      "total_games": 0
-    },
-    "zeff": {
-      "pseudo": "zeff",
-      "high_scores": {
-        "classic_easy": 0,
-        "classic_normal": 0,
-        "classic_hard": 0,
-        "challenge": 0
-      },
-      "tutorial_seen": true,
-      "total_games": 0
-    }
   }
 }

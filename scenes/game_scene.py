@@ -236,6 +236,9 @@ class GameScene(BaseScene):
         if sliced:
             self._process_sliced(sliced)
         
+        # Vérifier si le freeze doit se terminer (plus de fruits gelés)
+        self._check_freeze_end()
+        
         # Vérifier les entités sorties de l'écran
         self._check_missed_entities()
         
@@ -325,12 +328,14 @@ class GameScene(BaseScene):
             self.achievement_manager.on_ice_sliced()
     
     def _freeze_all(self, duration: float):
-        """Gèle toutes les entités."""
+        """Gèle tous les fruits (pas les bombes ni les glaçons)."""
         self.is_frozen = True
         self.freeze_timer = duration
         
+        # Ne geler que les fruits non tranchés
         for entity in self.entities:
-            entity.freeze()
+            if isinstance(entity, Fruit) and not entity.sliced:
+                entity.freeze()
     
     def _unfreeze_all(self):
         """Dégèle toutes les entités."""
@@ -338,7 +343,22 @@ class GameScene(BaseScene):
         self.freeze_timer = 0.0
         
         for entity in self.entities:
-            entity.unfreeze()
+            if isinstance(entity, Fruit):
+                entity.unfreeze()
+    
+    def _check_freeze_end(self):
+        """Vérifie si le freeze doit se terminer (plus de fruits gelés)."""
+        if not self.is_frozen:
+            return
+        
+        # Compter les fruits encore gelés (non tranchés)
+        frozen_fruits = [
+            e for e in self.entities 
+            if isinstance(e, Fruit) and e.frozen and not e.sliced
+        ]
+        
+        if len(frozen_fruits) == 0:
+            self._unfreeze_all()
     
     def _activate_multiplier(self):
         """Active le multiplicateur quand la jauge est pleine."""
@@ -435,10 +455,6 @@ class GameScene(BaseScene):
         
         # HUD (pas clippé)
         self._render_hud(screen)
-        
-        # Effet freeze
-        if self.is_frozen:
-            self._render_freeze_effect(screen)
     
     def _render_trail(self, screen: pygame.Surface):
         """Affiche la traînée de la souris."""
@@ -533,19 +549,6 @@ class GameScene(BaseScene):
                 segment_pos = Layout.GAME_GAUGE_SEGMENTS[i]
                 segment_rect = segment_img.get_rect(center=segment_pos)
                 screen.blit(segment_img, segment_rect)
-    
-    def _render_freeze_effect(self, screen: pygame.Surface):
-        """Affiche un effet visuel pendant le freeze."""
-        # Overlay bleu semi-transparent
-        overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
-        overlay.fill((100, 200, 255, 50))
-        screen.blit(overlay, (0, 0))
-        
-        # Texte FREEZE au centre
-        freeze_text = lang_manager.get("game.freeze_text")
-        text_surface = self.font_score.render(freeze_text, True, (100, 200, 255))
-        text_rect = text_surface.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
-        screen.blit(text_surface, text_rect)
     
     def cleanup(self):
         """Nettoyage à la sortie de la scène."""
