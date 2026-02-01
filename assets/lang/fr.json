@@ -98,10 +98,7 @@
   "game": {
     "score_label": "Score",
     "combo_text": "COMBO x{count}",
-    "freeze_text": "FREEZE !",
     "new_record": "Nouveau record !",
-    "paused": "Pause",
-    "resume": "Reprendre",
     "quit_confirm": "Quitter la partie ?"
   },
 
@@ -109,7 +106,7 @@
     "score_label": "Score final",
     "best_score_label": "Meilleur score",
     "new_record": "Nouveau record !",
-    "achievements_unlocked": "{count} succès débloqué(s)",
+    "achievements_unlocked": "succès débloqué(s)",
     "retry_button": "Rejouer",
     "menu_button": "Menu"
   },

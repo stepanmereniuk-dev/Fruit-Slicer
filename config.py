@@ -64,9 +64,10 @@ class TextColors:
 
     # Game Over Scene
     GAMEOVER_SCORE = (254, 237, 142)       # #feed8e
-    GAMEOVER_NEW_RECORD = (255, 176, 110)  # #ffb06e
+    GAMEOVER_NEW_RECORD = (255, 176, 110)  # #ffb06e - couleur #ffb06e
     GAMEOVER_BTN_REJOUER = (254, 237, 142) # #feed8e
     GAMEOVER_BTN_MENU = (239, 183, 255)    # #efb7ff
+    GAMEOVER_SUCCES = (254, 237, 142)      # #feed8e
 
 
 # ==================== IMAGES ====================
@@ -205,20 +206,26 @@ class Images:
     TUTO_CHALLENGE_BTN_PLAY = "scenes/tutorial_scene/challenge/Bouton jouer tuto 4 challenge 285x73.png"
 
     # Game Over Scene
-    # Explosion (bombe tranchée)
-    GAMEOVER_EXPLOSION_BG = "scenes/game_over_scene/explosion/Background game over explosion1920x1080.png"
+    # Explosion (bombe tranchée) - FR/EN
+    GAMEOVER_EXPLOSION_BG_FR = "scenes/game_over_scene/explosion/Background défaite explosion1920x1080.png"
+    GAMEOVER_EXPLOSION_BG_EN = "scenes/game_over_scene/explosion/Background game over explosion1920x1080.png"
     GAMEOVER_EXPLOSION_BTN_REJOUER = "scenes/game_over_scene/explosion/Bouton rejouer game over explosion 458x89.png"
     GAMEOVER_EXPLOSION_BTN_MENU = "scenes/game_over_scene/explosion/Bouton menu game over explosion 458x89.png"
     
-    # K.O (3 cœurs perdus)
-    GAMEOVER_KO_BG = "scenes/game_over_scene/K.O/Background game over ko1920x1080.png"
+    # K.O (3 cœurs perdus) - FR/EN
+    GAMEOVER_KO_BG_FR = "scenes/game_over_scene/K.O/Background défaite ko1920x1080.png"
+    GAMEOVER_KO_BG_EN = "scenes/game_over_scene/K.O/Background game over ko1920x1080.png"
     GAMEOVER_KO_BTN_REJOUER = "scenes/game_over_scene/K.O/Bouton rejouer game over ko 458x89.png"
     GAMEOVER_KO_BTN_MENU = "scenes/game_over_scene/K.O/Bouton menu game over ko 458x89.png"
     
-    # Temps écoulé (challenge)
-    GAMEOVER_TIME_BG = "scenes/game_over_scene/elapsed_time/Background temps écoulé challenge1920x1080.png"
+    # Temps écoulé (challenge) - FR/EN
+    GAMEOVER_TIME_BG_FR = "scenes/game_over_scene/elapsed_time/Background temps écoulé challenge1920x1080.png"
+    GAMEOVER_TIME_BG_EN = "scenes/game_over_scene/elapsed_time/Background time_s up challenge1920x1080.png"
     GAMEOVER_TIME_BTN_REJOUER = "scenes/game_over_scene/elapsed_time/Bouton temps écoulé challenge 458x89.png"
     GAMEOVER_TIME_BTN_MENU = "scenes/game_over_scene/elapsed_time/Bouton menu temps écoulé challenge 458x89.png"
+    
+    # Bouton succès (commun à toutes les variantes)
+    GAMEOVER_BTN_SUCCES = "scenes/game_over_scene/explosion/Bouton succes 544x80.png"
 
 
 # ==================== POSITIONS (centre des éléments) ====================
@@ -270,12 +277,24 @@ class Layout:
         (1157, 1016),  # Bleu
     ]
 
-    # Game Over Scene
-    GAMEOVER_SCORE_FINAL = (394, 395)      # Point de justification gauche
-    GAMEOVER_BEST_SCORE = (394, 478)       # Point de justification gauche
-    GAMEOVER_NEW_RECORD = (960, 395)       # Centre
-    GAMEOVER_BTN_REJOUER = (597, 632)      # Centre
-    GAMEOVER_BTN_MENU = (597, 767)         # Centre
+    # Game Over Scene (coordonnées selon le tableau de specs)
+    # Scores : justifié gauche (left=394)
+    GAMEOVER_SCORE_FINAL = (394, 476)      # Point de justification gauche, centery
+    GAMEOVER_BEST_SCORE = (394, 558)       # Point de justification gauche, centery
+    GAMEOVER_NEW_RECORD = (962, 474)       # Justifié gauche, centery
+    
+    # Boutons : centre
+    GAMEOVER_BTN_REJOUER = (597, 688)      # Centre du bouton
+    GAMEOVER_BTN_MENU = (597, 823)         # Centre du bouton
+    
+    # Textes boutons (légèrement différent du centre bouton selon specs)
+    GAMEOVER_TEXT_REJOUER = (597, 687)     # Centre du texte
+    GAMEOVER_TEXT_MENU = (597, 823)        # Centre du texte
+    
+    # Succès débloqués
+    GAMEOVER_SUCCES_TEXT = (170, 1016)     # Justifié gauche, centery
+    GAMEOVER_BTN_SUCCES = (342, 1016)      # Centre du bouton succès
+
 
 # ==================== GAMEPLAY ====================
 
@@ -363,8 +382,8 @@ KEYBOARD_LETTERS = ['A', 'Z', 'E', 'R', 'T', 'Q', 'S', 'D', 'F', 'G', 'W', 'X', 
 # ==================== AUDIO ====================
 
 class AudioConfig:
-    DEFAULT_MUSIC_VOLUME = 0.5
-    DEFAULT_SFX_VOLUME = 0.5
+    DEFAULT_MUSIC_VOLUME = 0.2
+    DEFAULT_SFX_VOLUME = 0.9
 
 
 # ==================== DEBUG ====================

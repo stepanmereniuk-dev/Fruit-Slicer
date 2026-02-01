@@ -36,16 +36,16 @@
     "speed_runner": true,
     "marathon": true,
     "parfait": true,
-    "virtuose_clavier": false,
+    "virtuose_clavier": true,
     "ninja_souris": true
   },
   "global_stats": {
-    "total_fruits_sliced": 1426,
-    "total_games_played": 62,
-    "total_combos": 68,
-    "total_ice_sliced": 52,
-    "total_bomb_explosions": 34,
-    "total_bombs_avoided": 169,
+    "total_fruits_sliced": 1593,
+    "total_games_played": 69,
+    "total_combos": 71,
+    "total_ice_sliced": 60,
+    "total_bomb_explosions": 38,
+    "total_bombs_avoided": 186,
     "mode_switches": 0,
     "success_screen_visited": false,
     "first_launch": false
@@ -54,9 +54,9 @@
     "massilia": {
       "pseudo": "massilia",
       "high_scores": {
-        "classic_easy": 0,
+        "classic_easy": 84,
         "classic_normal": 28,
-        "classic_hard": 3,
+        "classic_hard": 21,
         "challenge": 188
       },
       "tutorial_seen": true,
@@ -101,7 +101,7 @@
         "classic_easy": 0,
         "classic_normal": 15,
         "classic_hard": 37,
-        "challenge": 0
+        "challenge": 27
       },
       "tutorial_seen": true,
       "total_games": 0
@@ -144,6 +144,28 @@
       "high_scores": {
         "classic_easy": 0,
         "classic_normal": 102,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "EZFEZ": {
+      "pseudo": "EZFEZ",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "REG": {
+      "pseudo": "REG",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 25,
         "classic_hard": 0,
         "challenge": 0
       },

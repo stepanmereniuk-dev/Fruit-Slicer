@@ -5,6 +5,10 @@ GameOverScene - Écran de fin de partie.
 - Explosion : bombe tranchée (mode classique)
 - K.O : 3 cœurs perdus (mode classique)
 - Temps écoulé : fin du timer (mode challenge)
+
+Assets bilingues :
+- Les backgrounds changent selon la langue (FR/EN)
+- Les boutons sont identiques, le texte est ajouté dynamiquement
 """
 
 import pygame
@@ -14,7 +18,7 @@ from typing import List, Optional
 from scenes.base_scene import BaseScene
 from config import (
     IMAGES_DIR, FONTS_DIR, WINDOW_WIDTH, WINDOW_HEIGHT,
-    Images, Layout, TextColors, FONT_FILE, FONT_SIZE
+    Images, Layout, TextColors, FONT_FILE
 )
 from core import lang_manager
 from ui.buttons import Button
@@ -23,9 +27,11 @@ from ui.buttons import Button
 class GameOverScene(BaseScene):
     """Scène de fin de partie."""
     
-    # Tailles de police
-    SCORE_FONT_SIZE = 30
-    RECORD_FONT_SIZE = 36
+    # Tailles de police selon le tableau de specs
+    SCORE_FONT_SIZE = 40       # Score final et meilleur score
+    RECORD_FONT_SIZE = 45      # Nouveau record
+    BUTTON_FONT_SIZE = 36      # Texte des boutons
+    SUCCES_FONT_SIZE = 24      # Texte succès débloqués
     
     def __init__(self, scene_manager):
         super().__init__(scene_manager)
@@ -35,6 +41,10 @@ class GameOverScene(BaseScene):
         self.font_score = None
         self.font_record = None
         self.font_button = None
+        self.font_succes = None
+        
+        # Image du bouton succès
+        self.btn_succes_img = None
         
         # Boutons
         self.btn_rejouer: Optional[Button] = None
@@ -45,6 +55,7 @@ class GameOverScene(BaseScene):
         self.final_score = 0
         self.best_score = 0
         self.is_new_record = False
+        self.achievements_unlocked = 0  # Nombre de succès débloqués pendant la partie
     
     def setup(self):
         """Initialise la scène selon le type de game over."""
@@ -65,6 +76,9 @@ class GameOverScene(BaseScene):
         # Récupérer le meilleur score
         self._load_best_score()
         
+        # Récupérer le nombre de succès débloqués
+        self._count_achievements_unlocked()
+        
         # Charger les ressources
         self._load_resources()
     
@@ -84,34 +98,55 @@ class GameOverScene(BaseScene):
                 player_manager.update_high_score(category, self.final_score)
                 self.best_score = self.final_score
     
+    def _count_achievements_unlocked(self):
+        """Compte les succès débloqués pendant cette partie."""
+        achievement_manager = self.scene_manager.achievement_manager
+        if achievement_manager:
+            # Les notifications en attente sont les succès débloqués pendant la partie
+            # Note: on les compte sans les vider pour permettre l'affichage ailleurs
+            self.achievements_unlocked = len(achievement_manager.pending_notifications)
+        else:
+            self.achievements_unlocked = 0
+    
+    def _get_background_path(self) -> str:
+        """Retourne le chemin du background selon le type et la langue."""
+        lang = lang_manager.get_instance().get_language()
+        is_french = (lang == 'fr')
+        
+        if self.game_over_type == 'explosion':
+            return Images.GAMEOVER_EXPLOSION_BG_FR if is_french else Images.GAMEOVER_EXPLOSION_BG_EN
+        elif self.game_over_type == 'elapsed_time':
+            return Images.GAMEOVER_TIME_BG_FR if is_french else Images.GAMEOVER_TIME_BG_EN
+        else:  # ko
+            return Images.GAMEOVER_KO_BG_FR if is_french else Images.GAMEOVER_KO_BG_EN
+    
+    def _get_button_paths(self) -> tuple:
+        """Retourne les chemins des boutons selon le type."""
+        if self.game_over_type == 'explosion':
+            return (Images.GAMEOVER_EXPLOSION_BTN_REJOUER, Images.GAMEOVER_EXPLOSION_BTN_MENU)
+        elif self.game_over_type == 'elapsed_time':
+            return (Images.GAMEOVER_TIME_BTN_REJOUER, Images.GAMEOVER_TIME_BTN_MENU)
+        else:  # ko
+            return (Images.GAMEOVER_KO_BTN_REJOUER, Images.GAMEOVER_KO_BTN_MENU)
+    
     def _load_resources(self):
         """Charge les images et polices selon le type de game over."""
         # Polices
         font_path = os.path.join(FONTS_DIR, FONT_FILE)
         self.font_score = pygame.font.Font(font_path, self.SCORE_FONT_SIZE)
         self.font_record = pygame.font.Font(font_path, self.RECORD_FONT_SIZE)
-        self.font_button = pygame.font.Font(font_path, FONT_SIZE)
+        self.font_button = pygame.font.Font(font_path, self.BUTTON_FONT_SIZE)
+        self.font_succes = pygame.font.Font(font_path, self.SUCCES_FONT_SIZE)
         
-        # Charger le background et les boutons selon le type
-        if self.game_over_type == 'explosion':
-            bg_path = Images.GAMEOVER_EXPLOSION_BG
-            btn_rejouer_path = Images.GAMEOVER_EXPLOSION_BTN_REJOUER
-            btn_menu_path = Images.GAMEOVER_EXPLOSION_BTN_MENU
-        elif self.game_over_type == 'elapsed_time':
-            bg_path = Images.GAMEOVER_TIME_BG
-            btn_rejouer_path = Images.GAMEOVER_TIME_BTN_REJOUER
-            btn_menu_path = Images.GAMEOVER_TIME_BTN_MENU
-        else:  # ko
-            bg_path = Images.GAMEOVER_KO_BG
-            btn_rejouer_path = Images.GAMEOVER_KO_BTN_REJOUER
-            btn_menu_path = Images.GAMEOVER_KO_BTN_MENU
-        
-        # Background
+        # Background selon la langue
+        bg_path = self._get_background_path()
         self.background = pygame.image.load(
             os.path.join(IMAGES_DIR, bg_path)
         ).convert()
         
         # Boutons
+        btn_rejouer_path, btn_menu_path = self._get_button_paths()
+        
         self.btn_rejouer = Button(
             image_path=btn_rejouer_path,
             center=Layout.GAMEOVER_BTN_REJOUER,
@@ -127,6 +162,11 @@ class GameOverScene(BaseScene):
             text_color=TextColors.GAMEOVER_BTN_MENU,
             on_click=self._on_menu
         )
+        
+        # Bouton succès (juste l'image, pas cliquable)
+        self.btn_succes_img = pygame.image.load(
+            os.path.join(IMAGES_DIR, Images.GAMEOVER_BTN_SUCCES)
+        ).convert_alpha()
     
     # Callbacks
     def _on_rejouer(self):
@@ -168,9 +208,11 @@ class GameOverScene(BaseScene):
         if self.is_new_record:
             self._render_new_record(screen)
         
-        # Boutons
-        self.btn_rejouer.render(screen, self.font_button)
-        self.btn_menu.render(screen, self.font_button)
+        # Boutons (avec texte dynamique)
+        self._render_buttons(screen)
+        
+        # Succès débloqués
+        self._render_achievements(screen)
     
     def _render_score(self, screen: pygame.Surface):
         """Affiche le score final."""
@@ -198,8 +240,71 @@ class GameOverScene(BaseScene):
         """Affiche le texte 'Nouveau record !'."""
         record_text = lang_manager.get("game_over.new_record")
         record_surface = self.font_record.render(record_text, True, TextColors.GAMEOVER_NEW_RECORD)
-        record_rect = record_surface.get_rect(center=Layout.GAMEOVER_NEW_RECORD)
+        record_rect = record_surface.get_rect(
+            left=Layout.GAMEOVER_NEW_RECORD[0],
+            centery=Layout.GAMEOVER_NEW_RECORD[1]
+        )
         screen.blit(record_surface, record_rect)
+    
+    def _render_buttons(self, screen: pygame.Surface):
+        """Affiche les boutons avec leur texte et effets hover/clic."""
+        # Bouton Rejouer - utiliser le rendu de Button pour les effets
+        self._render_button_with_effects(
+            screen, 
+            self.btn_rejouer, 
+            lang_manager.get("game_over.retry_button"),
+            TextColors.GAMEOVER_BTN_REJOUER,
+            Layout.GAMEOVER_TEXT_REJOUER
+        )
+        
+        # Bouton Menu
+        self._render_button_with_effects(
+            screen, 
+            self.btn_menu, 
+            lang_manager.get("game_over.menu_button"),
+            TextColors.GAMEOVER_BTN_MENU,
+            Layout.GAMEOVER_TEXT_MENU
+        )
+    
+    def _render_button_with_effects(self, screen: pygame.Surface, button: Button, 
+                                     text: str, text_color: tuple, text_center: tuple):
+        """Affiche un bouton avec effets hover/clic et texte à une position spécifique."""
+        # Sélectionner l'image selon l'état du bouton
+        if button.is_pressed:
+            image = button.image_click
+            # Ajuster la position du texte pour le scale du clic
+            text_pos = text_center
+        elif button.is_hovered:
+            image = button.image_hover
+            text_pos = text_center
+        else:
+            image = button.image_original
+            text_pos = text_center
+        
+        # Afficher l'image du bouton
+        image_rect = image.get_rect(center=button.center)
+        screen.blit(image, image_rect)
+        
+        # Afficher le texte
+        text_surface = self.font_button.render(text, True, text_color)
+        text_rect = text_surface.get_rect(center=text_pos)
+        screen.blit(text_surface, text_rect)
+    
+    def _render_achievements(self, screen: pygame.Surface):
+        """Affiche le nombre de succès débloqués pendant la partie."""
+        # Image du bouton succès (fond)
+        btn_rect = self.btn_succes_img.get_rect(center=Layout.GAMEOVER_BTN_SUCCES)
+        screen.blit(self.btn_succes_img, btn_rect)
+        
+        # Texte du nombre de succès débloqués
+        succes_label = lang_manager.get("game_over.achievements_unlocked")
+        succes_text = f"{succes_label} : {self.achievements_unlocked}"
+        succes_surface = self.font_succes.render(succes_text, True, TextColors.GAMEOVER_SUCCES)
+        succes_rect = succes_surface.get_rect(
+            left=Layout.GAMEOVER_SUCCES_TEXT[0],
+            centery=Layout.GAMEOVER_SUCCES_TEXT[1]
+        )
+        screen.blit(succes_surface, succes_rect)
     
     def cleanup(self):
         """Nettoyage à la sortie de la scène."""
