@@ -10,7 +10,7 @@ Fonctionnalités :
 
 import pygame
 import os
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from scenes.base_scene import BaseScene
 from config import (
@@ -19,6 +19,7 @@ from config import (
 )
 from core import lang_manager
 from core.player_manager import PlayerManager
+from ui.buttons import Button, ImageButton
 
 
 class PlayerSelectScene(BaseScene):
@@ -35,24 +36,16 @@ class PlayerSelectScene(BaseScene):
         self.font = None
         self.font_large = None
         
-        # Images
+        # Images spécifiques (pas des boutons)
         self.pseudo_field_img = None
-        self.difficulty_label_img = None
-        self.btn_easy_img = None
-        self.btn_normal_img = None
-        self.btn_hard_img = None
-        self.btn_start_img = None
-        self.gear_img = None
-        self.cross_img = None
-        
-        # Rectangles pour les clics
         self.pseudo_field_rect = None
-        self.btn_easy_rect = None
-        self.btn_normal_rect = None
-        self.btn_hard_rect = None
-        self.btn_start_rect = None
-        self.gear_rect = None
-        self.cross_rect = None
+        self.difficulty_label_img = None
+        
+        # Boutons avec effets
+        self.btn_gear: Optional[ImageButton] = None
+        self.btn_cross: Optional[ImageButton] = None
+        self.btn_start: Optional[Button] = None
+        self.difficulty_buttons: Dict[str, Button] = {}
         
         # État
         self.pseudo = ""
@@ -95,97 +88,111 @@ class PlayerSelectScene(BaseScene):
         self.font = pygame.font.Font(font_path, FONT_SIZE)
         self.font_large = pygame.font.Font(font_path, 42)
         
-        # Images et rectangles
+        # Champ pseudo (pas un bouton, juste une image)
         self.pseudo_field_img = pygame.image.load(
             os.path.join(IMAGES_DIR, Images.PSS_PSEUDO_FIELD)
         ).convert_alpha()
         self.pseudo_field_rect = self.pseudo_field_img.get_rect(center=Layout.PSS_PSEUDO_FIELD)
         
+        # Label difficulté
         self.difficulty_label_img = pygame.image.load(
             os.path.join(IMAGES_DIR, Images.PSS_DIFFICULTY_LABEL)
         ).convert_alpha()
         
-        self.btn_easy_img = pygame.image.load(
-            os.path.join(IMAGES_DIR, Images.PSS_BTN_EASY)
-        ).convert_alpha()
-        self.btn_easy_rect = self.btn_easy_img.get_rect(center=Layout.PSS_BTN_EASY)
+        # Boutons icônes (engrenage, croix)
+        self.btn_gear = ImageButton(
+            image_path=Images.PSS_GEAR,
+            center=Layout.PSS_GEAR,
+            on_click=self._on_settings
+        )
         
-        self.btn_normal_img = pygame.image.load(
-            os.path.join(IMAGES_DIR, Images.PSS_BTN_NORMAL)
-        ).convert_alpha()
-        self.btn_normal_rect = self.btn_normal_img.get_rect(center=Layout.PSS_BTN_NORMAL)
+        self.btn_cross = ImageButton(
+            image_path=Images.PSS_CROSS,
+            center=Layout.PSS_CROSS,
+            on_click=self._on_back
+        )
         
-        self.btn_hard_img = pygame.image.load(
-            os.path.join(IMAGES_DIR, Images.PSS_BTN_HARD)
-        ).convert_alpha()
-        self.btn_hard_rect = self.btn_hard_img.get_rect(center=Layout.PSS_BTN_HARD)
+        # Bouton Start
+        self.btn_start = Button(
+            image_path=Images.PSS_BTN_START,
+            center=Layout.PSS_BTN_START,
+            text=lang_manager.get("player_select.start_button"),
+            text_color=TextColors.PSS_START,
+            on_click=self._on_start,
+            enabled=False  # Désactivé par défaut (pseudo vide)
+        )
         
-        self.btn_start_img = pygame.image.load(
-            os.path.join(IMAGES_DIR, Images.PSS_BTN_START)
-        ).convert_alpha()
-        self.btn_start_rect = self.btn_start_img.get_rect(center=Layout.PSS_BTN_START)
-        
-        self.gear_img = pygame.image.load(
-            os.path.join(IMAGES_DIR, Images.PSS_GEAR)
-        ).convert_alpha()
-        self.gear_rect = self.gear_img.get_rect(center=Layout.PSS_GEAR)
-        
-        self.cross_img = pygame.image.load(
-            os.path.join(IMAGES_DIR, Images.PSS_CROSS)
-        ).convert_alpha()
-        self.cross_rect = self.cross_img.get_rect(center=Layout.PSS_CROSS)
+        # Boutons de difficulté
+        self.difficulty_buttons = {
+            'easy': Button(
+                image_path=Images.PSS_BTN_EASY,
+                center=Layout.PSS_BTN_EASY,
+                text=lang_manager.get("player_select.difficulty_easy"),
+                text_color=TextColors.PSS_EASY,
+                on_click=lambda: self._select_difficulty('easy')
+            ),
+            'normal': Button(
+                image_path=Images.PSS_BTN_NORMAL,
+                center=Layout.PSS_BTN_NORMAL,
+                text=lang_manager.get("player_select.difficulty_normal"),
+                text_color=TextColors.PSS_NORMAL,
+                on_click=lambda: self._select_difficulty('normal')
+            ),
+            'hard': Button(
+                image_path=Images.PSS_BTN_HARD,
+                center=Layout.PSS_BTN_HARD,
+                text=lang_manager.get("player_select.difficulty_hard"),
+                text_color=TextColors.PSS_HARD,
+                on_click=lambda: self._select_difficulty('hard')
+            ),
+        }
     
     def set_player_manager(self, manager: PlayerManager):
         """Définit le gestionnaire de joueurs."""
         self.player_manager = manager
     
+    # Callbacks
+    def _on_settings(self):
+        self.scene_manager.change_scene('settings')
+    
+    def _on_back(self):
+        self.scene_manager.change_scene('menu')
+    
+    def _on_start(self):
+        if self.pseudo:
+            self._start_game()
+    
+    def _select_difficulty(self, difficulty: str):
+        self.selected_difficulty = difficulty
+    
     def handle_events(self, events: List[pygame.event.Event]):
         for event in events:
+            # Boutons icônes
+            self.btn_gear.handle_event(event)
+            self.btn_cross.handle_event(event)
+            
+            # Bouton start
+            self.btn_start.handle_event(event)
+            
+            # Boutons difficulté : pas d'effets hover/clic, juste détection du clic
+            if not self.is_challenge_mode:
+                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                    for diff_key, btn in self.difficulty_buttons.items():
+                        if btn.rect.collidepoint(event.pos):
+                            self._select_difficulty(diff_key)
+            
+            # Gestion du champ pseudo
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                self._handle_click(event.pos)
+                # Clic sur le champ pseudo ?
+                if self.pseudo_field_rect.collidepoint(event.pos):
+                    self.pseudo_field_focused = True
+                    self.cursor_visible = True
+                    self.cursor_timer = 0.0
+                else:
+                    self.pseudo_field_focused = False
             
             elif event.type == pygame.KEYDOWN:
                 self._handle_key(event)
-    
-    def _handle_click(self, pos: tuple):
-        """Gère les clics souris."""
-        # Croix = retour menu
-        if self.cross_rect.collidepoint(pos):
-            self.scene_manager.change_scene('menu')
-            return
-        
-        # Engrenage = paramètres
-        if self.gear_rect.collidepoint(pos):
-            self.scene_manager.change_scene('settings')
-            return
-        
-        # Champ pseudo = activer le focus
-        if self.pseudo_field_rect.collidepoint(pos):
-            self.pseudo_field_focused = True
-            self.cursor_visible = True
-            self.cursor_timer = 0.0
-            return
-        else:
-            # Clic ailleurs = désactiver le focus
-            self.pseudo_field_focused = False
-        
-        # Boutons de difficulté (seulement en mode classique)
-        if not self.is_challenge_mode:
-            if self.btn_easy_rect.collidepoint(pos):
-                self.selected_difficulty = "easy"
-                return
-            
-            if self.btn_normal_rect.collidepoint(pos):
-                self.selected_difficulty = "normal"
-                return
-            
-            if self.btn_hard_rect.collidepoint(pos):
-                self.selected_difficulty = "hard"
-                return
-        
-        # Bouton "C'est parti !" (seulement si pseudo non vide)
-        if self.btn_start_rect.collidepoint(pos) and self.pseudo:
-            self._start_game()
     
     def _handle_key(self, event: pygame.event.Event):
         """Gère la saisie clavier pour le pseudo."""
@@ -208,6 +215,9 @@ class PlayerSelectScene(BaseScene):
                 char = event.unicode
                 if char.isalpha():
                     self.pseudo += char
+        
+        # Mettre à jour l'état du bouton start
+        self.btn_start.set_enabled(bool(self.pseudo))
     
     def _start_game(self):
         """Lance la partie."""
@@ -233,15 +243,18 @@ class PlayerSelectScene(BaseScene):
             if self.cursor_timer >= self.CURSOR_BLINK_RATE:
                 self.cursor_timer = 0.0
                 self.cursor_visible = not self.cursor_visible
+        
+        # Mettre à jour l'état du bouton start selon le pseudo
+        self.btn_start.set_enabled(bool(self.pseudo))
     
     def render(self, screen: pygame.Surface):
         """Affiche la scène."""
         # Fond
         screen.blit(self.background, (0, 0))
         
-        # Engrenage et croix (haut droite)
-        screen.blit(self.gear_img, self.gear_rect)
-        screen.blit(self.cross_img, self.cross_rect)
+        # Boutons icônes (engrenage et croix)
+        self.btn_gear.render(screen)
+        self.btn_cross.render(screen)
         
         # Champ pseudo
         self._render_pseudo_field(screen)
@@ -251,7 +264,7 @@ class PlayerSelectScene(BaseScene):
             self._render_difficulty_section(screen)
         
         # Bouton "C'est parti !"
-        self._render_start_button(screen)
+        self.btn_start.render(screen, self.font)
     
     def _render_pseudo_field(self, screen: pygame.Surface):
         """Affiche le champ de saisie du pseudo."""
@@ -289,46 +302,21 @@ class PlayerSelectScene(BaseScene):
         text_rect = text_surface.get_rect(center=label_rect.center)
         screen.blit(text_surface, text_rect)
         
-        # Boutons de difficulté
-        difficulties = [
-            ("easy", self.btn_easy_img, self.btn_easy_rect, TextColors.PSS_EASY, "player_select.difficulty_easy"),
-            ("normal", self.btn_normal_img, self.btn_normal_rect, TextColors.PSS_NORMAL, "player_select.difficulty_normal"),
-            ("hard", self.btn_hard_img, self.btn_hard_rect, TextColors.PSS_HARD, "player_select.difficulty_hard"),
-        ]
-        
-        for diff_key, img, rect, color, text_key in difficulties:
-            # Assombrir si non sélectionné
+        # Boutons de difficulté (sans effets hover/clic, juste sélection)
+        for diff_key, btn in self.difficulty_buttons.items():
             if diff_key == self.selected_difficulty:
-                screen.blit(img, rect)
+                # Bouton sélectionné : rendu normal
+                screen.blit(btn.image_original, btn.rect)
             else:
-                # Créer une copie assombrie qui respecte l'alpha original
-                darkened_img = img.copy()
-                # Multiplier les couleurs par un facteur sombre (garder l'alpha)
+                # Bouton non sélectionné : assombri
+                darkened_img = btn.image_original.copy()
                 darkened_img.fill((80, 80, 80), special_flags=pygame.BLEND_RGB_MULT)
-                screen.blit(darkened_img, rect)
+                screen.blit(darkened_img, btn.rect)
             
             # Texte
-            text = lang_manager.get(text_key)
-            text_surface = self.font.render(text, True, color)
-            text_rect = text_surface.get_rect(center=rect.center)
+            text_surface = self.font.render(btn.text, True, btn.text_color)
+            text_rect = text_surface.get_rect(center=btn.rect.center)
             screen.blit(text_surface, text_rect)
-    
-    def _render_start_button(self, screen: pygame.Surface):
-        """Affiche le bouton C'est parti."""
-        # Assombrir si pseudo vide
-        if self.pseudo:
-            screen.blit(self.btn_start_img, self.btn_start_rect)
-        else:
-            # Créer une copie assombrie qui respecte l'alpha original
-            darkened_img = self.btn_start_img.copy()
-            darkened_img.fill((80, 80, 80), special_flags=pygame.BLEND_RGB_MULT)
-            screen.blit(darkened_img, self.btn_start_rect)
-        
-        # Texte
-        text = lang_manager.get("player_select.start_button")
-        text_surface = self.font.render(text, True, TextColors.PSS_START)
-        text_rect = text_surface.get_rect(center=self.btn_start_rect.center)
-        screen.blit(text_surface, text_rect)
     
     def cleanup(self):
         """Nettoyage à la sortie de la scène."""
