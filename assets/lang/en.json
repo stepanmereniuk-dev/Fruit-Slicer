@@ -104,8 +104,6 @@
   },
 
   "game_over": {
-    "title_classic": "Defeat",
-    "title_challenge": "Time's up!",
     "score_label": "Final score",
     "best_score_label": "Best score",
     "new_record": "New record!",

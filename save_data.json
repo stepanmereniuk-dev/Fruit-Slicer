@@ -16,7 +16,7 @@
     "langue_eclair": true,
     "langue_divine": false,
     "combo_addict": true,
-    "combo_master": false,
+    "combo_master": true,
     "fraicheur_bienvenue": true,
     "maitre_givre": true,
     "roi_glace": true,
@@ -40,12 +40,12 @@
     "ninja_souris": true
   },
   "global_stats": {
-    "total_fruits_sliced": 1117,
-    "total_games_played": 35,
-    "total_combos": 39,
-    "total_ice_sliced": 41,
-    "total_bomb_explosions": 13,
-    "total_bombs_avoided": 148,
+    "total_fruits_sliced": 1275,
+    "total_games_played": 42,
+    "total_combos": 53,
+    "total_ice_sliced": 44,
+    "total_bomb_explosions": 17,
+    "total_bombs_avoided": 161,
     "mode_switches": 0,
     "success_screen_visited": false,
     "first_launch": false
@@ -55,9 +55,9 @@
       "pseudo": "massilia",
       "high_scores": {
         "classic_easy": 0,
-        "classic_normal": 0,
+        "classic_normal": 28,
         "classic_hard": 0,
-        "challenge": 0
+        "challenge": 188
       },
       "tutorial_seen": true,
       "total_games": 0
@@ -67,6 +67,17 @@
       "high_scores": {
         "classic_easy": 0,
         "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "gcut": {
+      "pseudo": "gcut",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 20,
         "classic_hard": 0,
         "challenge": 0
       },

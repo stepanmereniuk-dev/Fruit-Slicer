@@ -62,6 +62,12 @@ class TextColors:
     # Game Scene
     GAME_SCORE = (254, 237, 142)     # #feed8e
 
+    # Game Over Scene
+    GAMEOVER_SCORE = (254, 237, 142)       # #feed8e
+    GAMEOVER_NEW_RECORD = (255, 176, 110)  # #ffb06e
+    GAMEOVER_BTN_REJOUER = (254, 237, 142) # #feed8e
+    GAMEOVER_BTN_MENU = (239, 183, 255)    # #efb7ff
+
 
 # ==================== IMAGES ====================
 
@@ -198,6 +204,22 @@ class Images:
     ]
     TUTO_CHALLENGE_BTN_PLAY = "scenes/tutorial_scene/challenge/Bouton jouer tuto 4 challenge 285x73.png"
 
+    # Game Over Scene
+    # Explosion (bombe tranchée)
+    GAMEOVER_EXPLOSION_BG = "scenes/game_over_scene/explosion/Background game over explosion1920x1080.png"
+    GAMEOVER_EXPLOSION_BTN_REJOUER = "scenes/game_over_scene/explosion/Bouton rejouer game over explosion 458x89.png"
+    GAMEOVER_EXPLOSION_BTN_MENU = "scenes/game_over_scene/explosion/Bouton menu game over explosion 458x89.png"
+    
+    # K.O (3 cœurs perdus)
+    GAMEOVER_KO_BG = "scenes/game_over_scene/K.O/Background game over ko1920x1080.png"
+    GAMEOVER_KO_BTN_REJOUER = "scenes/game_over_scene/K.O/Bouton rejouer game over ko 458x89.png"
+    GAMEOVER_KO_BTN_MENU = "scenes/game_over_scene/K.O/Bouton menu game over ko 458x89.png"
+    
+    # Temps écoulé (challenge)
+    GAMEOVER_TIME_BG = "scenes/game_over_scene/elapsed_time/Background temps écoulé challenge1920x1080.png"
+    GAMEOVER_TIME_BTN_REJOUER = "scenes/game_over_scene/elapsed_time/Bouton temps écoulé challenge 458x89.png"
+    GAMEOVER_TIME_BTN_MENU = "scenes/game_over_scene/elapsed_time/Bouton menu temps écoulé challenge 458x89.png"
+
 
 # ==================== POSITIONS (centre des éléments) ====================
 
@@ -248,6 +270,12 @@ class Layout:
         (1157, 1016),  # Bleu
     ]
 
+    # Game Over Scene
+    GAMEOVER_SCORE_FINAL = (394, 395)      # Point de justification gauche
+    GAMEOVER_BEST_SCORE = (394, 478)       # Point de justification gauche
+    GAMEOVER_NEW_RECORD = (960, 395)       # Centre
+    GAMEOVER_BTN_REJOUER = (597, 632)      # Centre
+    GAMEOVER_BTN_MENU = (597, 767)         # Centre
 
 # ==================== GAMEPLAY ====================
 
@@ -327,7 +355,7 @@ DIFFICULTY = {
 class ControlMode:
     KEYBOARD = "keyboard"
     MOUSE = "mouse"
-    DEFAULT = KEYBOARD
+    DEFAULT = MOUSE
 
 KEYBOARD_LETTERS = ['A', 'Z', 'E', 'R', 'T', 'Q', 'S', 'D', 'F', 'G', 'W', 'X', 'C', 'V']
 

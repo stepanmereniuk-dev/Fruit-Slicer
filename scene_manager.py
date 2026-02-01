@@ -49,12 +49,14 @@ class SceneManager:
         from scenes.game_scene import GameScene
         from scenes.player_select_scene import PlayerSelectScene
         from scenes.tutorial_scene import TutorialScene
+        from scenes.game_over_scene import GameOverScene
         
         self.scenes = {
             'menu': MenuScene(self),
             'game': GameScene(self),
             'player_select': PlayerSelectScene(self),
             'tutorial': TutorialScene(self),
+            'game_over': GameOverScene(self),
             # TODO: Ajouter les autres scènes quand elles seront prêtes
             # 'game_over': GameOverScene(self),
             # 'settings': SettingsScene(self),

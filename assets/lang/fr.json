@@ -106,8 +106,6 @@
   },
 
   "game_over": {
-    "title_classic": "Game Over",
-    "title_challenge": "Temps écoulé !",
     "score_label": "Score final",
     "best_score_label": "Meilleur score",
     "new_record": "Nouveau record !",
