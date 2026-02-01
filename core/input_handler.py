@@ -7,7 +7,7 @@ les événements en actions : "trancher ces entités".
 """
 
 import pygame
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Set
 from collections import deque
 
 from entities import Fruit, Bomb, Ice
@@ -34,6 +34,12 @@ class InputHandler:
         self.mouse_trail: deque = deque(maxlen=self.TRAIL_LENGTH)
         self.last_mouse_pos: Tuple[int, int] = (0, 0)
         
+        # Entités déjà tranchées dans ce tracé (pour éviter les doublons)
+        self._sliced_this_stroke: Set[int] = set()
+        
+        # Accumulation des fruits tranchés dans le tracé actuel
+        self._pending_sliced: List[Entity] = []
+        
         # Mode clavier
         self.pressed_keys: set = set()
     
@@ -47,6 +53,8 @@ class InputHandler:
         self.mouse_down = False
         self.mouse_trail.clear()
         self.pressed_keys.clear()
+        self._sliced_this_stroke.clear()
+        self._pending_sliced.clear()
     
     def handle_event(self, event: pygame.event.Event):
         """Traite un événement pygame."""
@@ -62,10 +70,12 @@ class InputHandler:
             self.mouse_trail.clear()
             self.mouse_trail.append(event.pos)
             self.last_mouse_pos = event.pos
+            self._sliced_this_stroke.clear()
         
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.mouse_down = False
             self.mouse_trail.clear()
+            self._sliced_this_stroke.clear()
         
         elif event.type == pygame.MOUSEMOTION and self.mouse_down:
             self.mouse_trail.append(event.pos)
@@ -111,8 +121,15 @@ class InputHandler:
         for entity in entities:
             if entity.sliced:
                 continue
+            
+            # Éviter de retrancher la même entité dans ce tracé
+            entity_id = id(entity)
+            if entity_id in self._sliced_this_stroke:
+                continue
+            
             if entity.collides_with_line(p1, p2):
                 sliced.append(entity)
+                self._sliced_this_stroke.add(entity_id)
         
         return sliced
     

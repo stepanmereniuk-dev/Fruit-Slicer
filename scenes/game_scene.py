@@ -68,6 +68,10 @@ class GameScene(BaseScene):
         self.game_over = False
         self.exploded = False  # Game over par bombe
         
+        # Accumulation des fruits tranchés pendant un tracé souris
+        self._stroke_sliced_fruits: List[Fruit] = []
+        self._was_slicing = False
+        
         # Mode de jeu
         self.mode = 'classic'  # 'classic' ou 'challenge'
         self.difficulty = 'normal'
@@ -103,6 +107,8 @@ class GameScene(BaseScene):
         self.freeze_timer = 0.0
         self.game_over = False
         self.exploded = False
+        self._stroke_sliced_fruits.clear()
+        self._was_slicing = False
         
         # Démarrer le tracking des succès
         if self.achievement_manager:
@@ -236,6 +242,13 @@ class GameScene(BaseScene):
         if sliced:
             self._process_sliced(sliced)
         
+        # Vérifier fin de tracé souris pour calculer le score du combo
+        is_slicing = self.input_handler.is_slicing()
+        if self._was_slicing and not is_slicing:
+            # Fin du tracé : calculer le score de tous les fruits accumulés
+            self._finalize_stroke()
+        self._was_slicing = is_slicing
+        
         # Vérifier si le freeze doit se terminer (plus de fruits gelés)
         self._check_freeze_end()
         
@@ -249,6 +262,32 @@ class GameScene(BaseScene):
         # Mise à jour du temps pour les succès
         if self.achievement_manager:
             self.achievement_manager.on_time_update(self.game_time)
+    
+    def _finalize_stroke(self):
+        """Finalise un tracé souris : calcule le score et les bonus."""
+        if not self._stroke_sliced_fruits:
+            return
+        
+        fruits = self._stroke_sliced_fruits
+        count = len(fruits)
+        
+        # Calculer les points (combo si plusieurs fruits)
+        points = self.scoring.add_sliced_fruits(count)
+        
+        # Vérifier paires identiques pour la jauge bonus
+        fruit_types = [f.fruit_type for f in fruits]
+        for fruit_type in set(fruit_types):
+            if fruit_types.count(fruit_type) >= 2:
+                if self.bonus_gauge.add_cran():
+                    self._activate_multiplier()
+        
+        # Succès
+        if self.achievement_manager:
+            self.achievement_manager.on_fruit_sliced(count)
+            self.achievement_manager.on_score_update(self.scoring.score)
+        
+        # Reset pour le prochain tracé
+        self._stroke_sliced_fruits.clear()
     
     def _process_sliced(self, sliced: List[Entity]):
         """Traite les entités tranchées."""
@@ -282,27 +321,32 @@ class GameScene(BaseScene):
             self._on_fruits_sliced(fruits_sliced)
     
     def _on_fruits_sliced(self, fruits: List[Fruit]):
-        """Appelé quand des fruits sont tranchés."""
-        count = len(fruits)
-        points = self.scoring.add_sliced_fruits(count)
-        
-        # Créer les éclaboussures
+        """Appelé quand des fruits sont tranchés (accumule pour le tracé)."""
+        # Créer les éclaboussures immédiatement
         for fruit in fruits:
             cx, cy = fruit.center
             splash = Splash(fruit.fruit_type, cx, cy)
             self.splashes.append(splash)
         
-        # Vérifier paires identiques pour la jauge bonus
-        fruit_types = [f.fruit_type for f in fruits]
-        for fruit_type in set(fruit_types):
-            if fruit_types.count(fruit_type) >= 2:
-                if self.bonus_gauge.add_cran():
-                    self._activate_multiplier()
-        
-        # Succès
-        if self.achievement_manager:
-            self.achievement_manager.on_fruit_sliced(count)
-            self.achievement_manager.on_score_update(self.scoring.score)
+        # Mode souris : accumuler pour le combo de fin de tracé
+        if self.input_handler.mode == "mouse":
+            self._stroke_sliced_fruits.extend(fruits)
+        else:
+            # Mode clavier : traiter immédiatement (une touche = un groupe)
+            count = len(fruits)
+            self.scoring.add_sliced_fruits(count)
+            
+            # Vérifier paires identiques pour la jauge bonus
+            fruit_types = [f.fruit_type for f in fruits]
+            for fruit_type in set(fruit_types):
+                if fruit_types.count(fruit_type) >= 2:
+                    if self.bonus_gauge.add_cran():
+                        self._activate_multiplier()
+            
+            # Succès
+            if self.achievement_manager:
+                self.achievement_manager.on_fruit_sliced(count)
+                self.achievement_manager.on_score_update(self.scoring.score)
     
     def _on_bomb_sliced(self):
         """Appelé quand une bombe est tranchée."""
