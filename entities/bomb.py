@@ -95,6 +95,8 @@ class Bomb:
         screen.blit(self.sprite, (self.x, self.y))
         
         if self.letter and font and not self.sliced:
-            letter_surface = font.render(self.letter, True, (255, 255, 255))
-            letter_rect = letter_surface.get_rect(center=self.center)
+            # Couleur jaune comme le score, position au-dessus du fruit
+            letter_surface = font.render(self.letter, True, (254, 237, 142))
+            cx, cy = self.center
+            letter_rect = letter_surface.get_rect(centerx=cx, bottom=cy - 100)
             screen.blit(letter_surface, letter_rect)

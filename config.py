@@ -327,7 +327,7 @@ DIFFICULTY = {
 class ControlMode:
     KEYBOARD = "keyboard"
     MOUSE = "mouse"
-    DEFAULT = MOUSE
+    DEFAULT = KEYBOARD
 
 KEYBOARD_LETTERS = ['A', 'Z', 'E', 'R', 'T', 'Q', 'S', 'D', 'F', 'G', 'W', 'X', 'C', 'V']
 

@@ -40,12 +40,12 @@
     "ninja_souris": true
   },
   "global_stats": {
-    "total_fruits_sliced": 1080,
-    "total_games_played": 29,
+    "total_fruits_sliced": 1117,
+    "total_games_played": 35,
     "total_combos": 39,
     "total_ice_sliced": 41,
-    "total_bomb_explosions": 12,
-    "total_bombs_avoided": 142,
+    "total_bomb_explosions": 13,
+    "total_bombs_avoided": 148,
     "mode_switches": 0,
     "success_screen_visited": false,
     "first_launch": false
@@ -53,6 +53,17 @@
   "players": {
     "massilia": {
       "pseudo": "massilia",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "d": {
+      "pseudo": "d",
       "high_scores": {
         "classic_easy": 0,
         "classic_normal": 0,

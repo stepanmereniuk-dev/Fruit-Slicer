@@ -149,10 +149,11 @@ class Fruit:
         """Affiche le fruit."""
         screen.blit(self.current_sprite, (self.x, self.y))
         
-        # Affiche la lettre en mode clavier
         if self.letter and font and not self.sliced:
-            letter_surface = font.render(self.letter, True, (255, 255, 255))
-            letter_rect = letter_surface.get_rect(center=self.center)
+            # Couleur jaune comme le score, position au-dessus du fruit
+            letter_surface = font.render(self.letter, True, (254, 237, 142))
+            cx, cy = self.center
+            letter_rect = letter_surface.get_rect(centerx=cx, bottom=cy - 100)
             screen.blit(letter_surface, letter_rect)
     
     def render_splash(self, screen: pygame.Surface):
