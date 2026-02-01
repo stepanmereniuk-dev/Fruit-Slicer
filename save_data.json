@@ -1,12 +1,12 @@
 {
   "achievements": {
-    "premier_repas": false,
+    "premier_repas": true,
     "appetit_croissant": false,
     "glouton_vert": false,
     "estomac_sans_fond": false,
     "legende_ile": false,
     "maitre_gourmet": false,
-    "bebe_yoshi": false,
+    "bebe_yoshi": true,
     "yoshi_junior": false,
     "yoshi_confirme": false,
     "super_yoshi": false,
@@ -26,7 +26,7 @@
     "survivant": false,
     "perseverant": false,
     "increvable": false,
-    "oups": false,
+    "oups": true,
     "demineur_amateur": false,
     "expert_explosifs": false,
     "accident_travail": false,
@@ -40,71 +40,14 @@
     "ninja_souris": false
   },
   "global_stats": {
-    "total_fruits_sliced": 3,
-    "total_games_played": 1,
+    "total_fruits_sliced": 16,
+    "total_games_played": 2,
     "total_combos": 0,
     "total_ice_sliced": 0,
-    "total_bomb_explosions": 0,
+    "total_bomb_explosions": 1,
     "total_bombs_avoided": 0,
     "mode_switches": 0,
     "success_screen_visited": false,
     "first_launch": false
-  },
-  "players": {
-    "mass": {
-      "pseudo": "mass",
-      "high_scores": {
-        "classic_easy": 0,
-        "classic_normal": 0,
-        "classic_hard": 0,
-        "challenge": 0
-      },
-      "tutorial_seen": true,
-      "total_games": 0
-    },
-    "mas": {
-      "pseudo": "mas",
-      "high_scores": {
-        "classic_easy": 0,
-        "classic_normal": 0,
-        "classic_hard": 0,
-        "challenge": 0
-      },
-      "tutorial_seen": true,
-      "total_games": 0
-    },
-    "ali": {
-      "pseudo": "ali",
-      "high_scores": {
-        "classic_easy": 0,
-        "classic_normal": 0,
-        "classic_hard": 0,
-        "challenge": 0
-      },
-      "tutorial_seen": true,
-      "total_games": 0
-    },
-    "ok": {
-      "pseudo": "ok",
-      "high_scores": {
-        "classic_easy": 0,
-        "classic_normal": 0,
-        "classic_hard": 0,
-        "challenge": 0
-      },
-      "tutorial_seen": true,
-      "total_games": 0
-    },
-    "af": {
-      "pseudo": "af",
-      "high_scores": {
-        "classic_easy": 0,
-        "classic_normal": 0,
-        "classic_hard": 0,
-        "challenge": 0
-      },
-      "tutorial_seen": true,
-      "total_games": 0
-    }
   }
 }

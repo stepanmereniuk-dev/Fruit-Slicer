@@ -81,9 +81,10 @@ class Fruit:
     
     def update(self, dt: float):
         """Met à jour la position selon la physique."""
-        if self.frozen or self.sliced:
+        if self.frozen:
             return
         
+        # Les fruits tranchés continuent de tomber (pour sortir de l'écran)
         # Mise à jour vitesse (gravité)
         self.velocity_y += self.gravity * dt
         

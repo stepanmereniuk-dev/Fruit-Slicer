@@ -22,6 +22,7 @@ class Ice:
         
         # États
         self.sliced = False
+        self.missed = False
         self.frozen = False  # Ironique mais cohérent avec les autres entités
         
         # Lettre pour mode clavier
@@ -53,9 +54,10 @@ class Ice:
         return pygame.Rect(self.x, self.y, GameConfig.FRUIT_SIZE, GameConfig.FRUIT_SIZE)
     
     def update(self, dt: float):
-        if self.frozen or self.sliced:
+        if self.frozen:
             return
         
+        # Continue de tomber même si tranchée
         self.velocity_y += self.gravity * dt
         self.x += self.velocity_x * dt
         self.y += self.velocity_y * dt
