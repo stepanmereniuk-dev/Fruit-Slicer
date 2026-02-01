@@ -25,9 +25,12 @@ class SceneManager:
         self.current_scene_name: str = ""
         
         # Gestionnaires partagés
-        self.achievement_manager = AchievementManager()
         self.player_manager = PlayerManager()
+        self.achievement_manager = AchievementManager()
         self.settings_manager = SettingsManager()
+        
+        # Connecter AchievementManager au PlayerManager
+        self.achievement_manager.set_player_manager(self.player_manager)
         
         # Données partagées entre scènes
         self.shared_data = {
@@ -58,7 +61,6 @@ class SceneManager:
             'tutorial': TutorialScene(self),
             'game_over': GameOverScene(self),
             # TODO: Ajouter les autres scènes quand elles seront prêtes
-            # 'game_over': GameOverScene(self),
             # 'settings': SettingsScene(self),
             # 'ranking': RankingScene(self),
             # 'success': SuccessScene(self),
@@ -70,6 +72,15 @@ class SceneManager:
         # Passer le gestionnaire de joueurs aux scènes qui en ont besoin
         self.scenes['player_select'].set_player_manager(self.player_manager)
         self.scenes['tutorial'].set_player_manager(self.player_manager)
+    
+    def on_player_selected(self, pseudo: str):
+        """
+        Appelé quand un joueur est sélectionné.
+        Synchronise l'AchievementManager avec le nouveau joueur.
+        """
+        # Le PlayerManager a déjà set le current_player
+        # On synchronise les succès
+        self.achievement_manager.sync_with_player()
     
     def change_scene(self, scene_name: str):
         """

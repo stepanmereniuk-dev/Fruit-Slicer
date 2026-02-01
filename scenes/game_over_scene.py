@@ -28,8 +28,8 @@ class GameOverScene(BaseScene):
     """Scène de fin de partie."""
     
     # Tailles de police selon le tableau de specs
-    SCORE_FONT_SIZE = 40       # Score final et meilleur score
-    RECORD_FONT_SIZE = 45      # Nouveau record
+    SCORE_FONT_SIZE = 30       # Score final et meilleur score
+    RECORD_FONT_SIZE = 36      # Nouveau record
     BUTTON_FONT_SIZE = 36      # Texte des boutons
     SUCCES_FONT_SIZE = 24      # Texte succès débloqués
     
@@ -102,9 +102,8 @@ class GameOverScene(BaseScene):
         """Compte les succès débloqués pendant cette partie."""
         achievement_manager = self.scene_manager.achievement_manager
         if achievement_manager:
-            # Les notifications en attente sont les succès débloqués pendant la partie
-            # Note: on les compte sans les vider pour permettre l'affichage ailleurs
-            self.achievements_unlocked = len(achievement_manager.pending_notifications)
+            # Utiliser get_pending_count pour ne pas vider la liste
+            self.achievements_unlocked = achievement_manager.get_pending_count()
         else:
             self.achievements_unlocked = 0
     

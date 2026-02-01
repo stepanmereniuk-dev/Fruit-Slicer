@@ -225,10 +225,14 @@ class PlayerSelectScene(BaseScene):
         self.scene_manager.shared_data['pseudo'] = self.pseudo
         self.scene_manager.shared_data['difficulty'] = self.selected_difficulty
         
-        # Vérifier si c'est un nouveau joueur (pour le tutoriel)
+        # Définir le joueur courant dans PlayerManager
         if self.player_manager:
             self.player_manager.set_current_player(self.pseudo)
             
+            # Synchroniser les achievements avec le nouveau joueur
+            self.scene_manager.on_player_selected(self.pseudo)
+            
+            # Vérifier si c'est un nouveau joueur (pour le tutoriel)
             if self.player_manager.should_show_tutorial():
                 self.scene_manager.change_scene('tutorial')
                 return

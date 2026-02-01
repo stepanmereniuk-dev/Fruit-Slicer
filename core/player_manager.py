@@ -4,6 +4,7 @@ PlayerManager - Gestion des joueurs et de leurs données.
 Responsabilités :
 - Créer/charger les profils joueurs par pseudo
 - Gérer les high scores (4 catégories)
+- Stocker les succès et stats PAR JOUEUR
 - Savoir si le tutoriel a été vu
 - Sauvegarder/charger depuis save_data.json
 """
@@ -14,6 +15,27 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict, field
 
 from config import SAVE_FILE
+
+
+@dataclass
+class PlayerStats:
+    """Statistiques d'un joueur (cumulées sur toutes ses parties)."""
+    total_fruits_sliced: int = 0
+    total_games_played: int = 0
+    total_combos: int = 0
+    total_ice_sliced: int = 0
+    total_bomb_explosions: int = 0
+    total_bombs_avoided: int = 0
+    mode_switches: int = 0
+    success_screen_visited: bool = False
+    first_launch: bool = True
+    
+    def to_dict(self) -> dict:
+        return asdict(self)
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> 'PlayerStats':
+        return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
 @dataclass
@@ -29,11 +51,25 @@ class PlayerData:
     tutorial_seen: bool = False
     total_games: int = 0
     
+    # Succès débloqués par ce joueur (dict: achievement_id -> bool)
+    achievements: Dict[str, bool] = field(default_factory=dict)
+    
+    # Stats cumulées de ce joueur
+    stats: PlayerStats = field(default_factory=PlayerStats)
+    
     def to_dict(self) -> dict:
-        return asdict(self)
+        return {
+            'pseudo': self.pseudo,
+            'high_scores': self.high_scores,
+            'tutorial_seen': self.tutorial_seen,
+            'total_games': self.total_games,
+            'achievements': self.achievements,
+            'stats': self.stats.to_dict(),
+        }
     
     @classmethod
     def from_dict(cls, data: dict) -> 'PlayerData':
+        stats_data = data.get('stats', {})
         return cls(
             pseudo=data.get('pseudo', ''),
             high_scores=data.get('high_scores', {
@@ -44,6 +80,8 @@ class PlayerData:
             }),
             tutorial_seen=data.get('tutorial_seen', False),
             total_games=data.get('total_games', 0),
+            achievements=data.get('achievements', {}),
+            stats=PlayerStats.from_dict(stats_data) if stats_data else PlayerStats(),
         )
 
 
@@ -69,24 +107,16 @@ class PlayerManager:
     
     def save(self):
         """Sauvegarde tous les joueurs dans le fichier."""
-        # Charger les données existantes (pour ne pas écraser les achievements)
-        existing_data = {}
-        if os.path.exists(self.save_path):
-            try:
-                with open(self.save_path, 'r', encoding='utf-8') as f:
-                    existing_data = json.load(f)
-            except (IOError, json.JSONDecodeError):
-                pass
-        
-        # Mettre à jour la section players
-        existing_data['players'] = {
-            pseudo: player.to_dict() 
-            for pseudo, player in self.players.items()
+        data = {
+            'players': {
+                pseudo: player.to_dict() 
+                for pseudo, player in self.players.items()
+            }
         }
         
         try:
             with open(self.save_path, 'w', encoding='utf-8') as f:
-                json.dump(existing_data, f, indent=2, ensure_ascii=False)
+                json.dump(data, f, indent=2, ensure_ascii=False)
         except IOError:
             pass
     
@@ -227,3 +257,22 @@ class PlayerManager:
         if self.current_player:
             self.current_player.total_games += 1
             self.save()
+    
+    # ==================== ACHIEVEMENTS (accesseurs pour AchievementManager) ====================
+    
+    def get_player_achievements(self) -> Dict[str, bool]:
+        """Retourne les succès du joueur actuel."""
+        if not self.current_player:
+            return {}
+        return self.current_player.achievements
+    
+    def set_player_achievement(self, achievement_id: str, unlocked: bool = True):
+        """Définit un succès pour le joueur actuel."""
+        if self.current_player:
+            self.current_player.achievements[achievement_id] = unlocked
+    
+    def get_player_stats(self) -> Optional[PlayerStats]:
+        """Retourne les stats du joueur actuel."""
+        if not self.current_player:
+            return None
+        return self.current_player.stats

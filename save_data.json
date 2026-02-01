@@ -1,55 +1,4 @@
 {
-  "achievements": {
-    "premier_repas": true,
-    "appetit_croissant": true,
-    "glouton_vert": true,
-    "estomac_sans_fond": true,
-    "legende_ile": true,
-    "maitre_gourmet": true,
-    "bebe_yoshi": true,
-    "yoshi_junior": true,
-    "yoshi_confirme": true,
-    "super_yoshi": true,
-    "yoshi_superstar": true,
-    "yoshi_legendaire": true,
-    "langue_agile": true,
-    "langue_eclair": true,
-    "langue_divine": false,
-    "combo_addict": true,
-    "combo_master": true,
-    "fraicheur_bienvenue": true,
-    "maitre_givre": true,
-    "roi_glace": true,
-    "freeze_stratege": true,
-    "coeur_intact": true,
-    "prudence": true,
-    "survivant": true,
-    "perseverant": true,
-    "increvable": true,
-    "oups": true,
-    "demineur_amateur": true,
-    "expert_explosifs": false,
-    "accident_travail": true,
-    "bienvenue": true,
-    "explorateur": false,
-    "indecis": false,
-    "speed_runner": true,
-    "marathon": true,
-    "parfait": true,
-    "virtuose_clavier": true,
-    "ninja_souris": true
-  },
-  "global_stats": {
-    "total_fruits_sliced": 1593,
-    "total_games_played": 69,
-    "total_combos": 71,
-    "total_ice_sliced": 60,
-    "total_bomb_explosions": 38,
-    "total_bombs_avoided": 186,
-    "mode_switches": 0,
-    "success_screen_visited": false,
-    "first_launch": false
-  },
   "players": {
     "massilia": {
       "pseudo": "massilia",
@@ -60,7 +9,19 @@
         "challenge": 188
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "d": {
       "pseudo": "d",
@@ -71,7 +32,19 @@
         "challenge": 0
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "gcut": {
       "pseudo": "gcut",
@@ -82,7 +55,19 @@
         "challenge": 0
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "s": {
       "pseudo": "s",
@@ -93,7 +78,19 @@
         "challenge": 0
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "MASSILIA": {
       "pseudo": "MASSILIA",
@@ -104,7 +101,19 @@
         "challenge": 27
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "QSV": {
       "pseudo": "QSV",
@@ -115,7 +124,19 @@
         "challenge": 0
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "zf": {
       "pseudo": "zf",
@@ -126,7 +147,19 @@
         "challenge": 0
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "qff": {
       "pseudo": "qff",
@@ -137,7 +170,19 @@
         "challenge": 0
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "y": {
       "pseudo": "y",
@@ -148,7 +193,19 @@
         "challenge": 0
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "EZFEZ": {
       "pseudo": "EZFEZ",
@@ -159,7 +216,19 @@
         "challenge": 0
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
     },
     "REG": {
       "pseudo": "REG",
@@ -170,7 +239,103 @@
         "challenge": 0
       },
       "tutorial_seen": true,
-      "total_games": 0
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
+    },
+    "ef": {
+      "pseudo": "ef",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 202,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
+    },
+    "ahaj": {
+      "pseudo": "ahaj",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 29,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0,
+      "achievements": {},
+      "stats": {
+        "total_fruits_sliced": 0,
+        "total_games_played": 0,
+        "total_combos": 0,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 0,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": true
+      }
+    },
+    "massiliasa": {
+      "pseudo": "massiliasa",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 128,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0,
+      "achievements": {
+        "bienvenue": true,
+        "fraicheur_bienvenue": true,
+        "langue_agile": true,
+        "bebe_yoshi": true,
+        "speed_runner": true,
+        "yoshi_junior": true,
+        "yoshi_confirme": true,
+        "ninja_souris": true,
+        "langue_eclair": true,
+        "langue_divine": true,
+        "super_yoshi": true,
+        "yoshi_superstar": true,
+        "premier_repas": true,
+        "appetit_croissant": true
+      },
+      "stats": {
+        "total_fruits_sliced": 51,
+        "total_games_played": 1,
+        "total_combos": 7,
+        "total_ice_sliced": 2,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 4,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": false
+      }
     }
   }
 }

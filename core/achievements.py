@@ -1,14 +1,16 @@
 """
 AchievementManager - Gestionnaire des succès pour Fruit Slicer
+
+Les succès sont maintenant liés au joueur courant via PlayerManager.
+Ce gestionnaire ne sauvegarde plus directement, il travaille sur les données
+du joueur et délègue la sauvegarde au PlayerManager.
 """
 
-import json
-import os
 from typing import Dict, List, Optional, Callable
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from enum import Enum
 
-from core.lang_manager import get as lang_get  # Import direct pour éviter circulaire
+from core.lang_manager import get as lang_get
 
 
 class AchievementCategory(Enum):
@@ -55,27 +57,6 @@ class GameStats:
     
     def reset(self):
         self.__init__()
-
-
-@dataclass
-class GlobalStats:
-    """Statistiques globales cumulées"""
-    total_fruits_sliced: int = 0
-    total_games_played: int = 0
-    total_combos: int = 0
-    total_ice_sliced: int = 0
-    total_bomb_explosions: int = 0
-    total_bombs_avoided: int = 0
-    mode_switches: int = 0
-    success_screen_visited: bool = False
-    first_launch: bool = True
-    
-    def to_dict(self) -> dict:
-        return asdict(self)
-    
-    @classmethod
-    def from_dict(cls, data: dict) -> 'GlobalStats':
-        return cls(**data)
 
 
 # Définition des succès : (id, category, condition_type, condition_value)
@@ -135,88 +116,99 @@ ACHIEVEMENTS_DATA = [
 
 
 class AchievementManager:
-    """Gestionnaire principal des succès."""
+    """
+    Gestionnaire principal des succès.
     
-    SAVE_FILE = "save_data.json"
+    Travaille avec le joueur courant fourni par PlayerManager.
+    Ne gère pas directement la sauvegarde (délègue au PlayerManager).
+    """
     
-    def __init__(self, save_path: str = None):
-        self.save_path = save_path or self.SAVE_FILE
+    def __init__(self):
         self.achievements: Dict[str, Achievement] = {}
-        self.global_stats = GlobalStats()
         self.game_stats = GameStats()
         self.pending_notifications: List[Achievement] = []
         self.on_achievement_unlocked: Optional[Callable[[Achievement], None]] = None
         
+        # Référence vers le PlayerManager (sera définie par SceneManager)
+        self._player_manager = None
+        
         self._init_achievements()
-        self.load()
     
     def _init_achievements(self):
+        """Initialise la liste des succès (tous verrouillés par défaut)."""
         for id, category, cond_type, cond_value in ACHIEVEMENTS_DATA:
             self.achievements[id] = Achievement(id, category.value, cond_type, cond_value)
     
-    # ==================== SAUVEGARDE ====================
+    def set_player_manager(self, player_manager):
+        """Définit le PlayerManager à utiliser."""
+        self._player_manager = player_manager
     
-    def save(self):
-        # Charger les données existantes pour ne pas écraser les autres sections (players, etc.)
-        existing_data = {}
-        if os.path.exists(self.save_path):
-            try:
-                with open(self.save_path, 'r', encoding='utf-8') as f:
-                    existing_data = json.load(f)
-            except (IOError, json.JSONDecodeError):
-                pass
-    
-        # Mettre à jour uniquement les sections achievements et global_stats
-        existing_data["achievements"] = {aid: ach.unlocked for aid, ach in self.achievements.items()}
-        existing_data["global_stats"] = self.global_stats.to_dict()
-    
-        try:
-            with open(self.save_path, 'w', encoding='utf-8') as f:
-                json.dump(existing_data, f, indent=2, ensure_ascii=False)
-        except IOError:
-            pass
-    
-    def load(self):
-        if not os.path.exists(self.save_path):
+    def sync_with_player(self):
+        """Synchronise les succès avec les données du joueur courant."""
+        if not self._player_manager or not self._player_manager.current_player:
+            # Réinitialiser tous les succès si pas de joueur
+            for ach in self.achievements.values():
+                ach.unlocked = False
             return
-        try:
-            with open(self.save_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            for aid, unlocked in data.get("achievements", {}).items():
-                if aid in self.achievements:
-                    self.achievements[aid].unlocked = unlocked
-            
-            if "global_stats" in data:
-                self.global_stats = GlobalStats.from_dict(data["global_stats"])
-        except (IOError, json.JSONDecodeError):
-            pass
+        
+        # Charger les succès du joueur
+        player_achievements = self._player_manager.get_player_achievements()
+        
+        for aid, ach in self.achievements.items():
+            ach.unlocked = player_achievements.get(aid, False)
+    
+    def _save(self):
+        """Sauvegarde via le PlayerManager."""
+        if self._player_manager:
+            self._player_manager.save()
+    
+    def _get_player_stats(self):
+        """Récupère les stats du joueur courant."""
+        if self._player_manager:
+            return self._player_manager.get_player_stats()
+        return None
     
     # ==================== TRACKING ====================
     
     def start_new_game(self, control_mode: str = "keyboard"):
+        """Appelé au début d'une nouvelle partie."""
         self.game_stats.reset()
         self.game_stats.control_mode = control_mode
+        self.pending_notifications.clear()
         
-        if self.global_stats.first_launch:
-            self.global_stats.first_launch = False
+        # Synchroniser avec le joueur courant
+        self.sync_with_player()
+        
+        player_stats = self._get_player_stats()
+        if player_stats and player_stats.first_launch:
+            player_stats.first_launch = False
             self._unlock("bienvenue")
+            self._save()
     
     def end_game(self, exploded: bool = False):
+        """Appelé à la fin d'une partie."""
         gs = self.game_stats
-        self.global_stats.total_fruits_sliced += gs.fruits_sliced
-        self.global_stats.total_combos += gs.combos_count
-        self.global_stats.total_ice_sliced += gs.ice_sliced
-        self.global_stats.total_games_played += 1
-        self.global_stats.total_bombs_avoided += gs.bombs_avoided
+        player_stats = self._get_player_stats()
+        
+        if not player_stats:
+            return
+        
+        # Mettre à jour les stats cumulées du joueur
+        player_stats.total_fruits_sliced += gs.fruits_sliced
+        player_stats.total_combos += gs.combos_count
+        player_stats.total_ice_sliced += gs.ice_sliced
+        player_stats.total_games_played += 1
+        player_stats.total_bombs_avoided += gs.bombs_avoided
         
         if exploded:
-            self.global_stats.total_bomb_explosions += 1
+            player_stats.total_bomb_explosions += 1
         
+        # Vérifier tous les succès
         self._check_all(exploded)
-        self.save()
+        self._save()
     
     def on_fruit_sliced(self, count: int = 1):
+        """Appelé quand des fruits sont tranchés."""
         self.game_stats.fruits_sliced += count
         if count >= 3:
             self.game_stats.combos_count += 1
@@ -224,6 +216,7 @@ class AchievementManager:
             self._check_by_type("combo", count)
     
     def on_score_update(self, new_score: int):
+        """Appelé quand le score change."""
         self.game_stats.score = new_score
         self._check_by_type("score", new_score)
         
@@ -237,17 +230,21 @@ class AchievementManager:
                 self._check_by_type("perfect", new_score)
     
     def on_ice_sliced(self):
+        """Appelé quand un glaçon est tranché."""
         self.game_stats.ice_sliced += 1
         self._check_by_type("ice_game", self.game_stats.ice_sliced)
     
     def on_heart_lost(self):
+        """Appelé quand un cœur est perdu."""
         self.game_stats.hearts_lost += 1
         self.game_stats.hearts_remaining -= 1
     
     def on_bomb_avoided(self):
+        """Appelé quand une bombe est évitée."""
         self.game_stats.bombs_avoided += 1
     
     def on_time_update(self, elapsed: float):
+        """Appelé pour mettre à jour le temps de jeu."""
         self.game_stats.game_time = elapsed
         self._check_by_type("game_time", int(elapsed))
         
@@ -255,46 +252,62 @@ class AchievementManager:
             self._unlock("speed_runner")
     
     def on_mode_switch(self):
-        self.global_stats.mode_switches += 1
-        self._check_by_type("mode_switches", self.global_stats.mode_switches)
-        self.save()
+        """Appelé quand le mode de contrôle change."""
+        player_stats = self._get_player_stats()
+        if player_stats:
+            player_stats.mode_switches += 1
+            self._check_by_type("mode_switches", player_stats.mode_switches)
+            self._save()
     
     def on_success_screen_visited(self):
-        if not self.global_stats.success_screen_visited:
-            self.global_stats.success_screen_visited = True
+        """Appelé quand l'écran des succès est visité."""
+        player_stats = self._get_player_stats()
+        if player_stats and not player_stats.success_screen_visited:
+            player_stats.success_screen_visited = True
             self._unlock("explorateur")
-            self.save()
+            self._save()
     
     # ==================== VÉRIFICATION ====================
     
     def _unlock(self, achievement_id: str) -> bool:
+        """Débloque un succès s'il ne l'est pas déjà."""
         ach = self.achievements.get(achievement_id)
         if ach and not ach.unlocked:
             ach.unlocked = True
             self.pending_notifications.append(ach)
+            
+            # Sauvegarder dans les données du joueur
+            if self._player_manager:
+                self._player_manager.set_player_achievement(achievement_id, True)
+            
             if self.on_achievement_unlocked:
                 self.on_achievement_unlocked(ach)
             return True
         return False
     
     def _check_by_type(self, condition_type: str, value: int):
-        """Vérifie et débloque tous les succès d'un type si le seuil est atteint"""
+        """Vérifie et débloque tous les succès d'un type si le seuil est atteint."""
         for ach in self.achievements.values():
             if ach.condition_type == condition_type and value >= ach.condition_value:
                 self._unlock(ach.id)
     
     def _check_all(self, exploded: bool):
-        """Vérifie tous les succès en fin de partie"""
+        """Vérifie tous les succès en fin de partie."""
         gs = self.game_stats
-        gstats = self.global_stats
+        player_stats = self._get_player_stats()
         
-        self._check_by_type("total_fruits", gstats.total_fruits_sliced)
-        self._check_by_type("total_combos", gstats.total_combos)
-        self._check_by_type("total_ice", gstats.total_ice_sliced)
-        self._check_by_type("total_games", gstats.total_games_played)
-        self._check_by_type("total_explosions", gstats.total_bomb_explosions)
+        if not player_stats:
+            return
+        
+        # Succès cumulatifs
+        self._check_by_type("total_fruits", player_stats.total_fruits_sliced)
+        self._check_by_type("total_combos", player_stats.total_combos)
+        self._check_by_type("total_ice", player_stats.total_ice_sliced)
+        self._check_by_type("total_games", player_stats.total_games_played)
+        self._check_by_type("total_explosions", player_stats.total_bomb_explosions)
         self._check_by_type("bombs_avoided_game", gs.bombs_avoided)
         
+        # Succès spéciaux
         if exploded:
             self._unlock("oups")
         
@@ -307,20 +320,29 @@ class AchievementManager:
     # ==================== GETTERS ====================
     
     def get_all_achievements(self) -> List[Achievement]:
+        """Retourne tous les succès."""
         return list(self.achievements.values())
     
     def get_unlocked_achievements(self) -> List[Achievement]:
+        """Retourne les succès débloqués."""
         return [a for a in self.achievements.values() if a.unlocked]
     
     def get_achievements_by_category(self, category: str) -> List[Achievement]:
+        """Retourne les succès d'une catégorie."""
         return [a for a in self.achievements.values() if a.category == category]
     
     def get_pending_notifications(self) -> List[Achievement]:
+        """Retourne et vide les notifications en attente."""
         notifs = self.pending_notifications.copy()
         self.pending_notifications.clear()
         return notifs
     
+    def get_pending_count(self) -> int:
+        """Retourne le nombre de notifications en attente (sans vider)."""
+        return len(self.pending_notifications)
+    
     def get_progress(self) -> dict:
+        """Retourne la progression globale."""
         total = len(self.achievements)
         unlocked = len(self.get_unlocked_achievements())
         return {
