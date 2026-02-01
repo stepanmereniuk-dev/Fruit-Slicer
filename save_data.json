@@ -33,12 +33,12 @@
         "combo_addict": true
       },
       "stats": {
-        "total_fruits_sliced": 193,
-        "total_games_played": 4,
-        "total_combos": 13,
-        "total_ice_sliced": 16,
-        "total_bomb_explosions": 2,
-        "total_bombs_avoided": 25,
+        "total_fruits_sliced": 223,
+        "total_games_played": 5,
+        "total_combos": 14,
+        "total_ice_sliced": 17,
+        "total_bomb_explosions": 3,
+        "total_bombs_avoided": 27,
         "mode_switches": 0,
         "success_screen_visited": false,
         "first_launch": false
@@ -353,6 +353,75 @@
         "total_ice_sliced": 2,
         "total_bomb_explosions": 0,
         "total_bombs_avoided": 4,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": false
+      }
+    },
+    "adfzg": {
+      "pseudo": "adfzg",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 21,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0,
+      "achievements": {
+        "bienvenue": true,
+        "langue_agile": true,
+        "bebe_yoshi": true,
+        "speed_runner": true,
+        "premier_repas": true,
+        "oups": true
+      },
+      "stats": {
+        "total_fruits_sliced": 16,
+        "total_games_played": 1,
+        "total_combos": 1,
+        "total_ice_sliced": 0,
+        "total_bomb_explosions": 1,
+        "total_bombs_avoided": 1,
+        "mode_switches": 0,
+        "success_screen_visited": false,
+        "first_launch": false
+      }
+    },
+    "qnt": {
+      "pseudo": "qnt",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 165,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0,
+      "achievements": {
+        "bienvenue": true,
+        "langue_agile": true,
+        "bebe_yoshi": true,
+        "speed_runner": true,
+        "yoshi_junior": true,
+        "fraicheur_bienvenue": true,
+        "freeze_stratege": true,
+        "yoshi_confirme": true,
+        "ninja_souris": true,
+        "parfait": true,
+        "super_yoshi": true,
+        "yoshi_superstar": true,
+        "yoshi_legendaire": true,
+        "premier_repas": true,
+        "appetit_croissant": true
+      },
+      "stats": {
+        "total_fruits_sliced": 90,
+        "total_games_played": 1,
+        "total_combos": 6,
+        "total_ice_sliced": 7,
+        "total_bomb_explosions": 0,
+        "total_bombs_avoided": 5,
         "mode_switches": 0,
         "success_screen_visited": false,
         "first_launch": false

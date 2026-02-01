@@ -61,6 +61,7 @@ class TextColors:
     
     # Game Scene
     GAME_SCORE = (254, 237, 142)     # #feed8e
+    GAME_NOTIF_SUCCES = (254, 237, 142)  # #feed8e - Notifications de succès
 
     # Game Over Scene
     GAMEOVER_SCORE = (254, 237, 142)       # #feed8e
@@ -238,6 +239,10 @@ class Images:
     
     # Bouton succès (commun à toutes les variantes)
     GAMEOVER_BTN_SUCCES = "scenes/game_over_scene/explosion/Bouton succes 544x80.png"
+    
+    # Notifications de succès en jeu (chaque mode a son propre asset)
+    NOTIF_BTN_SUCCES_CLASSIC = "scenes/game_scene/Bouton succes 544x80.png"
+    NOTIF_BTN_SUCCES_CHALLENGE = "scenes/challenge_scene/Bouton succes 544x80.png"
 
 
 # ==================== POSITIONS (centre des éléments) ====================
@@ -289,6 +294,10 @@ class Layout:
         (1157, 1016),  # Bleu
     ]
     GAME_YOSHI = (1757, 740)              # Position de Yoshi (centre)
+    
+    # Notifications de succès en jeu (mêmes positions que game_over)
+    GAME_NOTIF_BTN = (342, 1016)           # Centre du bouton succès
+    GAME_NOTIF_TEXT = (170, 1016)          # Justifié gauche, centery
 
     # Game Over Scene (coordonnées selon le tableau de specs)
     # Scores : justifié gauche (left=394)

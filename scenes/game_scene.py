@@ -23,6 +23,7 @@ from core.achievements import AchievementManager
 from entities import Fruit, Bomb, Ice
 from entities.splash import Splash
 from ui.buttons import ImageButton
+from ui.notifications import NotificationManager
 
 
 Entity = Union[Fruit, Bomb, Ice]
@@ -79,6 +80,7 @@ class GameScene(BaseScene):
         self.spawner = None
         self.input_handler = None
         self.achievement_manager = None
+        self.notification_manager = None  # Notifications de succès
         
         # État du jeu
         self.entities: List[Entity] = []
@@ -153,6 +155,9 @@ class GameScene(BaseScene):
         # Reset audio
         self._bomb_count = 0
         audio_manager.stop_bomb_alert()
+        
+        # Initialiser le gestionnaire de notifications (avec le bon mode)
+        self.notification_manager = NotificationManager(self.mode)
         
         if self.achievement_manager:
             self.achievement_manager.start_new_game(control_mode)
@@ -419,6 +424,15 @@ class GameScene(BaseScene):
         # Succès
         if self.achievement_manager:
             self.achievement_manager.on_time_update(self.game_time)
+            
+            # Récupérer les succès débloqués et les passer au NotificationManager
+            pending = self.achievement_manager.get_pending_notifications()
+            for achievement in pending:
+                self.notification_manager.add_from_achievement(achievement)
+        
+        # Mise à jour notifications
+        if self.notification_manager:
+            self.notification_manager.update(dt)
     
     def _update_transition(self, dt: float):
         """Met à jour la transition d'explosion."""
@@ -704,6 +718,10 @@ class GameScene(BaseScene):
         # HUD
         self._render_hud(screen)
         
+        # Notifications de succès
+        if self.notification_manager:
+            self.notification_manager.render(screen)
+        
         # Transition
         self._render_transition(screen)
     
@@ -815,3 +833,5 @@ class GameScene(BaseScene):
         self.entities.clear()
         if self.input_handler:
             self.input_handler.reset()
+        if self.notification_manager:
+            self.notification_manager.clear()
