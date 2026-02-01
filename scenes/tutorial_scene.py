@@ -1,19 +1,19 @@
 """
-TutorialScene - Écran de tutoriel pour les nouveaux joueurs.
+TutorialScene - Tutorial screen for new players.
 
-Tutoriel Classic (6 écrans) :
-1. Objectif du jeu
-2. Les contrôles
-3. Les cœurs et strikes
-4. Les bombes
-5. Les glaçons
-6. Combos et jauge bonus
+Classic Tutorial (6 screens):
+1. Game objective
+2. Controls
+3. Hearts and strikes
+4. Bombs
+5. Ice flowers
+6. Combos and bonus gauge
 
-Tutoriel Challenge (4 écrans) :
-1. Objectif du jeu
-2. Les contrôles
-3. Le timer et les bombes
-4. Combos et jauge bonus
+Challenge Tutorial (4 screens):
+1. Game objective
+2. Controls
+3. Timer and bombs
+4. Combos and bonus gauge
 """
 
 import pygame
@@ -31,35 +31,35 @@ from ui.buttons import Button
 
 
 class TutorialScene(BaseScene):
-    """Scène du tutoriel - adapté selon le mode (classic ou challenge)."""
+    """Tutorial scene - adapted according to the mode (classic or challenge)."""
     
-    # Tailles de police
+    # Font sizes
     TITLE_FONT_SIZE = 36
     TEXT_FONT_SIZE = 30
     BUTTON_FONT_SIZE = 30
     
-    # Interligne pour les textes sur 2 lignes
+    # Line height for 2-line texts
     LINE_HEIGHT = 1.4
     
     def __init__(self, scene_manager):
         super().__init__(scene_manager)
         
-        # Ressources
+        # Resources
         self.background = None
         self.font_title = None
         self.font_text = None
         self.font_button = None
         
-        # Images des blocs
+        # Block images
         self.blocks: List[pygame.Surface] = []
         
-        # Boutons
+        # Buttons
         self.btn_prev: Optional[Button] = None
         self.btn_next: Optional[Button] = None
         self.btn_play: Optional[Button] = None
         
-        # État
-        self.mode = 'classic'  # 'classic' ou 'challenge'
+        # State
+        self.mode = 'classic'  # 'classic' or 'challenge'
         self.current_screen = 0
         self.total_screens = 6
         
@@ -67,39 +67,39 @@ class TutorialScene(BaseScene):
         self.player_manager: Optional[PlayerManager] = None
     
     def setup(self):
-        """Initialise la scène selon le mode."""
-        # Récupérer le mode
+        """Initializes the scene according to the mode."""
+        # Retrieve the mode
         self.mode = self.scene_manager.shared_data.get('mode', 'classic')
         self.current_screen = 0
         
-        # Nombre d'écrans selon le mode
+        # Number of screens depending on mode
         if self.mode == 'challenge':
             self.total_screens = 4
         else:
             self.total_screens = 6
         
-        # Charger les ressources
+        # Load resources
         self._load_resources()
         
-        # Créer les boutons pour l'écran actuel
+        # Create buttons for the current screen
         self._setup_buttons()
     
     def _load_resources(self):
-        """Charge les images et polices."""
-        # Polices
+        """Loads images and fonts."""
+        # Fonts
         font_path = os.path.join(FONTS_DIR, FONT_FILE)
         self.font_title = pygame.font.Font(font_path, self.TITLE_FONT_SIZE)
         self.font_text = pygame.font.Font(font_path, self.TEXT_FONT_SIZE)
         self.font_button = pygame.font.Font(font_path, self.BUTTON_FONT_SIZE)
         
-        # Background (un seul par mode)
+        # Background (one per mode)
         if self.mode == 'challenge':
             bg_path = os.path.join(IMAGES_DIR, Images.TUTO_CHALLENGE_BG)
         else:
             bg_path = os.path.join(IMAGES_DIR, Images.TUTO_CLASSIC_BG)
         self.background = pygame.image.load(bg_path).convert()
         
-        # Charger tous les blocs
+        # Load all blocks
         self.blocks = []
         if self.mode == 'challenge':
             block_paths = Images.TUTO_CHALLENGE_BLOCKS
@@ -111,10 +111,10 @@ class TutorialScene(BaseScene):
             self.blocks.append(img)
     
     def _setup_buttons(self):
-        """Configure les boutons pour l'écran actuel."""
+        """Configures buttons for the current screen."""
         screen = self.current_screen
         
-        # Récupérer les chemins selon le mode
+        # Retrieve paths according to mode
         if self.mode == 'challenge':
             prev_paths = Images.TUTO_CHALLENGE_BTN_PREV
             next_paths = Images.TUTO_CHALLENGE_BTN_NEXT
@@ -124,7 +124,7 @@ class TutorialScene(BaseScene):
             next_paths = Images.TUTO_CLASSIC_BTN_NEXT
             play_path = Images.TUTO_CLASSIC_BTN_PLAY
         
-        # Bouton Précédent (sauf écran 1)
+        # Previous button (except screen 1)
         if prev_paths[screen] is not None:
             self.btn_prev = Button(
                 image_path=prev_paths[screen],
@@ -136,11 +136,11 @@ class TutorialScene(BaseScene):
         else:
             self.btn_prev = None
         
-        # Bouton Suivant ou Jouer
+        # Next button or Play button
         is_last_screen = screen == self.total_screens - 1
         
         if is_last_screen:
-            # Dernier écran : bouton Jouer
+            # Last screen: Play button
             self.btn_next = None
             self.btn_play = Button(
                 image_path=play_path,
@@ -150,7 +150,7 @@ class TutorialScene(BaseScene):
                 on_click=self._on_play
             )
         else:
-            # Autres écrans : bouton Suivant
+            # Other screens: Next button
             self.btn_play = None
             if next_paths[screen] is not None:
                 self.btn_next = Button(
@@ -164,34 +164,34 @@ class TutorialScene(BaseScene):
                 self.btn_next = None
     
     def set_player_manager(self, manager: PlayerManager):
-        """Définit le gestionnaire de joueurs."""
+        """Sets the player manager."""
         self.player_manager = manager
     
     # Callbacks
     def _on_previous(self):
-        """Écran précédent."""
+        """Previous screen."""
         if self.current_screen > 0:
             self.current_screen -= 1
             self._setup_buttons()
     
     def _on_next(self):
-        """Écran suivant."""
+        """Next screen."""
         if self.current_screen < self.total_screens - 1:
             self.current_screen += 1
             self._setup_buttons()
     
     def _on_play(self):
-        """Lance le jeu."""
-        # Marquer le tutoriel comme vu
+        """Starts the game."""
+        # Mark tutorial as seen
         if self.player_manager:
             self.player_manager.mark_tutorial_seen()
         
-        # Lancer le jeu
+        # Start the game
         self.scene_manager.change_scene('game')
     
     def handle_events(self, events: List[pygame.event.Event]):
         for event in events:
-            # Boutons
+            # Buttons
             if self.btn_prev:
                 self.btn_prev.handle_event(event)
             if self.btn_next:
@@ -199,7 +199,7 @@ class TutorialScene(BaseScene):
             if self.btn_play:
                 self.btn_play.handle_event(event)
             
-            # Raccourcis clavier
+            # Keyboard shortcuts
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_BACKSPACE:
                     self._on_previous()
@@ -214,29 +214,29 @@ class TutorialScene(BaseScene):
                     else:
                         self._on_next()
                 elif event.key == pygame.K_ESCAPE:
-                    # Retour au menu (annuler le tutoriel)
+                    # Back to menu (cancel tutorial)
                     self.scene_manager.change_scene('menu')
     
     def update(self, dt: float):
         pass
     
     def render(self, screen: pygame.Surface):
-        """Affiche la scène."""
-        # Fond
+        """Renders the scene."""
+        # Background
         screen.blit(self.background, (0, 0))
         
-        # Bloc central
+        # Central block
         block_img = self.blocks[self.current_screen]
         block_rect = block_img.get_rect(center=Layout.TUTO_BLOCK)
         screen.blit(block_img, block_rect)
         
-        # Titre
+        # Title
         self._render_title(screen)
         
-        # Texte
+        # Text
         self._render_text(screen)
         
-        # Boutons
+        # Buttons
         if self.btn_prev:
             self.btn_prev.render(screen, self.font_button)
         if self.btn_next:
@@ -245,8 +245,8 @@ class TutorialScene(BaseScene):
             self.btn_play.render(screen, self.font_button)
     
     def _render_title(self, screen: pygame.Surface):
-        """Affiche le titre de l'écran."""
-        # Clé de traduction selon le mode et l'écran
+        """Renders the screen title."""
+        # Translation key according to mode and screen
         if self.mode == 'challenge':
             title_key = f"tutorial.challenge.screen{self.current_screen + 1}.title"
         else:
@@ -258,8 +258,8 @@ class TutorialScene(BaseScene):
         screen.blit(title_surface, title_rect)
     
     def _render_text(self, screen: pygame.Surface):
-        """Affiche le texte de l'écran (peut être sur 2 lignes)."""
-        # Clé de traduction
+        """Renders the screen text (may span 2 lines)."""
+        # Translation key
         if self.mode == 'challenge':
             text_key = f"tutorial.challenge.screen{self.current_screen + 1}.text"
         else:
@@ -267,22 +267,22 @@ class TutorialScene(BaseScene):
         
         full_text = lang_manager.get(text_key)
         
-        # Vérifier si le texte contient un retour à la ligne
+        # Check if text contains a newline
         if "\n" in full_text:
             lines = full_text.split("\n")
             self._render_multiline_text(screen, lines)
         else:
-            # Une seule ligne
+            # Single line
             text_surface = self.font_text.render(full_text, True, TextColors.TUTO_TEXT)
             text_rect = text_surface.get_rect(center=Layout.TUTO_TEXT)
             screen.blit(text_surface, text_rect)
     
     def _render_multiline_text(self, screen: pygame.Surface, lines: List[str]):
-        """Affiche du texte sur plusieurs lignes avec interligne."""
+        """Renders multiline text with line spacing."""
         line_height = int(self.TEXT_FONT_SIZE * self.LINE_HEIGHT)
         total_height = line_height * len(lines)
         
-        # Position de départ (centré verticalement autour de TUTO_TEXT)
+        # Starting position (vertically centered around TUTO_TEXT)
         start_y = Layout.TUTO_TEXT[1] - total_height // 2 + line_height // 2
         
         for i, line in enumerate(lines):
@@ -294,5 +294,5 @@ class TutorialScene(BaseScene):
             screen.blit(text_surface, text_rect)
     
     def cleanup(self):
-        """Nettoyage à la sortie de la scène."""
+        """Cleanup on scene exit."""
         pass

@@ -1,16 +1,16 @@
 """
-SettingsManager - Gestion des paramètres utilisateur.
+SettingsManager - User settings management.
 
-Responsabilités :
-- Charger/sauvegarder depuis settings.json
-- Fournir les valeurs par défaut
-- Notifier les changements (pour que main.py puisse changer la langue, etc.)
+Responsibilities:
+- Load/save from settings.json
+- Provide default values
+- Notify changes (so main.py can change language, etc.)
 
-Paramètres gérés :
-- control_mode : "mouse" ou "keyboard"
-- music_volume : 0.0 à 1.0
-- sfx_volume : 0.0 à 1.0
-- language : "fr" ou "en"
+Managed settings:
+- control_mode: "mouse" or "keyboard"
+- music_volume: 0.0 to 1.0
+- sfx_volume: 0.0 to 1.0
+- language: "fr" or "en"
 """
 
 import json
@@ -22,15 +22,15 @@ from config import SETTINGS_FILE, ControlMode, AudioConfig
 
 class SettingsManager:
     """
-    Gestionnaire des paramètres globaux.
+    Global settings manager.
     
-    Utilisation :
+    Usage:
         settings = SettingsManager()
         settings.set_music_volume(0.7)
         settings.save()
     """
     
-    # Valeurs par défaut
+    # Default values
     DEFAULTS = {
         'control_mode': ControlMode.DEFAULT,
         'music_volume': AudioConfig.DEFAULT_MUSIC_VOLUME,
@@ -42,27 +42,27 @@ class SettingsManager:
         self.settings_path = settings_path or SETTINGS_FILE
         self._settings: Dict[str, Any] = self.DEFAULTS.copy()
         
-        # Callbacks pour réagir aux changements
+        # Callbacks to react to changes
         self._on_language_change: Optional[Callable[[str], None]] = None
         self._on_volume_change: Optional[Callable[[str, float], None]] = None
         self._on_control_mode_change: Optional[Callable[[str], None]] = None
         
         self.load()
     
-    # ==================== SAUVEGARDE / CHARGEMENT ====================
+    # ==================== SAVE / LOAD ====================
     
     def save(self):
-        """Sauvegarde les paramètres dans le fichier JSON."""
+        """Saves settings to the JSON file."""
         try:
             with open(self.settings_path, 'w', encoding='utf-8') as f:
                 json.dump(self._settings, f, indent=2, ensure_ascii=False)
         except IOError as e:
-            print(f"Erreur sauvegarde settings: {e}")
+            print(f"Error saving settings: {e}")
     
     def load(self):
-        """Charge les paramètres depuis le fichier JSON."""
+        """Loads settings from the JSON file."""
         if not os.path.exists(self.settings_path):
-            # Créer le fichier avec les valeurs par défaut
+            # Create file with default values
             self.save()
             return
         
@@ -70,33 +70,33 @@ class SettingsManager:
             with open(self.settings_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
-            # Fusionner avec les valeurs par défaut (au cas où de nouveaux paramètres existent)
+            # Merge with defaults (in case new settings were added)
             for key, default_value in self.DEFAULTS.items():
                 self._settings[key] = data.get(key, default_value)
             
-            # Valider les valeurs
+            # Validate values
             self._validate()
             
         except (IOError, json.JSONDecodeError) as e:
-            print(f"Erreur chargement settings: {e}")
-            # Garder les valeurs par défaut
+            print(f"Error loading settings: {e}")
+            # Keep defaults
     
     def _validate(self):
-        """Valide et corrige les valeurs si nécessaire."""
+        """Validates and corrects values if necessary."""
         # Control mode
         if self._settings['control_mode'] not in [ControlMode.MOUSE, ControlMode.KEYBOARD]:
             self._settings['control_mode'] = ControlMode.DEFAULT
         
-        # Volumes (clamp entre 0 et 1)
+        # Volumes (clamp between 0 and 1)
         self._settings['music_volume'] = max(0.0, min(1.0, float(self._settings['music_volume'])))
         self._settings['sfx_volume'] = max(0.0, min(1.0, float(self._settings['sfx_volume'])))
         
-        # Langue
+        # Language
         if self._settings['language'] not in ['fr', 'en']:
             self._settings['language'] = 'fr'
     
     def reset_to_defaults(self):
-        """Remet tous les paramètres aux valeurs par défaut."""
+        """Resets all settings to default values."""
         self._settings = self.DEFAULTS.copy()
         self.save()
     
@@ -119,13 +119,13 @@ class SettingsManager:
         return self._settings['language']
     
     def get_all(self) -> Dict[str, Any]:
-        """Retourne une copie de tous les paramètres."""
+        """Returns a copy of all settings."""
         return self._settings.copy()
     
     # ==================== SETTERS ====================
     
     def set_control_mode(self, mode: str):
-        """Change le mode de contrôle (mouse/keyboard)."""
+        """Changes the control mode (mouse/keyboard)."""
         if mode not in [ControlMode.MOUSE, ControlMode.KEYBOARD]:
             return
         
@@ -138,7 +138,7 @@ class SettingsManager:
         self.save()
     
     def set_music_volume(self, volume: float):
-        """Change le volume de la musique (0.0 à 1.0)."""
+        """Changes the music volume (0.0 to 1.0)."""
         volume = max(0.0, min(1.0, volume))
         self._settings['music_volume'] = volume
         
@@ -148,7 +148,7 @@ class SettingsManager:
         self.save()
     
     def set_sfx_volume(self, volume: float):
-        """Change le volume des effets sonores (0.0 à 1.0)."""
+        """Changes the sound effects volume (0.0 to 1.0)."""
         volume = max(0.0, min(1.0, volume))
         self._settings['sfx_volume'] = volume
         
@@ -158,7 +158,7 @@ class SettingsManager:
         self.save()
     
     def set_language(self, lang: str):
-        """Change la langue (fr/en)."""
+        """Changes the language (fr/en)."""
         if lang not in ['fr', 'en']:
             return
         
@@ -173,36 +173,36 @@ class SettingsManager:
     # ==================== CALLBACKS ====================
     
     def on_language_change(self, callback: Callable[[str], None]):
-        """Enregistre un callback appelé quand la langue change."""
+        """Registers a callback called when the language changes."""
         self._on_language_change = callback
     
     def on_volume_change(self, callback: Callable[[str, float], None]):
-        """Enregistre un callback appelé quand un volume change."""
+        """Registers a callback called when a volume changes."""
         self._on_volume_change = callback
     
     def on_control_mode_change(self, callback: Callable[[str], None]):
-        """Enregistre un callback appelé quand le mode de contrôle change."""
+        """Registers a callback called when the control mode changes."""
         self._on_control_mode_change = callback
 
 
-# Instance globale (singleton)
+# Global instance (singleton)
 _instance: Optional[SettingsManager] = None
 
 
 def init(settings_path: str = None) -> SettingsManager:
-    """Initialise l'instance globale. À appeler une fois au démarrage."""
+    """Initializes the global instance. Call once at startup."""
     global _instance
     _instance = SettingsManager(settings_path)
     return _instance
 
 
 def get_instance() -> Optional[SettingsManager]:
-    """Retourne l'instance globale."""
+    """Returns the global instance."""
     return _instance
 
 
 def get(key: str, default=None):
-    """Raccourci pour récupérer une valeur."""
+    """Shortcut to retrieve a value."""
     if _instance is None:
         return default
     return _instance.get_all().get(key, default)

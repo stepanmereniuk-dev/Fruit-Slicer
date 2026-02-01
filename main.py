@@ -1,6 +1,6 @@
 """
-Fruit Slicer - Point d'entrée du jeu
-Initialise Pygame et lance la boucle principale.
+Fruit Slicer - Game entry point
+Initializes Pygame and starts the main loop.
 """
 
 import pygame
@@ -16,56 +16,56 @@ from scene_manager import SceneManager
 
 
 def main():
-    # Initialisation Pygame
+    # Pygame initialization
     pygame.init()
     pygame.mixer.init()
     
-    # Création de la fenêtre
+    # Window creation
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption(WINDOW_TITLE)
     clock = pygame.time.Clock()
     
-    # Initialisation des paramètres utilisateur
+    # User settings initialization
     settings = settings_manager.init()
     
-    # Initialisation du système de langues avec la langue sauvegardée
+    # Language system initialization with the saved language
     lang_manager.init(LANG_DIR)
     lang_manager.get_instance().set_language(settings.language)
     
-    # Synchroniser les changements de langue
+    # Synchronize language changes
     settings.on_language_change(
         lambda lang: lang_manager.get_instance().set_language(lang)
     )
     
-    # Synchroniser les volumes audio
+    # Synchronize audio volume changes
     settings.on_volume_change(_on_volume_change)
     
-    # Appliquer les volumes initiaux
+    # Apply initial volumes
     pygame.mixer.music.set_volume(settings.music_volume)
     
-    # Création du gestionnaire de scènes
+    # Scene manager creation
     scene_manager = SceneManager(screen)
     
-    # Boucle principale
+    # Main loop
     running = True
     while running:
-        # Delta time en secondes
+        # Delta time in seconds
         dt = clock.tick(FPS) / 1000.0
         
-        # Récupération des événements
+        # Retrieve events
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 running = False
         
-        # Mise à jour de la scène active
+        # Update active scene
         scene_manager.handle_events(events)
         scene_manager.update(dt)
         
-        # Rendu
+        # Rendering
         scene_manager.render()
         
-        # Affichage FPS (debug)
+        # Display FPS (debug)
         if SHOW_FPS:
             fps = int(clock.get_fps())
             font = pygame.font.Font(None, 30)
@@ -74,16 +74,16 @@ def main():
         
         pygame.display.flip()
     
-    # Fermeture propre
+    # Clean shutdown
     pygame.quit()
     sys.exit()
 
 
 def _on_volume_change(volume_type: str, volume: float):
-    """Callback appelé quand un volume change dans les settings."""
+    """Callback called when a volume setting changes."""
     if volume_type == 'music':
         pygame.mixer.music.set_volume(volume)
-    # Note: Pour les SFX, chaque son devra être joué avec le bon volume
+    # Note: For SFX, each sound should be played with the correct volume
     # via settings_manager.get_instance().sfx_volume
 
 

@@ -1,6 +1,6 @@
 """
-Ice - Fleur de glace.
-Si tranchée : freeze le jeu pendant quelques secondes.
+Ice - Ice flower.
+If sliced: freezes the game for a few seconds.
 """
 
 import pygame
@@ -11,7 +11,7 @@ from config import IMAGES_DIR, Images, GameConfig
 
 
 class Ice:
-    """Fleur de glace qui freeze le temps."""
+    """Ice flower that freezes time."""
     
     def __init__(self, x: float, y: float, velocity_x: float, velocity_y: float, gravity: float):
         self.x = x
@@ -20,15 +20,15 @@ class Ice:
         self.velocity_y = velocity_y
         self.gravity = gravity
         
-        # États
+        # States
         self.sliced = False
         self.missed = False
-        self.frozen = False  # Ironique mais cohérent avec les autres entités
+        self.frozen = False  # Ironic but consistent with other entities
         
-        # Lettre pour mode clavier
+        # Letter for keyboard mode
         self.letter: Optional[str] = None
         
-        # Chargement des sprites
+        # Load sprites
         self.sprite_normal = pygame.image.load(
             os.path.join(IMAGES_DIR, Images.ICE_FLOWER)
         ).convert_alpha()
@@ -57,7 +57,7 @@ class Ice:
         if self.frozen:
             return
         
-        # Continue de tomber même si tranchée
+        # Continues falling even if sliced
         self.velocity_y += self.gravity * dt
         self.x += self.velocity_x * dt
         self.y += self.velocity_y * dt
@@ -103,7 +103,7 @@ class Ice:
         screen.blit(self.current_sprite, (self.x, self.y))
         
         if self.letter and font and not self.sliced:
-            # Couleur jaune comme le score, position au-dessus du fruit
+            # Yellow color like the score, positioned above the fruit
             letter_surface = font.render(self.letter, True, (254, 237, 142))
             cx, cy = self.center
             letter_rect = letter_surface.get_rect(centerx=cx, bottom=cy - 100)

@@ -1,5 +1,5 @@
 """
-Entities - Objets du jeu (fruits, bombes, glaçons, éclaboussures)
+Entities - Objets of game (fruits, bombes, glaçons, éclaboussures)
 """
 
 from entities.fruit import Fruit, create_random_fruit

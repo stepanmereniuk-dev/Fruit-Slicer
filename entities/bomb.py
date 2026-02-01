@@ -1,6 +1,6 @@
 """
-Bomb - Entité bombe (Bob-omb).
-Si tranchée : game over instantané (mode classique) ou -10 points (challenge).
+Bomb - Bomb entity (Bob-omb).
+If sliced: instant game over (classic mode) or -10 points (challenge).
 """
 
 import pygame
@@ -11,7 +11,7 @@ from config import IMAGES_DIR, Images, GameConfig
 
 
 class Bomb:
-    """Une bombe qui se déplace comme un fruit."""
+    """A bomb that moves like a fruit."""
     
     def __init__(self, x: float, y: float, velocity_x: float, velocity_y: float, gravity: float):
         self.x = x
@@ -20,15 +20,15 @@ class Bomb:
         self.velocity_y = velocity_y
         self.gravity = gravity
         
-        # États
+        # States
         self.sliced = False
         self.missed = False
         self.frozen = False
         
-        # Lettre pour mode clavier
+        # Letter for keyboard mode
         self.letter: Optional[str] = None
         
-        # Chargement du sprite
+        # Load sprite
         self.sprite = pygame.image.load(
             os.path.join(IMAGES_DIR, Images.BOMB)
         ).convert_alpha()
@@ -49,7 +49,7 @@ class Bomb:
         if self.frozen:
             return
         
-        # Continue de tomber même si tranchée
+        # Continues falling even if sliced
         self.velocity_y += self.gravity * dt
         self.x += self.velocity_x * dt
         self.y += self.velocity_y * dt
@@ -95,7 +95,7 @@ class Bomb:
         screen.blit(self.sprite, (self.x, self.y))
         
         if self.letter and font and not self.sliced:
-            # Couleur jaune comme le score, position au-dessus du fruit
+            # Yellow color like the score, positioned above the fruit
             letter_surface = font.render(self.letter, True, (254, 237, 142))
             cx, cy = self.center
             letter_rect = letter_surface.get_rect(centerx=cx, bottom=cy - 100)

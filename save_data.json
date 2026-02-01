@@ -14,7 +14,7 @@
     "yoshi_legendaire": true,
     "langue_agile": true,
     "langue_eclair": true,
-    "langue_divine": false,
+    "langue_divine": true,
     "combo_addict": true,
     "combo_master": true,
     "fraicheur_bienvenue": true,
@@ -25,7 +25,7 @@
     "prudence": true,
     "survivant": true,
     "perseverant": true,
-    "increvable": false,
+    "increvable": true,
     "oups": true,
     "demineur_amateur": true,
     "expert_explosifs": false,
@@ -40,12 +40,12 @@
     "ninja_souris": true
   },
   "global_stats": {
-    "total_fruits_sliced": 1275,
-    "total_games_played": 42,
-    "total_combos": 53,
-    "total_ice_sliced": 44,
-    "total_bomb_explosions": 17,
-    "total_bombs_avoided": 161,
+    "total_fruits_sliced": 1488,
+    "total_games_played": 59,
+    "total_combos": 82,
+    "total_ice_sliced": 48,
+    "total_bomb_explosions": 33,
+    "total_bombs_avoided": 181,
     "mode_switches": 0,
     "success_screen_visited": false,
     "first_launch": false
@@ -79,6 +79,39 @@
         "classic_easy": 0,
         "classic_normal": 20,
         "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "Stepan": {
+      "pseudo": "Stepan",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 44,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "sedfsde": {
+      "pseudo": "sedfsde",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 207
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "asfad": {
+      "pseudo": "asfad",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 46,
         "challenge": 0
       },
       "tutorial_seen": true,

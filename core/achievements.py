@@ -1,5 +1,5 @@
 """
-AchievementManager - Gestionnaire des succès pour Fruit Slicer
+AchievementManager - Achievement manager for Fruit Slicer
 """
 
 import json
@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Callable
 from dataclasses import dataclass, asdict
 from enum import Enum
 
-from core.lang_manager import get as lang_get  # Import direct pour éviter circulaire
+from core.lang_manager import get as lang_get  # Direct import to avoid circular imports
 
 
 class AchievementCategory(Enum):
@@ -23,7 +23,7 @@ class AchievementCategory(Enum):
 
 @dataclass
 class Achievement:
-    """Représente un succès individuel"""
+    """Represents an individual achievement"""
     id: str
     category: str
     condition_type: str
@@ -41,7 +41,7 @@ class Achievement:
 
 @dataclass
 class GameStats:
-    """Statistiques d'une partie en cours"""
+    """Statistics for the current game session"""
     score: int = 0
     fruits_sliced: int = 0
     max_combo: int = 0
@@ -59,7 +59,7 @@ class GameStats:
 
 @dataclass
 class GlobalStats:
-    """Statistiques globales cumulées"""
+    """Cumulative global statistics"""
     total_fruits_sliced: int = 0
     total_games_played: int = 0
     total_combos: int = 0
@@ -78,9 +78,9 @@ class GlobalStats:
         return cls(**data)
 
 
-# Définition des succès : (id, category, condition_type, condition_value)
+# Achievement definitions: (id, category, condition_type, condition_value)
 ACHIEVEMENTS_DATA = [
-    # Fruits tranchés (cumulatif)
+    # Sliced fruits (cumulative)
     ("premier_repas", AchievementCategory.FRUITS, "total_fruits", 10),
     ("appetit_croissant", AchievementCategory.FRUITS, "total_fruits", 50),
     ("glouton_vert", AchievementCategory.FRUITS, "total_fruits", 100),
@@ -88,7 +88,7 @@ ACHIEVEMENTS_DATA = [
     ("legende_ile", AchievementCategory.FRUITS, "total_fruits", 500),
     ("maitre_gourmet", AchievementCategory.FRUITS, "total_fruits", 1000),
     
-    # Score en une partie
+    # Score in a single game
     ("bebe_yoshi", AchievementCategory.SCORE, "score", 10),
     ("yoshi_junior", AchievementCategory.SCORE, "score", 25),
     ("yoshi_confirme", AchievementCategory.SCORE, "score", 50),
@@ -103,26 +103,26 @@ ACHIEVEMENTS_DATA = [
     ("combo_addict", AchievementCategory.COMBOS, "total_combos", 10),
     ("combo_master", AchievementCategory.COMBOS, "total_combos", 50),
     
-    # Glaçons
+    # Ice cubes
     ("fraicheur_bienvenue", AchievementCategory.ICE, "ice_game", 1),
     ("maitre_givre", AchievementCategory.ICE, "total_ice", 10),
     ("roi_glace", AchievementCategory.ICE, "total_ice", 25),
     ("freeze_stratege", AchievementCategory.ICE, "ice_game", 3),
     
-    # Survie
+    # Survival
     ("coeur_intact", AchievementCategory.SURVIVAL, "no_hearts_lost", 1),
     ("prudence", AchievementCategory.SURVIVAL, "hearts_remaining", 2),
     ("survivant", AchievementCategory.SURVIVAL, "total_games", 10),
     ("perseverant", AchievementCategory.SURVIVAL, "total_games", 25),
     ("increvable", AchievementCategory.SURVIVAL, "total_games", 50),
     
-    # Bombes
+    # Bombs
     ("oups", AchievementCategory.BOMBS, "exploded", 1),
     ("demineur_amateur", AchievementCategory.BOMBS, "bombs_avoided_game", 10),
     ("expert_explosifs", AchievementCategory.BOMBS, "bombs_avoided_game", 25),
     ("accident_travail", AchievementCategory.BOMBS, "total_explosions", 10),
     
-    # Spéciaux
+    # Special
     ("bienvenue", AchievementCategory.SPECIAL, "first_launch", 1),
     ("explorateur", AchievementCategory.SPECIAL, "success_screen", 1),
     ("indecis", AchievementCategory.SPECIAL, "mode_switches", 5),
@@ -135,7 +135,7 @@ ACHIEVEMENTS_DATA = [
 
 
 class AchievementManager:
-    """Gestionnaire principal des succès."""
+    """Main achievement manager."""
     
     SAVE_FILE = "save_data.json"
     
@@ -154,10 +154,10 @@ class AchievementManager:
         for id, category, cond_type, cond_value in ACHIEVEMENTS_DATA:
             self.achievements[id] = Achievement(id, category.value, cond_type, cond_value)
     
-    # ==================== SAUVEGARDE ====================
+    # ==================== SAVE ====================
     
     def save(self):
-        # Charger les données existantes pour ne pas écraser les autres sections (players, etc.)
+        # Load existing data to avoid overwriting other sections (players, etc.)
         existing_data = {}
         if os.path.exists(self.save_path):
             try:
@@ -166,7 +166,7 @@ class AchievementManager:
             except (IOError, json.JSONDecodeError):
                 pass
     
-        # Mettre à jour uniquement les sections achievements et global_stats
+        # Update only the achievements and global_stats sections
         existing_data["achievements"] = {aid: ach.unlocked for aid, ach in self.achievements.items()}
         existing_data["global_stats"] = self.global_stats.to_dict()
     
@@ -265,7 +265,7 @@ class AchievementManager:
             self._unlock("explorateur")
             self.save()
     
-    # ==================== VÉRIFICATION ====================
+    # ==================== CHECKING ====================
     
     def _unlock(self, achievement_id: str) -> bool:
         ach = self.achievements.get(achievement_id)
@@ -278,13 +278,13 @@ class AchievementManager:
         return False
     
     def _check_by_type(self, condition_type: str, value: int):
-        """Vérifie et débloque tous les succès d'un type si le seuil est atteint"""
+        """Check and unlock all achievements of a given type if the threshold is met"""
         for ach in self.achievements.values():
             if ach.condition_type == condition_type and value >= ach.condition_value:
                 self._unlock(ach.id)
     
     def _check_all(self, exploded: bool):
-        """Vérifie tous les succès en fin de partie"""
+        """Check all achievements at the end of a game"""
         gs = self.game_stats
         gstats = self.global_stats
         

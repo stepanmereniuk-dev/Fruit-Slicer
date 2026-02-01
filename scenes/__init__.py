@@ -1,5 +1,5 @@
 """
-Scenes - Écrans du jeu
+Scenes
 """
 
 from scenes.base_scene import BaseScene

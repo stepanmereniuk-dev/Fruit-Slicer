@@ -1,9 +1,9 @@
 """
-InputHandler - Gère les entrées utilisateur (clavier et souris).
+InputHandler - Handles user inputs (keyboard and mouse).
 
-Principe d'abstraction (selon la doc) :
-Le jeu ne sait pas quel mode est actif. L'InputHandler traduit
-les événements en actions : "trancher ces entités".
+Abstraction principle (according to the doc):
+The game does not know which mode is active. The InputHandler translates
+events into actions: "slice these entities".
 """
 
 import pygame
@@ -18,38 +18,38 @@ Entity = Union[Fruit, Bomb, Ice]
 
 class InputHandler:
     """
-    Gère les entrées et détecte les collisions avec les entités.
-    Mode souris : traînée de points, collision avec segment.
-    Mode clavier : touche pressée = tranche tous les éléments avec cette lettre.
+    Handles inputs and detects collisions with entities.
+    Mouse mode: trail of points, collision with line segment.
+    Keyboard mode: pressed key = slice all elements with that letter.
     """
     
-    # Longueur max de la traînée souris
+    # Maximum length of the mouse trail
     TRAIL_LENGTH = 20
     
     def __init__(self, mode: str = "mouse"):
         self.mode = mode
         
-        # Mode souris
+        # Mouse mode
         self.mouse_down = False
         self.mouse_trail: deque = deque(maxlen=self.TRAIL_LENGTH)
         self.last_mouse_pos: Tuple[int, int] = (0, 0)
         
-        # Entités déjà tranchées dans ce tracé (pour éviter les doublons)
+        # Entities already sliced in this stroke (to avoid duplicates)
         self._sliced_this_stroke: Set[int] = set()
         
-        # Accumulation des fruits tranchés dans le tracé actuel
+        # Accumulation of fruits sliced in the current stroke
         self._pending_sliced: List[Entity] = []
         
-        # Mode clavier
+        # Keyboard mode
         self.pressed_keys: set = set()
     
     def set_mode(self, mode: str):
-        """Change le mode de contrôle."""
+        """Change the control mode."""
         self.mode = mode
         self.reset()
     
     def reset(self):
-        """Remet l'état à zéro."""
+        """Reset the state to initial values."""
         self.mouse_down = False
         self.mouse_trail.clear()
         self.pressed_keys.clear()
@@ -57,14 +57,14 @@ class InputHandler:
         self._pending_sliced.clear()
     
     def handle_event(self, event: pygame.event.Event):
-        """Traite un événement pygame."""
+        """Process a pygame event."""
         if self.mode == "mouse":
             self._handle_mouse_event(event)
         else:
             self._handle_keyboard_event(event)
     
     def _handle_mouse_event(self, event: pygame.event.Event):
-        """Gère les événements souris."""
+        """Handle mouse events."""
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.mouse_down = True
             self.mouse_trail.clear()
@@ -82,7 +82,7 @@ class InputHandler:
             self.last_mouse_pos = event.pos
     
     def _handle_keyboard_event(self, event: pygame.event.Event):
-        """Gère les événements clavier."""
+        """Handle keyboard events."""
         if event.type == pygame.KEYDOWN:
             key_name = pygame.key.name(event.key).upper()
             self.pressed_keys.add(key_name)
@@ -93,8 +93,8 @@ class InputHandler:
     
     def get_sliced_entities(self, entities: List[Entity]) -> List[Entity]:
         """
-        Retourne la liste des entités tranchées ce frame.
-        C'est la méthode principale utilisée par le jeu.
+        Returns the list of entities sliced this frame.
+        This is the main method used by the game.
         """
         if self.mode == "mouse":
             return self._get_mouse_sliced(entities)
@@ -102,27 +102,27 @@ class InputHandler:
             return self._get_keyboard_sliced(entities)
     
     def _get_mouse_sliced(self, entities: List[Entity]) -> List[Entity]:
-        """Détecte les entités traversées par la traînée souris."""
+        """Detect entities intersected by the mouse trail."""
         if not self.mouse_down or len(self.mouse_trail) < 2:
             return []
         
         sliced = []
         
-        # Vérifier collision avec le dernier segment de la traînée
+        # Check collision with the last segment of the trail
         p1 = self.mouse_trail[-2]
         p2 = self.mouse_trail[-1]
         
-        # Il faut un mouvement minimum pour couper
+        # A minimum movement is required to slice
         dx = p2[0] - p1[0]
         dy = p2[1] - p1[1]
-        if dx * dx + dy * dy < 25:  # Seuil de mouvement
+        if dx * dx + dy * dy < 25:  # Movement threshold
             return []
         
         for entity in entities:
             if entity.sliced:
                 continue
             
-            # Éviter de retrancher la même entité dans ce tracé
+            # Avoid re-slicing the same entity in this stroke
             entity_id = id(entity)
             if entity_id in self._sliced_this_stroke:
                 continue
@@ -134,7 +134,7 @@ class InputHandler:
         return sliced
     
     def _get_keyboard_sliced(self, entities: List[Entity]) -> List[Entity]:
-        """Détecte les entités dont la lettre a été pressée."""
+        """Detect entities whose letter key was pressed."""
         if not self.pressed_keys:
             return []
         
@@ -146,15 +146,15 @@ class InputHandler:
             if entity.letter and entity.letter in self.pressed_keys:
                 sliced.append(entity)
         
-        # Vider les touches pressées (une pression = une action)
+        # Clear pressed keys (one press = one action)
         self.pressed_keys.clear()
         
         return sliced
     
     def get_trail_points(self) -> List[Tuple[int, int]]:
-        """Retourne les points de la traînée pour l'affichage."""
+        """Returns the trail points for rendering."""
         return list(self.mouse_trail)
     
     def is_slicing(self) -> bool:
-        """Retourne True si l'utilisateur est en train de trancher."""
+        """Returns True if the user is currently slicing."""
         return self.mouse_down if self.mode == "mouse" else bool(self.pressed_keys)

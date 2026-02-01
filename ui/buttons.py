@@ -1,9 +1,9 @@
 """
-Buttons - Composants de boutons réutilisables avec effets hover et clic.
+Buttons - Reusable button components with hover and click effects.
 
-Effets :
-- Hover : Éclaircissement du bouton
-- Clic : Assombrissement + légère réduction de taille
+Effects:
+- Hover: Brightening the button
+- Click: Darkening + slight size reduction
 """
 
 import pygame
@@ -15,9 +15,9 @@ from config import IMAGES_DIR, FONTS_DIR, FONT_FILE, FONT_SIZE
 
 class Button:
     """
-    Bouton cliquable avec effets visuels.
+    Clickable button with visual effects.
     
-    Utilisation :
+    Usage:
         btn = Button(
             image_path="scenes/menu_scene/bouton jouer 458x89.png",
             center=(960, 624),
@@ -26,17 +26,17 @@ class Button:
             on_click=lambda: scene_manager.change_scene('game')
         )
         
-        # Dans handle_events :
+        # In handle_events:
         btn.handle_event(event)
         
-        # Dans render :
+        # In render:
         btn.render(screen, font)
     """
     
-    # Facteurs d'effet
-    HOVER_BRIGHTEN = (20, 20, 20)  # Ajout RGB pour éclaircir (léger)
-    CLICK_DARKEN = (180, 180, 180)  # Multiplication RGB pour assombrir (léger)
-    CLICK_SCALE = 0.97             # Réduction de taille au clic (subtile)
+    # Effect factors
+    HOVER_BRIGHTEN = (20, 20, 20)  # RGB add for lightening (subtle)
+    CLICK_DARKEN = (180, 180, 180)  # RGB multiply for darkening (subtle)
+    CLICK_SCALE = 0.97             # Size reduction on click (subtle)
     
     def __init__(
         self,
@@ -50,13 +50,13 @@ class Button:
     ):
         """
         Args:
-            image_path: Chemin relatif depuis IMAGES_DIR
-            center: Position du centre du bouton
-            text: Texte à afficher sur le bouton
-            text_color: Couleur du texte
-            font: Police (si None, sera définie lors du render)
-            on_click: Fonction appelée lors du clic
-            enabled: Si False, le bouton est grisé et non cliquable
+            image_path: Relative path from IMAGES_DIR
+            center: Button center position
+            text: Text to display on the button
+            text_color: Text color
+            font: Font (if None, will be set during render)
+            on_click: Function called on click
+            enabled: If False, the button is grayed out and not clickable
         """
         self.center = center
         self.text = text
@@ -64,35 +64,35 @@ class Button:
         self.on_click = on_click
         self.enabled = enabled
         
-        # Charger l'image originale
+        # Load original image
         self.image_original = pygame.image.load(
             os.path.join(IMAGES_DIR, image_path)
         ).convert_alpha()
         
-        # Créer les versions avec effets
+        # Create effect versions
         self._create_effect_images()
         
-        # Rectangle de collision (basé sur l'image originale)
+        # Collision rectangle (based on original image)
         self.rect = self.image_original.get_rect(center=center)
         
-        # États
+        # States
         self.is_hovered = False
         self.is_pressed = False
         
-        # Police
+        # Font
         self.font = font
     
     def _create_effect_images(self):
-        """Crée les versions hover et clic de l'image."""
-        # Version hover (éclaircie)
+        """Creates hover and click versions of the image."""
+        # Hover version (brightened)
         self.image_hover = self.image_original.copy()
         self.image_hover.fill(self.HOVER_BRIGHTEN, special_flags=pygame.BLEND_RGB_ADD)
         
-        # Version clic (assombrie + réduite)
+        # Click version (darkened + scaled)
         darkened = self.image_original.copy()
         darkened.fill(self.CLICK_DARKEN, special_flags=pygame.BLEND_RGB_MULT)
         
-        # Réduire la taille
+        # Scale down
         original_size = self.image_original.get_size()
         new_size = (
             int(original_size[0] * self.CLICK_SCALE),
@@ -100,16 +100,16 @@ class Button:
         )
         self.image_click = pygame.transform.smoothscale(darkened, new_size)
         
-        # Version désactivée (assombrie)
+        # Disabled version (darkened)
         self.image_disabled = self.image_original.copy()
         self.image_disabled.fill(self.CLICK_DARKEN, special_flags=pygame.BLEND_RGB_MULT)
     
     def set_text(self, text: str):
-        """Change le texte du bouton."""
+        """Changes the button text."""
         self.text = text
     
     def set_enabled(self, enabled: bool):
-        """Active ou désactive le bouton."""
+        """Enables or disables the button."""
         self.enabled = enabled
         if not enabled:
             self.is_hovered = False
@@ -117,8 +117,8 @@ class Button:
     
     def handle_event(self, event: pygame.event.Event) -> bool:
         """
-        Gère un événement pygame.
-        Retourne True si le bouton a été cliqué.
+        Handles a pygame event.
+        Returns True if the button was clicked.
         """
         if not self.enabled:
             return False
@@ -143,16 +143,16 @@ class Button:
         return False
     
     def update_hover(self, mouse_pos: Tuple[int, int]):
-        """Met à jour l'état hover selon la position de la souris."""
+        """Updates hover state based on mouse position."""
         if self.enabled:
             self.is_hovered = self.rect.collidepoint(mouse_pos)
     
     def render(self, screen: pygame.Surface, font: Optional[pygame.font.Font] = None):
-        """Affiche le bouton avec l'effet approprié."""
-        # Utiliser la police fournie ou celle stockée
+        """Renders the button with the appropriate effect."""
+        # Use provided font or stored one
         render_font = font or self.font
         
-        # Sélectionner l'image selon l'état
+        # Select image based on state
         if not self.enabled:
             image = self.image_disabled
             image_rect = image.get_rect(center=self.center)
@@ -166,10 +166,10 @@ class Button:
             image = self.image_original
             image_rect = self.rect
         
-        # Afficher l'image
+        # Draw image
         screen.blit(image, image_rect)
         
-        # Afficher le texte
+        # Draw text
         if self.text and render_font:
             text_surface = render_font.render(self.text, True, self.text_color)
             text_rect = text_surface.get_rect(center=image_rect.center)
@@ -178,7 +178,7 @@ class Button:
 
 class ImageButton:
     """
-    Bouton image simple sans texte (pour les icônes comme engrenage, croix).
+    Simple image button without text (for icons like gear, cross).
     """
     
     HOVER_BRIGHTEN = (20, 20, 20)
@@ -194,28 +194,28 @@ class ImageButton:
         self.center = center
         self.on_click = on_click
         
-        # Charger l'image
+        # Load image
         self.image_original = pygame.image.load(
             os.path.join(IMAGES_DIR, image_path)
         ).convert_alpha()
         
-        # Créer les versions avec effets
+        # Create effect versions
         self._create_effect_images()
         
         # Rectangle
         self.rect = self.image_original.get_rect(center=center)
         
-        # États
+        # States
         self.is_hovered = False
         self.is_pressed = False
     
     def _create_effect_images(self):
-        """Crée les versions hover et clic."""
+        """Creates hover and click versions."""
         # Hover
         self.image_hover = self.image_original.copy()
         self.image_hover.fill(self.HOVER_BRIGHTEN, special_flags=pygame.BLEND_RGB_ADD)
         
-        # Clic
+        # Click
         darkened = self.image_original.copy()
         darkened.fill(self.CLICK_DARKEN, special_flags=pygame.BLEND_RGB_MULT)
         original_size = self.image_original.get_size()
@@ -226,7 +226,7 @@ class ImageButton:
         self.image_click = pygame.transform.smoothscale(darkened, new_size)
     
     def handle_event(self, event: pygame.event.Event) -> bool:
-        """Gère un événement. Retourne True si cliqué."""
+        """Handles an event. Returns True if clicked."""
         if event.type == pygame.MOUSEMOTION:
             self.is_hovered = self.rect.collidepoint(event.pos)
             if not self.is_hovered:
@@ -247,7 +247,7 @@ class ImageButton:
         return False
     
     def render(self, screen: pygame.Surface):
-        """Affiche le bouton."""
+        """Renders the button."""
         if self.is_pressed:
             image = self.image_click
             rect = image.get_rect(center=self.center)
@@ -259,3 +259,4 @@ class ImageButton:
             rect = self.rect
         
         screen.blit(image, rect)
+        

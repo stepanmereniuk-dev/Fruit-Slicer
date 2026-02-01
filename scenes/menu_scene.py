@@ -1,6 +1,6 @@
 """
-MenuScene - Menu principal du jeu.
-Affiche le fond et les 6 boutons de navigation.
+MenuScene - Main game menu.
+Displays the background and the 6 navigation buttons.
 """
 
 import pygame
@@ -14,7 +14,7 @@ from ui.buttons import Button
 
 
 class MenuScene(BaseScene):
-    """Scène du menu principal."""
+    """Main menu scene."""
     
     def __init__(self, scene_manager):
         super().__init__(scene_manager)
@@ -23,16 +23,16 @@ class MenuScene(BaseScene):
         self.buttons: Dict[str, Button] = {}
     
     def setup(self):
-        """Charge les ressources du menu."""
+        """Loads menu resources."""
         # Background
         bg_path = os.path.join(IMAGES_DIR, Images.MENU_BG)
         self.background = pygame.image.load(bg_path).convert()
         
-        # Police
+        # Font
         font_path = os.path.join(FONTS_DIR, FONT_FILE)
         self.font = pygame.font.Font(font_path, FONT_SIZE)
         
-        # Création des boutons avec callbacks
+        # Create buttons with callbacks
         self.buttons = {
             'jouer': Button(
                 image_path=Images.BTN_JOUER,
@@ -78,7 +78,7 @@ class MenuScene(BaseScene):
             ),
         }
     
-    # Callbacks des boutons
+    # Button callbacks
     def _on_play_classic(self):
         self.scene_manager.shared_data['mode'] = 'classic'
         self.scene_manager.change_scene('player_select')
@@ -101,7 +101,7 @@ class MenuScene(BaseScene):
     
     def handle_events(self, events: List[pygame.event.Event]):
         for event in events:
-            # Transmettre les événements aux boutons
+            # Pass events to buttons
             for button in self.buttons.values():
                 button.handle_event(event)
     
@@ -109,9 +109,9 @@ class MenuScene(BaseScene):
         pass
     
     def render(self, screen: pygame.Surface):
-        # Fond
+        # Background
         screen.blit(self.background, (0, 0))
         
-        # Boutons
+        # Buttons
         for button in self.buttons.values():
             button.render(screen, self.font)

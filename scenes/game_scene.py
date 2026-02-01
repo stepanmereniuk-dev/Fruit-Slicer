@@ -1,6 +1,6 @@
 """
-GameScene - Écran de jeu principal.
-Gère le gameplay : fruits, bombes, glaçons, score, cœurs, freeze.
+GameScene - Main game screen.
+Handles gameplay: fruits, bombs, ice flowers, score, hearts, freeze.
 """
 
 import pygame
@@ -26,68 +26,68 @@ Entity = Union[Fruit, Bomb, Ice]
 
 
 class GameScene(BaseScene):
-    """Scène de jeu - mode classique et challenge."""
+    """Game scene - classic and challenge modes."""
     
-    # Taille de police pour le score
+    # Font size for score
     SCORE_FONT_SIZE = 40
     
     def __init__(self, scene_manager):
         super().__init__(scene_manager)
         
-        # Ressources
+        # Resources
         self.background = None
         self.font_score = None
         self.font_letter = None
         
-        # Images HUD
-        self.coin_img = None  # TODO: ajouter l'image de la pièce
+        # HUD images
+        self.coin_img = None  # TODO: add coin image
         self.heart_full_img = None
         self.heart_empty_img = None
         self.gauge_img = None
-        self.gauge_segments = []  # [jaune, orange, rouge, violet, bleu]
-        self.timer_frame_img = None  # Cadre du timer (challenge)
+        self.gauge_segments = []  # [yellow, orange, red, purple, blue]
+        self.timer_frame_img = None  # Timer frame (challenge mode)
         
-        # Boutons
+        # Buttons
         self.btn_gear: Optional[ImageButton] = None
         self.btn_cross: Optional[ImageButton] = None
         
-        # Composants
+        # Components
         self.scoring = ScoringManager()
         self.bonus_gauge = BonusGauge()
         self.spawner = None
         self.input_handler = None
         self.achievement_manager = None
         
-        # État du jeu
+        # Game state
         self.entities: List[Entity] = []
-        self.splashes: List[Splash] = []  # Éclaboussures actives
+        self.splashes: List[Splash] = []  # Active splashes
         self.hearts = GameConfig.MAX_HEARTS
         self.game_time = 0.0
         self.is_frozen = False
         self.freeze_timer = 0.0
         self.game_over = False
-        self.exploded = False  # Game over par bombe
+        self.exploded = False  # Game over by bomb
         
-        # Accumulation des fruits tranchés pendant un tracé souris
+        # Accumulation of fruits sliced during a mouse stroke
         self._stroke_sliced_fruits: List[Fruit] = []
         self._was_slicing = False
         
-        # Mode de jeu
-        self.mode = 'classic'  # 'classic' ou 'challenge'
+        # Game mode
+        self.mode = 'classic'  # 'classic' or 'challenge'
         self.difficulty = 'normal'
         self.challenge_timer = 0.0
     
     def setup(self):
-        """Initialise la partie."""
-        # Récupérer les données du scene_manager
+        """Initializes the game."""
+        # Retrieve data from scene_manager
         self.mode = self.scene_manager.shared_data.get('mode', 'classic')
         self.difficulty = self.scene_manager.shared_data.get('difficulty', 'normal')
         control_mode = self.scene_manager.shared_data.get('control_mode', 'mouse')
         
-        # Charger les ressources
+        # Load resources
         self._load_resources()
         
-        # Initialiser les composants
+        # Initialize components
         if self.mode == 'challenge':
             self.spawner = Spawner('challenge')
             self.challenge_timer = DIFFICULTY['challenge']['duration']
@@ -96,7 +96,7 @@ class GameScene(BaseScene):
         
         self.input_handler = InputHandler(control_mode)
         
-        # Reset état
+        # Reset state
         self.entities.clear()
         self.splashes.clear()
         self.scoring.reset()
@@ -110,25 +110,25 @@ class GameScene(BaseScene):
         self._stroke_sliced_fruits.clear()
         self._was_slicing = False
         
-        # Démarrer le tracking des succès
+        # Start achievement tracking
         if self.achievement_manager:
             self.achievement_manager.start_new_game(control_mode)
     
     def _load_resources(self):
-        """Charge les images et polices."""
-        # Background selon le mode
+        """Loads images and fonts."""
+        # Background depending on mode
         if self.mode == 'challenge':
             bg_path = os.path.join(IMAGES_DIR, Images.CHALLENGE_BG)
         else:
             bg_path = os.path.join(IMAGES_DIR, Images.GAME_BG)
         self.background = pygame.image.load(bg_path).convert()
         
-        # Polices
+        # Fonts
         font_path = os.path.join(FONTS_DIR, FONT_FILE)
         self.font_score = pygame.font.Font(font_path, self.SCORE_FONT_SIZE)
         self.font_letter = pygame.font.Font(font_path, 24)
         
-        # Cœurs
+        # Hearts
         self.heart_full_img = pygame.image.load(
             os.path.join(IMAGES_DIR, Images.HEART_FULL)
         ).convert_alpha()
@@ -136,12 +136,12 @@ class GameScene(BaseScene):
             os.path.join(IMAGES_DIR, Images.HEART_EMPTY)
         ).convert_alpha()
         
-        # Jauge
+        # Gauge
         self.gauge_img = pygame.image.load(
             os.path.join(IMAGES_DIR, Images.GAUGE)
         ).convert_alpha()
         
-        # Segments de la jauge
+        # Gauge segments
         segment_paths = [
             Images.GAUGE_YELLOW,
             Images.GAUGE_ORANGE,
@@ -154,13 +154,13 @@ class GameScene(BaseScene):
             img = pygame.image.load(os.path.join(IMAGES_DIR, path)).convert_alpha()
             self.gauge_segments.append(img)
         
-        # Cadre du timer (mode challenge uniquement)
+        # Timer frame (challenge mode only)
         if self.mode == 'challenge':
             self.timer_frame_img = pygame.image.load(
                 os.path.join(IMAGES_DIR, Images.CHALLENGE_TIMER_FRAME)
             ).convert_alpha()
         
-        # Boutons (engrenage et croix)
+        # Buttons (gear and cross)
         self.btn_gear = ImageButton(
             image_path=Images.GEAR,
             center=Layout.GAME_GEAR,
@@ -173,16 +173,16 @@ class GameScene(BaseScene):
         )
     
     def set_achievement_manager(self, manager: AchievementManager):
-        """Définit le gestionnaire de succès."""
+        """Sets the achievement manager."""
         self.achievement_manager = manager
     
-    # Callbacks boutons
+    # Button callbacks
     def _on_settings(self):
-        # TODO: ouvrir les paramètres en pause
+        # TODO: open settings in pause
         pass
     
     def _on_quit(self):
-        # Retour au menu
+        # Back to menu
         self.scene_manager.change_scene('menu')
     
     def handle_events(self, events: List[pygame.event.Event]):
@@ -190,14 +190,14 @@ class GameScene(BaseScene):
             return
         
         for event in events:
-            # Boutons HUD
+            # HUD buttons
             self.btn_gear.handle_event(event)
             self.btn_cross.handle_event(event)
             
-            # Transmettre à l'input handler
+            # Pass to input handler
             self.input_handler.handle_event(event)
             
-            # Raccourci Échap pour quitter
+            # Escape shortcut to quit
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self._on_quit()
     
@@ -207,90 +207,90 @@ class GameScene(BaseScene):
         
         self.game_time += dt
         
-        # Mode challenge : décompte du temps
+        # Challenge mode: countdown timer
         if self.mode == 'challenge':
             self.challenge_timer -= dt
             if self.challenge_timer <= 0:
                 self._end_game()
                 return
         
-        # Gestion du freeze
+        # Freeze handling
         if self.is_frozen:
             self.freeze_timer -= dt
             if self.freeze_timer <= 0:
                 self._unfreeze_all()
         
-        # Mise à jour du multiplicateur
+        # Update multiplier
         self.scoring.update(dt)
         
-        # Spawn de nouvelles entités (sauf si freeze)
+        # Spawn new entities (unless frozen)
         if not self.is_frozen:
             keyboard_mode = self.input_handler.mode == "keyboard"
             new_entities = self.spawner.update(dt, keyboard_mode)
             self.entities.extend(new_entities)
         
-        # Mise à jour des entités
+        # Update entities
         for entity in self.entities:
             entity.update(dt)
         
-        # Mise à jour des éclaboussures
+        # Update splashes
         for splash in self.splashes:
             splash.update(dt)
         
-        # Détection des tranches
+        # Detect slices
         sliced = self.input_handler.get_sliced_entities(self.entities)
         if sliced:
             self._process_sliced(sliced)
         
-        # Vérifier fin de tracé souris pour calculer le score du combo
+        # Check end of mouse stroke to calculate combo score
         is_slicing = self.input_handler.is_slicing()
         if self._was_slicing and not is_slicing:
-            # Fin du tracé : calculer le score de tous les fruits accumulés
+            # End of stroke: calculate score for all accumulated fruits
             self._finalize_stroke()
         self._was_slicing = is_slicing
         
-        # Vérifier si le freeze doit se terminer (plus de fruits gelés)
+        # Check if freeze should end (no more frozen fruits)
         self._check_freeze_end()
         
-        # Vérifier les entités sorties de l'écran
+        # Check entities that went off-screen
         self._check_missed_entities()
         
-        # Nettoyer les entités mortes et les éclaboussures terminées
+        # Clean up dead entities and finished splashes
         self._cleanup_entities()
         self.splashes = [s for s in self.splashes if not s.finished]
         
-        # Mise à jour du temps pour les succès
+        # Update time for achievements
         if self.achievement_manager:
             self.achievement_manager.on_time_update(self.game_time)
     
     def _finalize_stroke(self):
-        """Finalise un tracé souris : calcule le score et les bonus."""
+        """Finalizes a mouse stroke: calculates score and bonuses."""
         if not self._stroke_sliced_fruits:
             return
         
         fruits = self._stroke_sliced_fruits
         count = len(fruits)
         
-        # Calculer les points (combo si plusieurs fruits)
+        # Calculate points (combo if multiple fruits)
         points = self.scoring.add_sliced_fruits(count)
         
-        # Vérifier paires identiques pour la jauge bonus
+        # Check identical pairs for bonus gauge
         fruit_types = [f.fruit_type for f in fruits]
         for fruit_type in set(fruit_types):
             if fruit_types.count(fruit_type) >= 2:
                 if self.bonus_gauge.add_cran():
                     self._activate_multiplier()
         
-        # Succès
+        # Achievements
         if self.achievement_manager:
             self.achievement_manager.on_fruit_sliced(count)
             self.achievement_manager.on_score_update(self.scoring.score)
         
-        # Reset pour le prochain tracé
+        # Reset for next stroke
         self._stroke_sliced_fruits.clear()
     
     def _process_sliced(self, sliced: List[Entity]):
-        """Traite les entités tranchées."""
+        """Processes sliced entities."""
         fruits_sliced = []
         bomb_sliced = False
         ice_sliced = False
@@ -298,7 +298,7 @@ class GameScene(BaseScene):
         for entity in sliced:
             entity.slice()
             
-            # Libérer la lettre
+            # Release the letter
             if entity.letter:
                 self.spawner.release_letter(entity.letter)
             
@@ -309,7 +309,7 @@ class GameScene(BaseScene):
             elif isinstance(entity, Ice):
                 ice_sliced = True
         
-        # Priorité : bombe > glaçon > fruits (selon doc)
+        # Priority: bomb > ice > fruits
         if bomb_sliced:
             self._on_bomb_sliced()
             return
@@ -321,49 +321,49 @@ class GameScene(BaseScene):
             self._on_fruits_sliced(fruits_sliced)
     
     def _on_fruits_sliced(self, fruits: List[Fruit]):
-        """Appelé quand des fruits sont tranchés (accumule pour le tracé)."""
-        # Créer les éclaboussures immédiatement
+        """Called when fruits are sliced (accumulates for stroke)."""
+        # Create splashes immediately
         for fruit in fruits:
             cx, cy = fruit.center
             splash = Splash(fruit.fruit_type, cx, cy)
             self.splashes.append(splash)
         
-        # Mode souris : accumuler pour le combo de fin de tracé
+        # Mouse mode: accumulate for end-of-stroke combo
         if self.input_handler.mode == "mouse":
             self._stroke_sliced_fruits.extend(fruits)
         else:
-            # Mode clavier : traiter immédiatement (une touche = un groupe)
+            # Keyboard mode: process immediately (one key = one group)
             count = len(fruits)
             self.scoring.add_sliced_fruits(count)
             
-            # Vérifier paires identiques pour la jauge bonus
+            # Check identical pairs for bonus gauge
             fruit_types = [f.fruit_type for f in fruits]
             for fruit_type in set(fruit_types):
                 if fruit_types.count(fruit_type) >= 2:
                     if self.bonus_gauge.add_cran():
                         self._activate_multiplier()
             
-            # Succès
+            # Achievements
             if self.achievement_manager:
                 self.achievement_manager.on_fruit_sliced(count)
                 self.achievement_manager.on_score_update(self.scoring.score)
     
     def _on_bomb_sliced(self):
-        """Appelé quand une bombe est tranchée."""
+        """Called when a bomb is sliced."""
         if self.mode == 'challenge':
-            # Mode challenge : pénalité de points
+            # Challenge mode: point penalty
             penalty = DIFFICULTY['challenge']['bomb_penalty']
             self.scoring.apply_bomb_penalty(penalty)
         else:
-            # Mode classique : game over instantané
+            # Classic mode: instant game over
             self.exploded = True
             self._end_game()
     
     def _on_ice_sliced(self):
-        """Appelé quand un glaçon est tranché."""
-        # Récupérer la durée du freeze selon la difficulté
+        """Called when an ice flower is sliced."""
+        # Get freeze duration based on difficulty
         if self.mode == 'challenge':
-            return  # Pas de glaçons en mode challenge
+            return  # No ice flowers in challenge mode
         
         freeze_duration = DIFFICULTY.get(self.difficulty, DIFFICULTY['normal']).get('freeze_duration', 4.0)
         self._freeze_all(freeze_duration)
@@ -372,17 +372,17 @@ class GameScene(BaseScene):
             self.achievement_manager.on_ice_sliced()
     
     def _freeze_all(self, duration: float):
-        """Gèle tous les fruits (pas les bombes ni les glaçons)."""
+        """Freezes all fruits (not bombs or ice flowers)."""
         self.is_frozen = True
         self.freeze_timer = duration
         
-        # Ne geler que les fruits non tranchés
+        # Freeze only unsliced fruits
         for entity in self.entities:
             if isinstance(entity, Fruit) and not entity.sliced:
                 entity.freeze()
     
     def _unfreeze_all(self):
-        """Dégèle toutes les entités."""
+        """Unfreezes all entities."""
         self.is_frozen = False
         self.freeze_timer = 0.0
         
@@ -391,11 +391,11 @@ class GameScene(BaseScene):
                 entity.unfreeze()
     
     def _check_freeze_end(self):
-        """Vérifie si le freeze doit se terminer (plus de fruits gelés)."""
+        """Checks if freeze should end (no more frozen fruits)."""
         if not self.is_frozen:
             return
         
-        # Compter les fruits encore gelés (non tranchés)
+        # Count still-frozen (unsliced) fruits
         frozen_fruits = [
             e for e in self.entities 
             if isinstance(e, Fruit) and e.frozen and not e.sliced
@@ -405,38 +405,38 @@ class GameScene(BaseScene):
             self._unfreeze_all()
     
     def _activate_multiplier(self):
-        """Active le multiplicateur quand la jauge est pleine."""
+        """Activates multiplier when gauge is full."""
         if self.scoring.has_multiplier:
-            # Augmenter le multiplicateur existant
+            # Increase existing multiplier
             self.scoring.increase_multiplier(
                 BonusGauge.MULTIPLIER_INCREMENT,
                 BonusGauge.MULTIPLIER_DURATION
             )
         else:
-            # Premier multiplicateur
+            # First multiplier
             self.scoring.activate_multiplier(2, BonusGauge.MULTIPLIER_DURATION)
     
     def _check_missed_entities(self):
-        """Vérifie les entités sorties par le bas de la zone de jeu."""
+        """Checks entities that exited bottom of game zone."""
         for entity in self.entities:
             if entity.sliced or entity.missed:
                 continue
             
-            # Un fruit est raté s'il sort par le bas de la zone de jeu
+            # Fruit is missed if it exits bottom of game zone
             if entity.y > GameConfig.GAME_ZONE_BOTTOM:
                 entity.missed = True
                 
                 if isinstance(entity, Fruit):
                     self._on_fruit_missed()
                 elif isinstance(entity, Bomb):
-                    # Bombe évitée
+                    # Bomb avoided
                     if self.achievement_manager:
                         self.achievement_manager.on_bomb_avoided()
     
     def _on_fruit_missed(self):
-        """Appelé quand un fruit est raté."""
+        """Called when a fruit is missed."""
         if self.mode == 'challenge':
-            return  # Pas de pénalité en mode challenge
+            return  # No penalty in challenge mode
         
         self.hearts -= 1
         
@@ -447,33 +447,33 @@ class GameScene(BaseScene):
             self._end_game()
     
     def _cleanup_entities(self):
-        """Supprime les entités sorties de la zone de jeu."""
+        """Removes entities that left the game zone."""
         self.entities = [
             e for e in self.entities
             if not (e.missed or e.y > GameConfig.GAME_ZONE_BOTTOM)
         ]
     
     def _end_game(self):
-        """Termine la partie."""
+        """Ends the game."""
         self.game_over = True
         
-        # Finaliser les succès
+        # Finalize achievements
         if self.achievement_manager:
             self.achievement_manager.end_game(self.exploded)
         
-        # Sauvegarder le score
+        # Save score
         self.scene_manager.shared_data['last_score'] = self.scoring.score
         self.scene_manager.shared_data['exploded'] = self.exploded
-        # TODO: vérifier si nouveau record
+        # TODO: check for new record
         
-        # Transition vers game over
+        # Transition to game over
         self.scene_manager.change_scene('game_over')
     
     def render(self, screen: pygame.Surface):
-        # Fond
+        # Background
         screen.blit(self.background, (0, 0))
         
-        # Définir la zone de clip pour les entités (zone de jeu uniquement)
+        # Set clip zone for entities (game zone only)
         game_zone_rect = pygame.Rect(
             GameConfig.GAME_ZONE_LEFT,
             GameConfig.GAME_ZONE_TOP,
@@ -482,57 +482,57 @@ class GameScene(BaseScene):
         )
         screen.set_clip(game_zone_rect)
         
-        # Éclaboussures (en arrière-plan des entités)
+        # Splashes (behind entities)
         for splash in self.splashes:
             splash.render(screen)
         
-        # Entités (clippées à la zone de jeu)
+        # Entities (clipped to game zone)
         for entity in self.entities:
             entity.render(screen, self.font_letter if self.input_handler.mode == "keyboard" else None)
         
-        # Traînée souris (clippée aussi)
+        # Mouse trail (also clipped)
         if self.input_handler.mode == "mouse" and self.input_handler.is_slicing():
             self._render_trail(screen)
         
-        # Retirer le clip pour le reste du HUD
+        # Remove clip for HUD
         screen.set_clip(None)
         
-        # HUD (pas clippé)
+        # HUD (not clipped)
         self._render_hud(screen)
     
     def _render_trail(self, screen: pygame.Surface):
-        """Affiche la traînée de la souris."""
+        """Renders the mouse trail."""
         points = self.input_handler.get_trail_points()
         if len(points) < 2:
             return
         
-        # Ligne blanche avec effet de fade
+        # White line with fade effect
         for i in range(1, len(points)):
             alpha = int(255 * (i / len(points)))
             color = (255, 255, 255)
             pygame.draw.line(screen, color, points[i-1], points[i], 3)
     
     def _render_hud(self, screen: pygame.Surface):
-        """Affiche le HUD (score, cœurs/timer, jauge, boutons)."""
-        # Score (haut gauche, justifié gauche depuis position 361)
+        """Renders HUD (score, hearts/timer, gauge, buttons)."""
+        # Score (top left, left-justified)
         self._render_score(screen)
         
-        # Cœurs ou Timer (haut centre)
+        # Hearts or Timer (top center)
         if self.mode == 'challenge':
             self._render_timer(screen)
         else:
             self._render_hearts(screen)
         
-        # Boutons (haut droit)
+        # Buttons (top right)
         self.btn_gear.render(screen)
         self.btn_cross.render(screen)
         
-        # Jauge bonus (bas centre)
+        # Bonus gauge (bottom center)
         self._render_gauge(screen)
     
     def _render_score(self, screen: pygame.Surface):
-        """Affiche le score avec multiplicateur si actif."""
-        # Format: "140387 x2 (10s)" ou juste "140387"
+        """Renders score with multiplier if active."""
+        # Format: "140387 x2 (10s)" or just "140387"
         score_text = f"{self.scoring.score}"
         
         if self.scoring.has_multiplier:
@@ -542,12 +542,12 @@ class GameScene(BaseScene):
         
         score_surface = self.font_score.render(score_text, True, TextColors.GAME_SCORE)
         
-        # Même position pour classic et challenge (justifié gauche)
+        # Same position for classic and challenge (left-justified)
         score_rect = score_surface.get_rect(left=Layout.GAME_SCORE_POS_CLASSIC[0], centery=Layout.GAME_SCORE_POS_CLASSIC[1])
         screen.blit(score_surface, score_rect)
     
     def _render_hearts(self, screen: pygame.Surface):
-        """Affiche les 3 cœurs (mode classique)."""
+        """Renders the 3 hearts (classic mode)."""
         heart_positions = [
             Layout.GAME_HEART_1,
             Layout.GAME_HEART_2,
@@ -564,13 +564,13 @@ class GameScene(BaseScene):
             screen.blit(img, rect)
     
     def _render_timer(self, screen: pygame.Surface):
-        """Affiche le timer avec son cadre (mode challenge)."""
-        # Cadre du timer
+        """Renders the timer with its frame (challenge mode)."""
+        # Timer frame
         if self.timer_frame_img:
             frame_rect = self.timer_frame_img.get_rect(center=Layout.GAME_TIMER)
             screen.blit(self.timer_frame_img, frame_rect)
         
-        # Texte du timer
+        # Timer text
         minutes = int(self.challenge_timer) // 60
         seconds = int(self.challenge_timer) % 60
         timer_text = f"{minutes}:{seconds:02d}"
@@ -580,12 +580,12 @@ class GameScene(BaseScene):
         screen.blit(timer_surface, timer_rect)
     
     def _render_gauge(self, screen: pygame.Surface):
-        """Affiche la jauge de bonus avec ses segments."""
-        # Fond de la jauge
+        """Renders the bonus gauge with its segments."""
+        # Gauge background
         gauge_rect = self.gauge_img.get_rect(center=Layout.GAME_GAUGE)
         screen.blit(self.gauge_img, gauge_rect)
         
-        # Segments remplis selon le niveau de la jauge
+        # Filled segments based on gauge level
         crans = self.bonus_gauge.crans
         for i in range(crans):
             if i < len(self.gauge_segments):
@@ -595,7 +595,7 @@ class GameScene(BaseScene):
                 screen.blit(segment_img, segment_rect)
     
     def cleanup(self):
-        """Nettoyage à la sortie de la scène."""
+        """Cleanup on scene exit."""
         self.entities.clear()
         if self.input_handler:
             self.input_handler.reset()

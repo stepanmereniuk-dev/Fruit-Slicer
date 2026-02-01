@@ -1,10 +1,10 @@
 """
-Configuration du jeu Fruit Slicer
+Fruit Slicer Game Configuration
 """
 
 import os
 
-# ==================== CHEMINS ====================
+# ==================== PATHS ====================
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(ROOT_DIR, "assets")
@@ -17,21 +17,21 @@ SAVE_FILE = os.path.join(ROOT_DIR, "save_data.json")
 SETTINGS_FILE = os.path.join(ROOT_DIR, "settings.json")
 
 
-# ==================== FENÊTRE ====================
+# ==================== WINDOW ====================
 
 WINDOW_WIDTH = 1920
 WINDOW_HEIGHT = 1080
-WINDOW_TITLE = "Fruit Slicer - Sauve Yoshi !"
+WINDOW_TITLE = "Fruit Slicer - Save Yoshi!"
 FPS = 60
 
 
-# ==================== POLICE ====================
+# ==================== FONT ====================
 
 FONT_FILE = "Baloo2-SemiBold.ttf"
 FONT_SIZE = 36
 
 
-# ==================== COULEURS TEXTE (boutons menu) ====================
+# ==================== TEXT COLORS (menu buttons) ====================
 
 class TextColors:
     BTN_JOUER = (254, 237, 142)      # #feed8e
@@ -72,14 +72,14 @@ class TextColors:
 # ==================== IMAGES ====================
 
 class Images:
-    """Chemins relatifs depuis IMAGES_DIR"""
+    """Relative paths from IMAGES_DIR"""
     
     # Backgrounds
     MENU_BG = "scenes/menu_scene/Background menu_scene 1920x1080.png"
     GAME_BG = "scenes/game_scene/Background gamescene 1920x1080.png"
     CHALLENGE_BG = "scenes/challenge_scene/Background challenge 1920x1080.png"
     
-    # Boutons menu
+    # Menu buttons
     BTN_JOUER = "scenes/menu_scene/bouton jouer 458x89.png"
     BTN_CHALLENGE = "scenes/menu_scene/bouton challenge 458x89.png"
     BTN_CLASSEMENT = "scenes/menu_scene/bouton classement 458x89.png"
@@ -121,7 +121,7 @@ class Images:
         },
     }
     
-    # Éléments spéciaux
+    # Special elements
     BOMB = "elements/bomb/Bombe 223x223 (1).png"
     ICE_FLOWER = "elements/ice_flower/Fleur de glace 223x223 (1).png"
     ICE_FLOWER_SLICED = "elements/ice_flower/Fleur de glace coupée 223x223 (1).png"
@@ -133,7 +133,7 @@ class Images:
     GEAR = "scenes/game_scene/Engrenage gamescene 104x77.png"
     CROSS = "scenes/game_scene/Croix gamescene 151x78.png"
     
-    # Segments jauge bonus
+    # Bonus gauge segments
     GAUGE_YELLOW = "scenes/game_scene/jaune gamescene 81 x 36.png"
     GAUGE_ORANGE = "scenes/game_scene/orange gamescene 81 x 36.png"
     GAUGE_RED = "scenes/game_scene/rouge gamescene 81 x 36.png"
@@ -165,7 +165,7 @@ class Images:
         "scenes/tutorial_scene/classic/Bloc tuto 6 classic 1049x964.png",
     ]
     TUTO_CLASSIC_BTN_PREV = [
-        None,  # Écran 1 : pas de bouton précédent
+        None,  # Screen 1: no previous button
         "scenes/tutorial_scene/classic/Bouton précédent tuto 2 classic 285x73.png",
         "scenes/tutorial_scene/classic/Bouton précédent tuto 3 classic 285x73.png",
         "scenes/tutorial_scene/classic/Bouton précédent tuto 4 classic 285x73.png",
@@ -178,7 +178,7 @@ class Images:
         "scenes/tutorial_scene/classic/Bouton suivant tuto 3 classic 285x73.png",
         "scenes/tutorial_scene/classic/Bouton suivant tuto 4 classic 285x73.png",
         "scenes/tutorial_scene/classic/Bouton suivant tuto 5 classic 285x73.png",
-        None,  # Écran 6 : bouton jouer à la place
+        None,  # Screen 6: play button instead
     ]
     TUTO_CLASSIC_BTN_PLAY = "scenes/tutorial_scene/classic/Bouton jouer tuto 6 classic 285x73.png"
     
@@ -191,7 +191,7 @@ class Images:
         "scenes/tutorial_scene/challenge/Bloc tuto 4 challenge 1049x964.png",
     ]
     TUTO_CHALLENGE_BTN_PREV = [
-        None,  # Écran 1 : pas de bouton précédent
+        None,  # Screen 1: no previous button
         "scenes/tutorial_scene/challenge/Bouton précédent tuto 2 challenge 285x73.png",
         "scenes/tutorial_scene/challenge/Bouton précédent tuto 3 challenge 285x73.png",
         "scenes/tutorial_scene/challenge/Bouton précédent tuto 4 challenge 285x73.png",
@@ -200,33 +200,33 @@ class Images:
         "scenes/tutorial_scene/challenge/Bouton suivant tuto 1 challenge 285x73.png",
         "scenes/tutorial_scene/challenge/Bouton suivant tuto 2 challenge 285x73.png",
         "scenes/tutorial_scene/challenge/Bouton suivant tuto 3 challenge 285x73.png",
-        None,  # Écran 4 : bouton jouer à la place
+        None,  # Screen 4: play button instead
     ]
     TUTO_CHALLENGE_BTN_PLAY = "scenes/tutorial_scene/challenge/Bouton jouer tuto 4 challenge 285x73.png"
 
     # Game Over Scene
-    # Explosion (bombe tranchée)
+    # Explosion (sliced bomb)
     GAMEOVER_EXPLOSION_BG = "scenes/game_over_scene/explosion/Background game over explosion1920x1080.png"
     GAMEOVER_EXPLOSION_BTN_REJOUER = "scenes/game_over_scene/explosion/Bouton rejouer game over explosion 458x89.png"
     GAMEOVER_EXPLOSION_BTN_MENU = "scenes/game_over_scene/explosion/Bouton menu game over explosion 458x89.png"
     
-    # K.O (3 cœurs perdus)
+    # K.O (3 hearts lost)
     GAMEOVER_KO_BG = "scenes/game_over_scene/K.O/Background game over ko1920x1080.png"
     GAMEOVER_KO_BTN_REJOUER = "scenes/game_over_scene/K.O/Bouton rejouer game over ko 458x89.png"
     GAMEOVER_KO_BTN_MENU = "scenes/game_over_scene/K.O/Bouton menu game over ko 458x89.png"
     
-    # Temps écoulé (challenge)
+    # Time elapsed (challenge)
     GAMEOVER_TIME_BG = "scenes/game_over_scene/elapsed_time/Background temps écoulé challenge1920x1080.png"
     GAMEOVER_TIME_BTN_REJOUER = "scenes/game_over_scene/elapsed_time/Bouton temps écoulé challenge 458x89.png"
     GAMEOVER_TIME_BTN_MENU = "scenes/game_over_scene/elapsed_time/Bouton menu temps écoulé challenge 458x89.png"
 
 
-# ==================== POSITIONS (centre des éléments) ====================
+# ==================== POSITIONS (element centers) ====================
 
 class Layout:
-    """Coordonnées des éléments UI"""
+    """UI element coordinates"""
     
-    # Menu - boutons (centre)
+    # Menu - buttons (center)
     MENU_BTN_JOUER = (960, 624)
     MENU_BTN_CHALLENGE = (960, 726)
     MENU_BTN_CLASSEMENT = (960, 826)
@@ -234,7 +234,7 @@ class Layout:
     MENU_BTN_PARAMETRES = (309, 1015)
     MENU_BTN_QUITTER = (1588, 1015)
     
-    # Player Select Scene (centre des éléments)
+    # Player Select Scene (element centers)
     PSS_GEAR = (1624, 84)
     PSS_CROSS = (1765, 84)
     PSS_PSEUDO_FIELD = (960, 370)
@@ -244,38 +244,38 @@ class Layout:
     PSS_BTN_HARD = (1335, 699)
     PSS_BTN_START = (960, 876)
     
-    # Tutorial Scene (centre des éléments)
+    # Tutorial Scene (element centers)
     TUTO_BLOCK = (960, 535)
     TUTO_TITLE = (960, 164)
     TUTO_TEXT = (960, 653)
     TUTO_BTN_PREV = (706, 787)
     TUTO_BTN_NEXT = (1214, 787)
-    TUTO_BTN_PLAY = (1214, 787)  # Même position que suivant
+    TUTO_BTN_PLAY = (1214, 787)  # Same position as next
     
-    # Game Scene (positions des éléments)
-    GAME_SCORE_POS_CLASSIC = (171, 84)    # Point de justification gauche (classique)
-    GAME_SCORE_POS_CHALLENGE = (361, 84)  # Point de justification gauche (challenge)
+    # Game Scene (element positions)
+    GAME_SCORE_POS_CLASSIC = (171, 84)    # Left justification point (classic)
+    GAME_SCORE_POS_CHALLENGE = (361, 84)  # Left justification point (challenge)
     GAME_HEART_1 = (878, 84)
     GAME_HEART_2 = (960, 84)
     GAME_HEART_3 = (1041, 84)
     GAME_GEAR = (1624, 84)
     GAME_CROSS = (1765, 84)
-    GAME_TIMER = (960, 106)               # Timer challenge (centre)
+    GAME_TIMER = (960, 106)               # Challenge timer (center)
     GAME_GAUGE = (960, 1003)
     GAME_GAUGE_SEGMENTS = [
-        (763, 1016),   # Jaune
+        (763, 1016),   # Yellow
         (862, 1016),   # Orange
-        (960, 1016),   # Rouge
-        (1058, 1016),  # Violet
-        (1157, 1016),  # Bleu
+        (960, 1016),   # Red
+        (1058, 1016),  # Purple
+        (1157, 1016),  # Blue
     ]
 
     # Game Over Scene
-    GAMEOVER_SCORE_FINAL = (394, 395)      # Point de justification gauche
-    GAMEOVER_BEST_SCORE = (394, 478)       # Point de justification gauche
-    GAMEOVER_NEW_RECORD = (960, 395)       # Centre
-    GAMEOVER_BTN_REJOUER = (597, 632)      # Centre
-    GAMEOVER_BTN_MENU = (597, 767)         # Centre
+    GAMEOVER_SCORE_FINAL = (394, 395)      # Left justification point
+    GAMEOVER_BEST_SCORE = (394, 478)       # Left justification point
+    GAMEOVER_NEW_RECORD = (960, 395)       # Center
+    GAMEOVER_BTN_REJOUER = (597, 632)      # Center
+    GAMEOVER_BTN_MENU = (597, 767)         # Center
 
 # ==================== GAMEPLAY ====================
 
@@ -284,7 +284,7 @@ class GameConfig:
     FRUIT_SIZE = 223
     FRUIT_TYPES = ['apple', 'banana', 'grape', 'melon', 'watermelon']
     
-    # Zone de jeu active (centre 960x535, taille 1260x770)
+    # Active game zone (center 960x535, size 1260x770)
     GAME_ZONE_CENTER = (960, 535)
     GAME_ZONE_SIZE = (1260, 770)
     GAME_ZONE_LEFT = 960 - 630  # 330
@@ -292,22 +292,22 @@ class GameConfig:
     GAME_ZONE_TOP = 535 - 385  # 150
     GAME_ZONE_BOTTOM = 535 + 385  # 920
     
-    SPAWN_MARGIN = 0.10  # 10% marge sur les côtés de la zone
+    SPAWN_MARGIN = 0.10  # 10% margin on zone sides
     
-    # Jauge bonus
+    # Bonus gauge
     BONUS_MAX_CRANS = 5
     BONUS_DURATION = 10.0
     BONUS_INCREMENT = 2
     
-    # Paires identiques (pour remplir la jauge)
+    # Identical pairs (to fill the gauge)
     IDENTICAL_PAIR_CHANCE = 0.25
 
 
-# ==================== DIFFICULTÉ ====================
+# ==================== DIFFICULTY ====================
 
 DIFFICULTY = {
     'easy': {
-        'speed_y': (-1000, -850),    # Monte ~500-625 px
+        'speed_y': (-1000, -850),    # Rises ~500-625 px
         'speed_x': (-60, 60),
         'gravity': 700,
         'spawn_delay': (1.5, 2.0),
@@ -317,7 +317,7 @@ DIFFICULTY = {
         'freeze_duration': 5.0,
     },
     'normal': {
-        'speed_y': (-1100, -950),    # Monte ~550-700 px
+        'speed_y': (-1100, -950),    # Rises ~550-700 px
         'speed_x': (-80, 80),
         'gravity': 750,
         'spawn_delay': (1.0, 1.5),
@@ -327,7 +327,7 @@ DIFFICULTY = {
         'freeze_duration': 4.0,
     },
     'hard': {
-        'speed_y': (-1150, -950),    # Monte ~550-680 px
+        'speed_y': (-1150, -950),    # Rises ~550-680 px
         'speed_x': (-100, 100),
         'gravity': 800,
         'spawn_delay': (0.6, 1.0),
@@ -350,7 +350,7 @@ DIFFICULTY = {
 }
 
 
-# ==================== CONTRÔLES ====================
+# ==================== CONTROLS ====================
 
 class ControlMode:
     KEYBOARD = "keyboard"

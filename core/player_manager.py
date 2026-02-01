@@ -1,11 +1,11 @@
 """
-PlayerManager - Gestion des joueurs et de leurs données.
+PlayerManager - Management of players and their data.
 
-Responsabilités :
-- Créer/charger les profils joueurs par pseudo
-- Gérer les high scores (4 catégories)
-- Savoir si le tutoriel a été vu
-- Sauvegarder/charger depuis save_data.json
+Responsibilities:
+- Create/load player profiles by username
+- Manage high scores (4 categories)
+- Track whether the tutorial has been seen
+- Save/load from save_data.json
 """
 
 import json
@@ -18,7 +18,7 @@ from config import SAVE_FILE
 
 @dataclass
 class PlayerData:
-    """Données d'un joueur."""
+    """Data for a single player."""
     pseudo: str
     high_scores: Dict[str, int] = field(default_factory=lambda: {
         'classic_easy': 0,
@@ -49,9 +49,9 @@ class PlayerData:
 
 class PlayerManager:
     """
-    Gère les profils joueurs.
+    Manages player profiles.
     
-    Utilisation :
+    Usage:
         manager = PlayerManager()
         manager.set_current_player("Yoshi")
         manager.update_high_score('classic_normal', 150)
@@ -65,11 +65,11 @@ class PlayerManager:
         
         self.load()
     
-    # ==================== SAUVEGARDE ====================
+    # ==================== SAVE ====================
     
     def save(self):
-        """Sauvegarde tous les joueurs dans le fichier."""
-        # Charger les données existantes (pour ne pas écraser les achievements)
+        """Save all players to the file."""
+        # Load existing data (to avoid overwriting achievements)
         existing_data = {}
         if os.path.exists(self.save_path):
             try:
@@ -78,7 +78,7 @@ class PlayerManager:
             except (IOError, json.JSONDecodeError):
                 pass
         
-        # Mettre à jour la section players
+        # Update the players section
         existing_data['players'] = {
             pseudo: player.to_dict() 
             for pseudo, player in self.players.items()
@@ -91,7 +91,7 @@ class PlayerManager:
             pass
     
     def load(self):
-        """Charge les joueurs depuis le fichier."""
+        """Load players from the file."""
         if not os.path.exists(self.save_path):
             return
         
@@ -105,12 +105,12 @@ class PlayerManager:
         except (IOError, json.JSONDecodeError):
             pass
     
-    # ==================== GESTION JOUEURS ====================
+    # ==================== PLAYER MANAGEMENT ====================
     
     def set_current_player(self, pseudo: str) -> PlayerData:
         """
-        Définit le joueur actuel. Crée le profil si nouveau.
-        Retourne les données du joueur.
+        Set the current player. Creates the profile if it is new.
+        Returns the player's data.
         """
         pseudo = self._sanitize_pseudo(pseudo)
         
@@ -122,37 +122,37 @@ class PlayerManager:
         return self.current_player
     
     def get_player(self, pseudo: str) -> Optional[PlayerData]:
-        """Retourne les données d'un joueur ou None."""
+        """Return a player's data or None."""
         return self.players.get(pseudo)
     
     def get_all_pseudos(self) -> List[str]:
-        """Retourne la liste de tous les pseudos."""
+        """Return the list of all usernames."""
         return list(self.players.keys())
     
     def player_exists(self, pseudo: str) -> bool:
-        """Vérifie si un joueur existe."""
+        """Check if a player exists."""
         return pseudo in self.players
     
     def is_new_player(self, pseudo: str) -> bool:
-        """Vérifie si c'est un nouveau joueur (pour le tutoriel)."""
+        """Check if this is a new player (for the tutorial)."""
         player = self.players.get(pseudo)
         if not player:
             return True
         return not player.tutorial_seen
     
     def _sanitize_pseudo(self, pseudo: str) -> str:
-        """Nettoie le pseudo (lettres uniquement, max 10 caractères)."""
-        # Garder uniquement les lettres
+        """Clean the username (letters only, max 10 characters)."""
+        # Keep only letters
         clean = ''.join(c for c in pseudo if c.isalpha())
-        # Limiter à 10 caractères
+        # Limit to 10 characters
         return clean[:10]
     
     # ==================== HIGH SCORES ====================
     
     def update_high_score(self, category: str, score: int) -> bool:
         """
-        Met à jour le high score si battu.
-        Retourne True si nouveau record.
+        Update the high score if the new score is higher.
+        Returns True if a new record was set.
         """
         if not self.current_player:
             return False
@@ -167,35 +167,35 @@ class PlayerManager:
         return False
     
     def get_high_score(self, category: str) -> int:
-        """Retourne le high score du joueur actuel pour une catégorie."""
+        """Return the current player's high score for a category."""
         if not self.current_player:
             return 0
         return self.current_player.high_scores.get(category, 0)
     
     def get_category_key(self, mode: str, difficulty: str) -> str:
-        """Retourne la clé de catégorie pour le high score."""
+        """Return the category key for the high score."""
         if mode == 'challenge':
             return 'challenge'
         return f'classic_{difficulty}'
     
-    # ==================== CLASSEMENT ====================
+    # ==================== LEADERBOARD ====================
     
     def get_leaderboard(self, category: str, limit: int = 10) -> List[Dict]:
         """
-        Retourne le classement pour une catégorie.
+        Return the leaderboard for a category.
         Format: [{'rank': 1, 'pseudo': 'Yoshi', 'score': 150}, ...]
         """
-        # Collecter les scores
+        # Collect scores
         scores = []
         for pseudo, player in self.players.items():
             score = player.high_scores.get(category, 0)
             if score > 0:
                 scores.append({'pseudo': pseudo, 'score': score})
         
-        # Trier par score décroissant
+        # Sort by score descending
         scores.sort(key=lambda x: x['score'], reverse=True)
         
-        # Ajouter les rangs et limiter
+        # Add ranks and limit
         leaderboard = []
         for i, entry in enumerate(scores[:limit]):
             leaderboard.append({
@@ -206,16 +206,16 @@ class PlayerManager:
         
         return leaderboard
     
-    # ==================== TUTORIEL ====================
+    # ==================== TUTORIAL ====================
     
     def mark_tutorial_seen(self):
-        """Marque le tutoriel comme vu pour le joueur actuel."""
+        """Mark the tutorial as seen for the current player."""
         if self.current_player:
             self.current_player.tutorial_seen = True
             self.save()
     
     def should_show_tutorial(self) -> bool:
-        """Retourne True si le tutoriel doit être affiché."""
+        """Return True if the tutorial should be shown."""
         if not self.current_player:
             return True
         return not self.current_player.tutorial_seen
@@ -223,7 +223,8 @@ class PlayerManager:
     # ==================== STATS ====================
     
     def increment_games_played(self):
-        """Incrémente le compteur de parties jouées."""
+        """Increment the counter of games played."""
         if self.current_player:
             self.current_player.total_games += 1
             self.save()
+            

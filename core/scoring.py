@@ -1,28 +1,28 @@
 """
-Scoring - Calcul des points et gestion des combos.
+Scoring - Point calculation and combo management.
 
-Règles :
+Rules:
 - 1 fruit = 1 point
-- N fruits en un coup = N + (N-1) points
-- Multiplicateur (x2, x4, x6...) s'applique au total
+- N fruits in one stroke = N + (N-1) points
+- Multiplier (x2, x4, x6...) applies to the total
 """
 
 
 class ScoringManager:
-    """Gère le score et les multiplicateurs."""
+    """Manages the score and multipliers."""
     
     def __init__(self):
         self.score = 0
         self.multiplier = 1
         self.multiplier_timer = 0.0
         
-        # Stats pour les succès
+        # Stats for achievements
         self.total_fruits_sliced = 0
         self.total_combos = 0
         self.max_combo = 0
     
     def reset(self):
-        """Remet le score à zéro pour une nouvelle partie."""
+        """Resets the score to zero for a new game."""
         self.score = 0
         self.multiplier = 1
         self.multiplier_timer = 0.0
@@ -32,22 +32,22 @@ class ScoringManager:
     
     def add_sliced_fruits(self, count: int) -> int:
         """
-        Ajoute des points pour les fruits tranchés.
-        Retourne les points gagnés.
+        Adds points for sliced fruits.
+        Returns the points earned.
         """
         if count <= 0:
             return 0
         
-        # Calcul des points : N fruits = N + (N-1)
+        # Point calculation: N fruits = N + (N-1)
         base_points = count + (count - 1) if count > 1 else 1
         
-        # Application du multiplicateur
+        # Apply multiplier
         points = base_points * self.multiplier
         
         self.score += points
         self.total_fruits_sliced += count
         
-        # Stats combos
+        # Combo stats
         if count >= 3:
             self.total_combos += 1
             self.max_combo = max(self.max_combo, count)
@@ -55,21 +55,21 @@ class ScoringManager:
         return points
     
     def apply_bomb_penalty(self, penalty: int):
-        """Retire des points (mode challenge)."""
+        """Deducts points (challenge mode)."""
         self.score = max(0, self.score - penalty)
     
     def activate_multiplier(self, multiplier: int, duration: float):
-        """Active un multiplicateur temporaire."""
+        """Activates a temporary multiplier."""
         self.multiplier = multiplier
         self.multiplier_timer = duration
     
     def increase_multiplier(self, increment: int, duration: float):
-        """Augmente le multiplicateur existant."""
+        """Increases the existing multiplier."""
         self.multiplier += increment
         self.multiplier_timer = duration
     
     def update(self, dt: float):
-        """Met à jour le timer du multiplicateur."""
+        """Updates the multiplier timer."""
         if self.multiplier_timer > 0:
             self.multiplier_timer -= dt
             if self.multiplier_timer <= 0:
@@ -83,8 +83,8 @@ class ScoringManager:
 
 class BonusGauge:
     """
-    Jauge de bonus qui se remplit avec des paires de fruits identiques.
-    5 crans = activation du multiplicateur.
+    Bonus gauge that fills with identical fruit pairs.
+    5 notches = multiplier activation.
     """
     
     MAX_CRANS = 5
@@ -99,8 +99,8 @@ class BonusGauge:
     
     def add_cran(self) -> bool:
         """
-        Ajoute un cran à la jauge.
-        Retourne True si la jauge est pleine.
+        Adds a notch to the gauge.
+        Returns True if the gauge is full.
         """
         self.crans += 1
         if self.crans >= self.MAX_CRANS:
@@ -109,5 +109,5 @@ class BonusGauge:
         return False
     
     def get_fill_ratio(self) -> float:
-        """Retourne le ratio de remplissage (0.0 à 1.0)."""
+        """Returns the fill ratio (0.0 to 1.0)."""
         return self.crans / self.MAX_CRANS
