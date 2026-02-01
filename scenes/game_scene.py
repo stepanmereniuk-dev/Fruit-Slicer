@@ -31,6 +31,10 @@ class GameScene(BaseScene):
     # Taille de police pour le score
     SCORE_FONT_SIZE = 40
     
+    # Paramètres de transition explosion
+    FLASH_DURATION = 1.0     # Durée du flash blanc (secondes)
+    FADE_TO_BLACK_DURATION = 0.5  # Durée du fondu vers noir
+    
     def __init__(self, scene_manager):
         super().__init__(scene_manager)
         
@@ -68,6 +72,14 @@ class GameScene(BaseScene):
         self.game_over = False
         self.exploded = False  # Game over par bombe
         
+        # Système de transition explosion
+        self.transition_state = 'playing'  # 'playing', 'flash', 'fade_to_black', 'finished'
+        self.transition_timer = 0.0
+        
+        # Surfaces pour les effets de transition
+        self.white_overlay = None
+        self.black_overlay = None
+        
         # Accumulation des fruits tranchés pendant un tracé souris
         self._stroke_sliced_fruits: List[Fruit] = []
         self._was_slicing = False
@@ -82,7 +94,7 @@ class GameScene(BaseScene):
         # Récupérer les données du scene_manager
         self.mode = self.scene_manager.shared_data.get('mode', 'classic')
         self.difficulty = self.scene_manager.shared_data.get('difficulty', 'normal')
-        control_mode = self.scene_manager.shared_data.get('control_mode', 'mouse')
+        control_mode = self.scene_manager.shared_data.get('control_mode', 'keyboard')
         
         # Charger les ressources
         self._load_resources()
@@ -110,6 +122,10 @@ class GameScene(BaseScene):
         self._stroke_sliced_fruits.clear()
         self._was_slicing = False
         
+        # Reset transition
+        self.transition_state = 'playing'
+        self.transition_timer = 0.0
+        
         # Démarrer le tracking des succès
         if self.achievement_manager:
             self.achievement_manager.start_new_game(control_mode)
@@ -126,7 +142,7 @@ class GameScene(BaseScene):
         # Polices
         font_path = os.path.join(FONTS_DIR, FONT_FILE)
         self.font_score = pygame.font.Font(font_path, self.SCORE_FONT_SIZE)
-        self.font_letter = pygame.font.Font(font_path, 24)
+        self.font_letter = pygame.font.Font(font_path, 72)
         
         # Cœurs
         self.heart_full_img = pygame.image.load(
@@ -171,6 +187,13 @@ class GameScene(BaseScene):
             center=Layout.GAME_CROSS,
             on_click=self._on_quit
         )
+        
+        # Créer les overlays pour les transitions
+        self.white_overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.white_overlay.fill((255, 255, 255))
+        
+        self.black_overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.black_overlay.fill((0, 0, 0))
     
     def set_achievement_manager(self, manager: AchievementManager):
         """Définit le gestionnaire de succès."""
@@ -186,7 +209,8 @@ class GameScene(BaseScene):
         self.scene_manager.change_scene('menu')
     
     def handle_events(self, events: List[pygame.event.Event]):
-        if self.game_over:
+        # Bloquer les inputs pendant la transition
+        if self.game_over or self.transition_state != 'playing':
             return
         
         for event in events:
@@ -202,6 +226,11 @@ class GameScene(BaseScene):
                 self._on_quit()
     
     def update(self, dt: float):
+        # Gérer les transitions
+        if self.transition_state != 'playing':
+            self._update_transition(dt)
+            return
+        
         if self.game_over:
             return
         
@@ -262,6 +291,41 @@ class GameScene(BaseScene):
         # Mise à jour du temps pour les succès
         if self.achievement_manager:
             self.achievement_manager.on_time_update(self.game_time)
+    
+    def _update_transition(self, dt: float):
+        """Met à jour la transition d'explosion."""
+        self.transition_timer += dt
+        
+        if self.transition_state == 'flash':
+            if self.transition_timer >= self.FLASH_DURATION:
+                self.transition_state = 'fade_to_black'
+                self.transition_timer = 0.0
+        
+        elif self.transition_state == 'fade_to_black':
+            if self.transition_timer >= self.FADE_TO_BLACK_DURATION:
+                self.transition_state = 'finished'
+                # Finaliser et changer de scène
+                self._finalize_game_over()
+    
+    def _start_explosion_transition(self):
+        """Démarre la transition d'explosion (flash blanc → fondu noir)."""
+        self.transition_state = 'flash'
+        self.transition_timer = 0.0
+        self.exploded = True
+        self.game_over = True
+        
+        # Finaliser les succès immédiatement
+        if self.achievement_manager:
+            self.achievement_manager.end_game(self.exploded)
+    
+    def _finalize_game_over(self):
+        """Appelé quand la transition est terminée."""
+        # Sauvegarder le score
+        self.scene_manager.shared_data['last_score'] = self.scoring.score
+        self.scene_manager.shared_data['exploded'] = self.exploded
+        
+        # Transition vers game over
+        self.scene_manager.change_scene('game_over')
     
     def _finalize_stroke(self):
         """Finalise un tracé souris : calcule le score et les bonus."""
@@ -355,9 +419,8 @@ class GameScene(BaseScene):
             penalty = DIFFICULTY['challenge']['bomb_penalty']
             self.scoring.apply_bomb_penalty(penalty)
         else:
-            # Mode classique : game over instantané
-            self.exploded = True
-            self._end_game()
+            # Mode classique : déclencher la transition d'explosion
+            self._start_explosion_transition()
     
     def _on_ice_sliced(self):
         """Appelé quand un glaçon est tranché."""
@@ -454,7 +517,7 @@ class GameScene(BaseScene):
         ]
     
     def _end_game(self):
-        """Termine la partie."""
+        """Termine la partie (sans explosion)."""
         self.game_over = True
         
         # Finaliser les succès
@@ -464,7 +527,6 @@ class GameScene(BaseScene):
         # Sauvegarder le score
         self.scene_manager.shared_data['last_score'] = self.scoring.score
         self.scene_manager.shared_data['exploded'] = self.exploded
-        # TODO: vérifier si nouveau record
         
         # Transition vers game over
         self.scene_manager.change_scene('game_over')
@@ -499,6 +561,26 @@ class GameScene(BaseScene):
         
         # HUD (pas clippé)
         self._render_hud(screen)
+        
+        # Afficher les effets de transition par-dessus tout
+        self._render_transition(screen)
+    
+    def _render_transition(self, screen: pygame.Surface):
+        """Affiche les effets de transition (flash blanc, fondu noir)."""
+        if self.transition_state == 'flash':
+            # Flash blanc avec alpha décroissant
+            progress = self.transition_timer / self.FLASH_DURATION
+            # Commencer à 255, puis diminuer rapidement
+            alpha = int(255 * (1 - progress * 0.3))
+            self.white_overlay.set_alpha(alpha)
+            screen.blit(self.white_overlay, (0, 0))
+        
+        elif self.transition_state == 'fade_to_black':
+            # Fondu vers le noir
+            progress = self.transition_timer / self.FADE_TO_BLACK_DURATION
+            alpha = int(255 * progress)
+            self.black_overlay.set_alpha(alpha)
+            screen.blit(self.black_overlay, (0, 0))
     
     def _render_trail(self, screen: pygame.Surface):
         """Affiche la traînée de la souris."""

@@ -25,7 +25,7 @@
     "prudence": true,
     "survivant": true,
     "perseverant": true,
-    "increvable": false,
+    "increvable": true,
     "oups": true,
     "demineur_amateur": true,
     "expert_explosifs": false,
@@ -40,12 +40,12 @@
     "ninja_souris": true
   },
   "global_stats": {
-    "total_fruits_sliced": 1275,
-    "total_games_played": 42,
-    "total_combos": 53,
-    "total_ice_sliced": 44,
-    "total_bomb_explosions": 17,
-    "total_bombs_avoided": 161,
+    "total_fruits_sliced": 1353,
+    "total_games_played": 59,
+    "total_combos": 63,
+    "total_ice_sliced": 48,
+    "total_bomb_explosions": 32,
+    "total_bombs_avoided": 164,
     "mode_switches": 0,
     "success_screen_visited": false,
     "first_launch": false
@@ -79,6 +79,39 @@
         "classic_easy": 0,
         "classic_normal": 20,
         "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "s": {
+      "pseudo": "s",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 1,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "MASSILIA": {
+      "pseudo": "MASSILIA",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 15,
+        "classic_hard": 37,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "QSV": {
+      "pseudo": "QSV",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 12,
         "challenge": 0
       },
       "tutorial_seen": true,
