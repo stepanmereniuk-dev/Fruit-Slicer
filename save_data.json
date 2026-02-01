@@ -40,12 +40,12 @@
     "ninja_souris": true
   },
   "global_stats": {
-    "total_fruits_sliced": 1353,
-    "total_games_played": 59,
-    "total_combos": 63,
-    "total_ice_sliced": 48,
-    "total_bomb_explosions": 32,
-    "total_bombs_avoided": 164,
+    "total_fruits_sliced": 1426,
+    "total_games_played": 62,
+    "total_combos": 68,
+    "total_ice_sliced": 52,
+    "total_bomb_explosions": 34,
+    "total_bombs_avoided": 169,
     "mode_switches": 0,
     "success_screen_visited": false,
     "first_launch": false
@@ -56,7 +56,7 @@
       "high_scores": {
         "classic_easy": 0,
         "classic_normal": 28,
-        "classic_hard": 0,
+        "classic_hard": 3,
         "challenge": 188
       },
       "tutorial_seen": true,
@@ -112,6 +112,39 @@
         "classic_easy": 0,
         "classic_normal": 0,
         "classic_hard": 12,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "zf": {
+      "pseudo": "zf",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "qff": {
+      "pseudo": "qff",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "y": {
+      "pseudo": "y",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 102,
+        "classic_hard": 0,
         "challenge": 0
       },
       "tutorial_seen": true,

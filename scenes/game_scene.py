@@ -13,6 +13,7 @@ from config import (
     Images, Layout, TextColors, GameConfig, DIFFICULTY, FONT_FILE
 )
 from core import lang_manager
+from core import audio_manager
 from core.scoring import ScoringManager, BonusGauge
 from core.spawner import Spawner
 from core.input_handler import InputHandler
@@ -88,6 +89,9 @@ class GameScene(BaseScene):
         self.mode = 'classic'  # 'classic' ou 'challenge'
         self.difficulty = 'normal'
         self.challenge_timer = 0.0
+        
+        # Tracking audio pour les bombes
+        self._bomb_count = 0  # Nombre de bombes actuellement à l'écran
     
     def setup(self):
         """Initialise la partie."""
@@ -125,6 +129,10 @@ class GameScene(BaseScene):
         # Reset transition
         self.transition_state = 'playing'
         self.transition_timer = 0.0
+        
+        # Reset audio
+        self._bomb_count = 0
+        audio_manager.stop_bomb_alert()
         
         # Démarrer le tracking des succès
         if self.achievement_manager:
@@ -205,6 +213,8 @@ class GameScene(BaseScene):
         pass
     
     def _on_quit(self):
+        # Arrêter l'alerte bombe si active
+        audio_manager.stop_bomb_alert()
         # Retour au menu
         self.scene_manager.change_scene('menu')
     
@@ -256,6 +266,12 @@ class GameScene(BaseScene):
         if not self.is_frozen:
             keyboard_mode = self.input_handler.mode == "keyboard"
             new_entities = self.spawner.update(dt, keyboard_mode)
+            
+            # Gérer l'audio des bombes pour les nouvelles entités
+            for entity in new_entities:
+                if isinstance(entity, Bomb):
+                    self._on_bomb_spawned()
+            
             self.entities.extend(new_entities)
         
         # Mise à jour des entités
@@ -314,6 +330,12 @@ class GameScene(BaseScene):
         self.exploded = True
         self.game_over = True
         
+        # Arrêter l'alerte bombe
+        audio_manager.stop_bomb_alert()
+        
+        # Jouer le SFX game over
+        audio_manager.play_sfx('game_over')
+        
         # Finaliser les succès immédiatement
         if self.achievement_manager:
             self.achievement_manager.end_game(self.exploded)
@@ -370,6 +392,7 @@ class GameScene(BaseScene):
                 fruits_sliced.append(entity)
             elif isinstance(entity, Bomb):
                 bomb_sliced = True
+                self._on_bomb_removed()  # Bombe tranchée = retirée
             elif isinstance(entity, Ice):
                 ice_sliced = True
         
@@ -427,6 +450,9 @@ class GameScene(BaseScene):
         # Récupérer la durée du freeze selon la difficulté
         if self.mode == 'challenge':
             return  # Pas de glaçons en mode challenge
+        
+        # Jouer le SFX freeze
+        audio_manager.play_sfx('freeze')
         
         freeze_duration = DIFFICULTY.get(self.difficulty, DIFFICULTY['normal']).get('freeze_duration', 4.0)
         self._freeze_all(freeze_duration)
@@ -492,7 +518,8 @@ class GameScene(BaseScene):
                 if isinstance(entity, Fruit):
                     self._on_fruit_missed()
                 elif isinstance(entity, Bomb):
-                    # Bombe évitée
+                    # Bombe évitée (sortie de l'écran)
+                    self._on_bomb_removed()
                     if self.achievement_manager:
                         self.achievement_manager.on_bomb_avoided()
     
@@ -516,9 +543,33 @@ class GameScene(BaseScene):
             if not (e.missed or e.y > GameConfig.GAME_ZONE_BOTTOM)
         ]
     
+    # ==================== GESTION AUDIO BOMBES ====================
+    
+    def _on_bomb_spawned(self):
+        """Appelé quand une bombe apparaît."""
+        self._bomb_count += 1
+        # Démarrer l'alerte si c'est la première bombe
+        if self._bomb_count == 1:
+            audio_manager.start_bomb_alert()
+    
+    def _on_bomb_removed(self):
+        """Appelé quand une bombe disparaît (tranchée ou sortie de l'écran)."""
+        self._bomb_count = max(0, self._bomb_count - 1)
+        # Arrêter l'alerte si plus aucune bombe
+        if self._bomb_count == 0:
+            audio_manager.stop_bomb_alert()
+    
+    # ==================== FIN DE PARTIE ====================
+    
     def _end_game(self):
         """Termine la partie (sans explosion)."""
         self.game_over = True
+        
+        # Arrêter l'alerte bombe si active
+        audio_manager.stop_bomb_alert()
+        
+        # Jouer le SFX game over
+        audio_manager.play_sfx('game_over')
         
         # Finaliser les succès
         if self.achievement_manager:
@@ -678,6 +729,9 @@ class GameScene(BaseScene):
     
     def cleanup(self):
         """Nettoyage à la sortie de la scène."""
+        # Arrêter l'alerte bombe si active
+        audio_manager.stop_bomb_alert()
+        
         self.entities.clear()
         if self.input_handler:
             self.input_handler.reset()

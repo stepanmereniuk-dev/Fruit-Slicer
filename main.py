@@ -12,6 +12,7 @@ from config import (
 )
 from core import lang_manager
 from core import settings_manager
+from core import audio_manager
 from scene_manager import SceneManager
 
 
@@ -32,16 +33,21 @@ def main():
     lang_manager.init(LANG_DIR)
     lang_manager.get_instance().set_language(settings.language)
     
+    # Initialisation du système audio
+    audio = audio_manager.init()
+    audio.set_music_volume(settings.music_volume)
+    audio.set_sfx_volume(settings.sfx_volume)
+    
+    # Lancer la musique de fond (tourne en boucle partout)
+    audio.play_music()
+    
     # Synchroniser les changements de langue
     settings.on_language_change(
         lambda lang: lang_manager.get_instance().set_language(lang)
     )
     
-    # Synchroniser les volumes audio
+    # Synchroniser les volumes audio avec l'AudioManager
     settings.on_volume_change(_on_volume_change)
-    
-    # Appliquer les volumes initiaux
-    pygame.mixer.music.set_volume(settings.music_volume)
     
     # Création du gestionnaire de scènes
     scene_manager = SceneManager(screen)
@@ -75,16 +81,21 @@ def main():
         pygame.display.flip()
     
     # Fermeture propre
+    audio.cleanup()
     pygame.quit()
     sys.exit()
 
 
 def _on_volume_change(volume_type: str, volume: float):
     """Callback appelé quand un volume change dans les settings."""
+    audio = audio_manager.get_instance()
+    if not audio:
+        return
+    
     if volume_type == 'music':
-        pygame.mixer.music.set_volume(volume)
-    # Note: Pour les SFX, chaque son devra être joué avec le bon volume
-    # via settings_manager.get_instance().sfx_volume
+        audio.set_music_volume(volume)
+    elif volume_type == 'sfx':
+        audio.set_sfx_volume(volume)
 
 
 if __name__ == "__main__":
