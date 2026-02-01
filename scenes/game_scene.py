@@ -18,6 +18,7 @@ from core.spawner import Spawner
 from core.input_handler import InputHandler
 from core.achievements import AchievementManager
 from entities import Fruit, Bomb, Ice
+from entities.splash import Splash
 from ui.buttons import ImageButton
 
 
@@ -59,6 +60,7 @@ class GameScene(BaseScene):
         
         # État du jeu
         self.entities: List[Entity] = []
+        self.splashes: List[Splash] = []  # Éclaboussures actives
         self.hearts = GameConfig.MAX_HEARTS
         self.game_time = 0.0
         self.is_frozen = False
@@ -92,6 +94,7 @@ class GameScene(BaseScene):
         
         # Reset état
         self.entities.clear()
+        self.splashes.clear()
         self.scoring.reset()
         self.bonus_gauge.reset()
         self.hearts = GameConfig.MAX_HEARTS
@@ -224,6 +227,10 @@ class GameScene(BaseScene):
         for entity in self.entities:
             entity.update(dt)
         
+        # Mise à jour des éclaboussures
+        for splash in self.splashes:
+            splash.update(dt)
+        
         # Détection des tranches
         sliced = self.input_handler.get_sliced_entities(self.entities)
         if sliced:
@@ -232,8 +239,9 @@ class GameScene(BaseScene):
         # Vérifier les entités sorties de l'écran
         self._check_missed_entities()
         
-        # Nettoyer les entités mortes
+        # Nettoyer les entités mortes et les éclaboussures terminées
         self._cleanup_entities()
+        self.splashes = [s for s in self.splashes if not s.finished]
         
         # Mise à jour du temps pour les succès
         if self.achievement_manager:
@@ -274,6 +282,12 @@ class GameScene(BaseScene):
         """Appelé quand des fruits sont tranchés."""
         count = len(fruits)
         points = self.scoring.add_sliced_fruits(count)
+        
+        # Créer les éclaboussures
+        for fruit in fruits:
+            cx, cy = fruit.center
+            splash = Splash(fruit.fruit_type, cx, cy)
+            self.splashes.append(splash)
         
         # Vérifier paires identiques pour la jauge bonus
         fruit_types = [f.fruit_type for f in fruits]
@@ -403,6 +417,10 @@ class GameScene(BaseScene):
             GameConfig.GAME_ZONE_SIZE[1]
         )
         screen.set_clip(game_zone_rect)
+        
+        # Éclaboussures (en arrière-plan des entités)
+        for splash in self.splashes:
+            splash.render(screen)
         
         # Entités (clippées à la zone de jeu)
         for entity in self.entities:
