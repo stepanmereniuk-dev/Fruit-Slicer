@@ -144,6 +144,18 @@ class Images:
     # Challenge Scene
     CHALLENGE_TIMER_FRAME = "scenes/challenge_scene/timer challenge 371x183.png"
     
+    # Yoshi - Mode Classique (game_scene)
+    YOSHI_CLASSIC_ATTEND = "scenes/game_scene/Yoshi attends 351x465.png"
+    YOSHI_CLASSIC_CONTENT = "scenes/game_scene/Yoshi content 351x465.png"
+    YOSHI_CLASSIC_TRISTE = "scenes/game_scene/Yoshi triste 351x465.png"
+    YOSHI_CLASSIC_GELE = "scenes/game_scene/Yoshi gelé351x465.png"
+    YOSHI_CLASSIC_AFFAME = "scenes/game_scene/Yoshi affamé 351x465.png"
+    
+    # Yoshi - Mode Challenge (challenge_scene)
+    YOSHI_CHALLENGE_ATTEND = "scenes/challenge_scene/Yoshi attends 351x465.png"
+    YOSHI_CHALLENGE_CONTENT = "scenes/challenge_scene/Yoshi content 351x465.png"
+    YOSHI_CHALLENGE_TRISTE = "scenes/challenge_scene/Yoshi triste 351x465.png"
+    
     # Player Select Scene
     PSS_BG = "scenes/player_select_scene/background pss 1920x1080.png"
     PSS_PSEUDO_FIELD = "scenes/player_select_scene/Bouton tapez votre pseudo pss 599x88.png"
@@ -276,6 +288,7 @@ class Layout:
         (1058, 1016),  # Violet
         (1157, 1016),  # Bleu
     ]
+    GAME_YOSHI = (1757, 740)              # Position de Yoshi (centre)
 
     # Game Over Scene (coordonnées selon le tableau de specs)
     # Scores : justifié gauche (left=394)
@@ -382,8 +395,8 @@ KEYBOARD_LETTERS = ['A', 'Z', 'E', 'R', 'T', 'Q', 'S', 'D', 'F', 'G', 'W', 'X', 
 # ==================== AUDIO ====================
 
 class AudioConfig:
-    DEFAULT_MUSIC_VOLUME = 0.2
-    DEFAULT_SFX_VOLUME = 0.9
+    DEFAULT_MUSIC_VOLUME = 0.5
+    DEFAULT_SFX_VOLUME = 0.5
 
 
 # ==================== DEBUG ====================

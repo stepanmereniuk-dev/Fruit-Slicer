@@ -4,23 +4,44 @@
       "pseudo": "massilia",
       "high_scores": {
         "classic_easy": 84,
-        "classic_normal": 28,
+        "classic_normal": 122,
         "classic_hard": 21,
         "challenge": 188
       },
       "tutorial_seen": true,
       "total_games": 0,
-      "achievements": {},
+      "achievements": {
+        "bienvenue": true,
+        "bebe_yoshi": true,
+        "fraicheur_bienvenue": true,
+        "langue_agile": true,
+        "speed_runner": true,
+        "freeze_stratege": true,
+        "yoshi_junior": true,
+        "yoshi_confirme": true,
+        "ninja_souris": true,
+        "premier_repas": true,
+        "oups": true,
+        "super_yoshi": true,
+        "appetit_croissant": true,
+        "demineur_amateur": true,
+        "langue_eclair": true,
+        "langue_divine": true,
+        "yoshi_superstar": true,
+        "glouton_vert": true,
+        "maitre_givre": true,
+        "combo_addict": true
+      },
       "stats": {
-        "total_fruits_sliced": 0,
-        "total_games_played": 0,
-        "total_combos": 0,
-        "total_ice_sliced": 0,
-        "total_bomb_explosions": 0,
-        "total_bombs_avoided": 0,
+        "total_fruits_sliced": 193,
+        "total_games_played": 4,
+        "total_combos": 13,
+        "total_ice_sliced": 16,
+        "total_bomb_explosions": 2,
+        "total_bombs_avoided": 25,
         "mode_switches": 0,
         "success_screen_visited": false,
-        "first_launch": true
+        "first_launch": false
       }
     },
     "d": {

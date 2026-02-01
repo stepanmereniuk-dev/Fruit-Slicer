@@ -1,11 +1,13 @@
 """
 GameScene - Écran de jeu principal.
 Gère le gameplay : fruits, bombes, glaçons, score, cœurs, freeze.
+Inclut le système d'états de Yoshi qui réagit aux événements.
 """
 
 import pygame
 import os
 from typing import List, Union, Optional
+from enum import Enum
 
 from scenes.base_scene import BaseScene
 from config import (
@@ -26,6 +28,15 @@ from ui.buttons import ImageButton
 Entity = Union[Fruit, Bomb, Ice]
 
 
+class YoshiState(Enum):
+    """États possibles de Yoshi pendant le jeu."""
+    ATTEND = "attend"      # Par défaut
+    CONTENT = "content"    # Combo réussi
+    TRISTE = "triste"      # Perte de cœur ou bombe en challenge
+    AFFAME = "affame"      # 1 cœur restant (classique seulement)
+    GELE = "gele"          # Freeze actif (classique seulement)
+
+
 class GameScene(BaseScene):
     """Scène de jeu - mode classique et challenge."""
     
@@ -33,8 +44,12 @@ class GameScene(BaseScene):
     SCORE_FONT_SIZE = 40
     
     # Paramètres de transition explosion
-    FLASH_DURATION = 1.0     # Durée du flash blanc (secondes)
-    FADE_TO_BLACK_DURATION = 0.5  # Durée du fondu vers noir
+    FLASH_DURATION = 1.0
+    FADE_TO_BLACK_DURATION = 0.5
+    
+    # Durées des états temporaires de Yoshi
+    YOSHI_CONTENT_DURATION = 3.0  # secondes
+    YOSHI_TRISTE_DURATION = 5.0   # secondes
     
     def __init__(self, scene_manager):
         super().__init__(scene_manager)
@@ -45,12 +60,14 @@ class GameScene(BaseScene):
         self.font_letter = None
         
         # Images HUD
-        self.coin_img = None  # TODO: ajouter l'image de la pièce
         self.heart_full_img = None
         self.heart_empty_img = None
         self.gauge_img = None
-        self.gauge_segments = []  # [jaune, orange, rouge, violet, bleu]
-        self.timer_frame_img = None  # Cadre du timer (challenge)
+        self.gauge_segments = []
+        self.timer_frame_img = None
+        
+        # Images Yoshi
+        self.yoshi_images = {}  # Dict[YoshiState, pygame.Surface]
         
         # Boutons
         self.btn_gear: Optional[ImageButton] = None
@@ -65,19 +82,21 @@ class GameScene(BaseScene):
         
         # État du jeu
         self.entities: List[Entity] = []
-        self.splashes: List[Splash] = []  # Éclaboussures actives
+        self.splashes: List[Splash] = []
         self.hearts = GameConfig.MAX_HEARTS
         self.game_time = 0.0
         self.is_frozen = False
         self.freeze_timer = 0.0
         self.game_over = False
-        self.exploded = False  # Game over par bombe
+        self.exploded = False
+        
+        # État de Yoshi
+        self.yoshi_state = YoshiState.ATTEND
+        self.yoshi_temp_timer = 0.0  # Timer pour les états temporaires
         
         # Système de transition explosion
-        self.transition_state = 'playing'  # 'playing', 'flash', 'fade_to_black', 'finished'
+        self.transition_state = 'playing'
         self.transition_timer = 0.0
-        
-        # Surfaces pour les effets de transition
         self.white_overlay = None
         self.black_overlay = None
         
@@ -86,24 +105,21 @@ class GameScene(BaseScene):
         self._was_slicing = False
         
         # Mode de jeu
-        self.mode = 'classic'  # 'classic' ou 'challenge'
+        self.mode = 'classic'
         self.difficulty = 'normal'
         self.challenge_timer = 0.0
         
         # Tracking audio pour les bombes
-        self._bomb_count = 0  # Nombre de bombes actuellement à l'écran
+        self._bomb_count = 0
     
     def setup(self):
         """Initialise la partie."""
-        # Récupérer les données du scene_manager
         self.mode = self.scene_manager.shared_data.get('mode', 'classic')
         self.difficulty = self.scene_manager.shared_data.get('difficulty', 'normal')
         control_mode = self.scene_manager.shared_data.get('control_mode', 'keyboard')
         
-        # Charger les ressources
         self._load_resources()
         
-        # Initialiser les composants
         if self.mode == 'challenge':
             self.spawner = Spawner('challenge')
             self.challenge_timer = DIFFICULTY['challenge']['duration']
@@ -126,6 +142,10 @@ class GameScene(BaseScene):
         self._stroke_sliced_fruits.clear()
         self._was_slicing = False
         
+        # Reset Yoshi
+        self.yoshi_state = YoshiState.ATTEND
+        self.yoshi_temp_timer = 0.0
+        
         # Reset transition
         self.transition_state = 'playing'
         self.transition_timer = 0.0
@@ -134,7 +154,6 @@ class GameScene(BaseScene):
         self._bomb_count = 0
         audio_manager.stop_bomb_alert()
         
-        # Démarrer le tracking des succès
         if self.achievement_manager:
             self.achievement_manager.start_new_game(control_mode)
     
@@ -165,7 +184,6 @@ class GameScene(BaseScene):
             os.path.join(IMAGES_DIR, Images.GAUGE)
         ).convert_alpha()
         
-        # Segments de la jauge
         segment_paths = [
             Images.GAUGE_YELLOW,
             Images.GAUGE_ORANGE,
@@ -178,13 +196,13 @@ class GameScene(BaseScene):
             img = pygame.image.load(os.path.join(IMAGES_DIR, path)).convert_alpha()
             self.gauge_segments.append(img)
         
-        # Cadre du timer (mode challenge uniquement)
+        # Timer (challenge)
         if self.mode == 'challenge':
             self.timer_frame_img = pygame.image.load(
                 os.path.join(IMAGES_DIR, Images.CHALLENGE_TIMER_FRAME)
             ).convert_alpha()
         
-        # Boutons (engrenage et croix)
+        # Boutons
         self.btn_gear = ImageButton(
             image_path=Images.GEAR,
             center=Layout.GAME_GEAR,
@@ -196,47 +214,144 @@ class GameScene(BaseScene):
             on_click=self._on_quit
         )
         
-        # Créer les overlays pour les transitions
+        # Overlays pour transitions
         self.white_overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.white_overlay.fill((255, 255, 255))
-        
         self.black_overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.black_overlay.fill((0, 0, 0))
+        
+        # Charger les images de Yoshi selon le mode
+        self._load_yoshi_images()
+    
+    def _load_yoshi_images(self):
+        """Charge les images de Yoshi selon le mode de jeu."""
+        self.yoshi_images = {}
+        
+        if self.mode == 'challenge':
+            # Mode Challenge : attend, content, triste seulement
+            self.yoshi_images[YoshiState.ATTEND] = pygame.image.load(
+                os.path.join(IMAGES_DIR, Images.YOSHI_CHALLENGE_ATTEND)
+            ).convert_alpha()
+            self.yoshi_images[YoshiState.CONTENT] = pygame.image.load(
+                os.path.join(IMAGES_DIR, Images.YOSHI_CHALLENGE_CONTENT)
+            ).convert_alpha()
+            self.yoshi_images[YoshiState.TRISTE] = pygame.image.load(
+                os.path.join(IMAGES_DIR, Images.YOSHI_CHALLENGE_TRISTE)
+            ).convert_alpha()
+        else:
+            # Mode Classique : tous les états
+            self.yoshi_images[YoshiState.ATTEND] = pygame.image.load(
+                os.path.join(IMAGES_DIR, Images.YOSHI_CLASSIC_ATTEND)
+            ).convert_alpha()
+            self.yoshi_images[YoshiState.CONTENT] = pygame.image.load(
+                os.path.join(IMAGES_DIR, Images.YOSHI_CLASSIC_CONTENT)
+            ).convert_alpha()
+            self.yoshi_images[YoshiState.TRISTE] = pygame.image.load(
+                os.path.join(IMAGES_DIR, Images.YOSHI_CLASSIC_TRISTE)
+            ).convert_alpha()
+            self.yoshi_images[YoshiState.GELE] = pygame.image.load(
+                os.path.join(IMAGES_DIR, Images.YOSHI_CLASSIC_GELE)
+            ).convert_alpha()
+            self.yoshi_images[YoshiState.AFFAME] = pygame.image.load(
+                os.path.join(IMAGES_DIR, Images.YOSHI_CLASSIC_AFFAME)
+            ).convert_alpha()
     
     def set_achievement_manager(self, manager: AchievementManager):
         """Définit le gestionnaire de succès."""
         self.achievement_manager = manager
     
-    # Callbacks boutons
+    # ==================== SYSTÈME D'ÉTATS YOSHI ====================
+    
+    def _set_yoshi_state(self, state: YoshiState, temporary: bool = False, duration: float = 0.0):
+        """
+        Change l'état de Yoshi.
+        
+        Args:
+            state: Nouvel état
+            temporary: Si True, l'état reviendra à ATTEND après duration
+            duration: Durée de l'état temporaire
+        """
+        self.yoshi_state = state
+        if temporary:
+            self.yoshi_temp_timer = duration
+        else:
+            self.yoshi_temp_timer = 0.0
+    
+    def _get_current_yoshi_state(self) -> YoshiState:
+        """
+        Retourne l'état actuel de Yoshi selon la priorité.
+        
+        Priorité (plus haute → plus basse) :
+        1. Gelé (freeze actif) - classique seulement
+        2. Affamé (1 cœur restant) - classique seulement
+        3. Triste (temporaire)
+        4. Content (temporaire)
+        5. Attend (défaut)
+        """
+        # En mode classique, vérifier les états prioritaires permanents
+        if self.mode == 'classic':
+            # Priorité 1 : Gelé
+            if self.is_frozen:
+                return YoshiState.GELE
+            
+            # Priorité 2 : Affamé (1 cœur restant)
+            if self.hearts == 1:
+                return YoshiState.AFFAME
+        
+        # Les états temporaires (triste, content) sont gérés par yoshi_state
+        # et le timer gère leur expiration
+        return self.yoshi_state
+    
+    def _update_yoshi_state(self, dt: float):
+        """Met à jour l'état temporaire de Yoshi."""
+        if self.yoshi_temp_timer > 0:
+            self.yoshi_temp_timer -= dt
+            if self.yoshi_temp_timer <= 0:
+                # L'état temporaire expire, revenir à ATTEND
+                self.yoshi_state = YoshiState.ATTEND
+                self.yoshi_temp_timer = 0.0
+    
+    def _on_combo(self, count: int):
+        """Appelé quand un combo est réalisé (3+ fruits)."""
+        if count >= 3:
+            self._set_yoshi_state(YoshiState.CONTENT, temporary=True, duration=self.YOSHI_CONTENT_DURATION)
+    
+    def _on_heart_lost_yoshi(self):
+        """Appelé quand un cœur est perdu - met Yoshi triste temporairement."""
+        # Triste seulement si on a encore des cœurs (sinon game over)
+        if self.hearts > 0:
+            self._set_yoshi_state(YoshiState.TRISTE, temporary=True, duration=self.YOSHI_TRISTE_DURATION)
+    
+    def _on_bomb_penalty_yoshi(self):
+        """Appelé en mode challenge quand une bombe est tranchée (-10 pts)."""
+        self._set_yoshi_state(YoshiState.TRISTE, temporary=True, duration=self.YOSHI_TRISTE_DURATION)
+    
+    # ==================== CALLBACKS BOUTONS ====================
+    
     def _on_settings(self):
-        # TODO: ouvrir les paramètres en pause
         pass
     
     def _on_quit(self):
-        # Arrêter l'alerte bombe si active
         audio_manager.stop_bomb_alert()
-        # Retour au menu
         self.scene_manager.change_scene('menu')
     
+    # ==================== ÉVÉNEMENTS ====================
+    
     def handle_events(self, events: List[pygame.event.Event]):
-        # Bloquer les inputs pendant la transition
         if self.game_over or self.transition_state != 'playing':
             return
         
         for event in events:
-            # Boutons HUD
             self.btn_gear.handle_event(event)
             self.btn_cross.handle_event(event)
-            
-            # Transmettre à l'input handler
             self.input_handler.handle_event(event)
             
-            # Raccourci Échap pour quitter
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self._on_quit()
     
+    # ==================== UPDATE ====================
+    
     def update(self, dt: float):
-        # Gérer les transitions
         if self.transition_state != 'playing':
             self._update_transition(dt)
             return
@@ -246,65 +361,62 @@ class GameScene(BaseScene):
         
         self.game_time += dt
         
-        # Mode challenge : décompte du temps
+        # Mode challenge : décompte
         if self.mode == 'challenge':
             self.challenge_timer -= dt
             if self.challenge_timer <= 0:
                 self._end_game()
                 return
         
-        # Gestion du freeze
+        # Freeze
         if self.is_frozen:
             self.freeze_timer -= dt
             if self.freeze_timer <= 0:
                 self._unfreeze_all()
         
-        # Mise à jour du multiplicateur
+        # Multiplicateur
         self.scoring.update(dt)
         
-        # Spawn de nouvelles entités (sauf si freeze)
+        # Spawn
         if not self.is_frozen:
             keyboard_mode = self.input_handler.mode == "keyboard"
             new_entities = self.spawner.update(dt, keyboard_mode)
             
-            # Gérer l'audio des bombes pour les nouvelles entités
             for entity in new_entities:
                 if isinstance(entity, Bomb):
                     self._on_bomb_spawned()
             
             self.entities.extend(new_entities)
         
-        # Mise à jour des entités
+        # Entités
         for entity in self.entities:
             entity.update(dt)
         
-        # Mise à jour des éclaboussures
+        # Éclaboussures
         for splash in self.splashes:
             splash.update(dt)
         
-        # Détection des tranches
+        # Détection tranches
         sliced = self.input_handler.get_sliced_entities(self.entities)
         if sliced:
             self._process_sliced(sliced)
         
-        # Vérifier fin de tracé souris pour calculer le score du combo
+        # Fin de tracé souris
         is_slicing = self.input_handler.is_slicing()
         if self._was_slicing and not is_slicing:
-            # Fin du tracé : calculer le score de tous les fruits accumulés
             self._finalize_stroke()
         self._was_slicing = is_slicing
         
-        # Vérifier si le freeze doit se terminer (plus de fruits gelés)
+        # Vérifications
         self._check_freeze_end()
-        
-        # Vérifier les entités sorties de l'écran
         self._check_missed_entities()
-        
-        # Nettoyer les entités mortes et les éclaboussures terminées
         self._cleanup_entities()
         self.splashes = [s for s in self.splashes if not s.finished]
         
-        # Mise à jour du temps pour les succès
+        # Mise à jour état Yoshi
+        self._update_yoshi_state(dt)
+        
+        # Succès
         if self.achievement_manager:
             self.achievement_manager.on_time_update(self.game_time)
     
@@ -320,59 +432,52 @@ class GameScene(BaseScene):
         elif self.transition_state == 'fade_to_black':
             if self.transition_timer >= self.FADE_TO_BLACK_DURATION:
                 self.transition_state = 'finished'
-                # Finaliser et changer de scène
                 self._finalize_game_over()
     
     def _start_explosion_transition(self):
-        """Démarre la transition d'explosion (flash blanc → fondu noir)."""
+        """Démarre la transition d'explosion."""
         self.transition_state = 'flash'
         self.transition_timer = 0.0
         self.exploded = True
         self.game_over = True
         
-        # Arrêter l'alerte bombe
         audio_manager.stop_bomb_alert()
-        
-        # Jouer le SFX game over
         audio_manager.play_sfx('game_over')
         
-        # Finaliser les succès immédiatement
         if self.achievement_manager:
             self.achievement_manager.end_game(self.exploded)
     
     def _finalize_game_over(self):
         """Appelé quand la transition est terminée."""
-        # Sauvegarder le score
         self.scene_manager.shared_data['last_score'] = self.scoring.score
         self.scene_manager.shared_data['exploded'] = self.exploded
-        
-        # Transition vers game over
         self.scene_manager.change_scene('game_over')
     
     def _finalize_stroke(self):
-        """Finalise un tracé souris : calcule le score et les bonus."""
+        """Finalise un tracé souris."""
         if not self._stroke_sliced_fruits:
             return
         
         fruits = self._stroke_sliced_fruits
         count = len(fruits)
         
-        # Calculer les points (combo si plusieurs fruits)
         points = self.scoring.add_sliced_fruits(count)
         
-        # Vérifier paires identiques pour la jauge bonus
+        # Combo
+        if count >= 3:
+            self._on_combo(count)
+        
+        # Jauge bonus
         fruit_types = [f.fruit_type for f in fruits]
         for fruit_type in set(fruit_types):
             if fruit_types.count(fruit_type) >= 2:
                 if self.bonus_gauge.add_cran():
                     self._activate_multiplier()
         
-        # Succès
         if self.achievement_manager:
             self.achievement_manager.on_fruit_sliced(count)
             self.achievement_manager.on_score_update(self.scoring.score)
         
-        # Reset pour le prochain tracé
         self._stroke_sliced_fruits.clear()
     
     def _process_sliced(self, sliced: List[Entity]):
@@ -384,7 +489,6 @@ class GameScene(BaseScene):
         for entity in sliced:
             entity.slice()
             
-            # Libérer la lettre
             if entity.letter:
                 self.spawner.release_letter(entity.letter)
             
@@ -392,11 +496,10 @@ class GameScene(BaseScene):
                 fruits_sliced.append(entity)
             elif isinstance(entity, Bomb):
                 bomb_sliced = True
-                self._on_bomb_removed()  # Bombe tranchée = retirée
+                self._on_bomb_removed()
             elif isinstance(entity, Ice):
                 ice_sliced = True
         
-        # Priorité : bombe > glaçon > fruits (selon doc)
         if bomb_sliced:
             self._on_bomb_sliced()
             return
@@ -408,29 +511,27 @@ class GameScene(BaseScene):
             self._on_fruits_sliced(fruits_sliced)
     
     def _on_fruits_sliced(self, fruits: List[Fruit]):
-        """Appelé quand des fruits sont tranchés (accumule pour le tracé)."""
-        # Créer les éclaboussures immédiatement
+        """Appelé quand des fruits sont tranchés."""
         for fruit in fruits:
             cx, cy = fruit.center
             splash = Splash(fruit.fruit_type, cx, cy)
             self.splashes.append(splash)
         
-        # Mode souris : accumuler pour le combo de fin de tracé
         if self.input_handler.mode == "mouse":
             self._stroke_sliced_fruits.extend(fruits)
         else:
-            # Mode clavier : traiter immédiatement (une touche = un groupe)
             count = len(fruits)
             self.scoring.add_sliced_fruits(count)
             
-            # Vérifier paires identiques pour la jauge bonus
+            if count >= 3:
+                self._on_combo(count)
+            
             fruit_types = [f.fruit_type for f in fruits]
             for fruit_type in set(fruit_types):
                 if fruit_types.count(fruit_type) >= 2:
                     if self.bonus_gauge.add_cran():
                         self._activate_multiplier()
             
-            # Succès
             if self.achievement_manager:
                 self.achievement_manager.on_fruit_sliced(count)
                 self.achievement_manager.on_score_update(self.scoring.score)
@@ -438,20 +539,17 @@ class GameScene(BaseScene):
     def _on_bomb_sliced(self):
         """Appelé quand une bombe est tranchée."""
         if self.mode == 'challenge':
-            # Mode challenge : pénalité de points
             penalty = DIFFICULTY['challenge']['bomb_penalty']
             self.scoring.apply_bomb_penalty(penalty)
+            self._on_bomb_penalty_yoshi()  # Yoshi triste
         else:
-            # Mode classique : déclencher la transition d'explosion
             self._start_explosion_transition()
     
     def _on_ice_sliced(self):
         """Appelé quand un glaçon est tranché."""
-        # Récupérer la durée du freeze selon la difficulté
         if self.mode == 'challenge':
-            return  # Pas de glaçons en mode challenge
+            return
         
-        # Jouer le SFX freeze
         audio_manager.play_sfx('freeze')
         
         freeze_duration = DIFFICULTY.get(self.difficulty, DIFFICULTY['normal']).get('freeze_duration', 4.0)
@@ -461,11 +559,10 @@ class GameScene(BaseScene):
             self.achievement_manager.on_ice_sliced()
     
     def _freeze_all(self, duration: float):
-        """Gèle tous les fruits (pas les bombes ni les glaçons)."""
+        """Gèle tous les fruits."""
         self.is_frozen = True
         self.freeze_timer = duration
         
-        # Ne geler que les fruits non tranchés
         for entity in self.entities:
             if isinstance(entity, Fruit) and not entity.sliced:
                 entity.freeze()
@@ -480,11 +577,10 @@ class GameScene(BaseScene):
                 entity.unfreeze()
     
     def _check_freeze_end(self):
-        """Vérifie si le freeze doit se terminer (plus de fruits gelés)."""
+        """Vérifie si le freeze doit se terminer."""
         if not self.is_frozen:
             return
         
-        # Compter les fruits encore gelés (non tranchés)
         frozen_fruits = [
             e for e in self.entities 
             if isinstance(e, Fruit) and e.frozen and not e.sliced
@@ -494,31 +590,27 @@ class GameScene(BaseScene):
             self._unfreeze_all()
     
     def _activate_multiplier(self):
-        """Active le multiplicateur quand la jauge est pleine."""
+        """Active le multiplicateur."""
         if self.scoring.has_multiplier:
-            # Augmenter le multiplicateur existant
             self.scoring.increase_multiplier(
                 BonusGauge.MULTIPLIER_INCREMENT,
                 BonusGauge.MULTIPLIER_DURATION
             )
         else:
-            # Premier multiplicateur
             self.scoring.activate_multiplier(2, BonusGauge.MULTIPLIER_DURATION)
     
     def _check_missed_entities(self):
-        """Vérifie les entités sorties par le bas de la zone de jeu."""
+        """Vérifie les entités sorties de l'écran."""
         for entity in self.entities:
             if entity.sliced or entity.missed:
                 continue
             
-            # Un fruit est raté s'il sort par le bas de la zone de jeu
             if entity.y > GameConfig.GAME_ZONE_BOTTOM:
                 entity.missed = True
                 
                 if isinstance(entity, Fruit):
                     self._on_fruit_missed()
                 elif isinstance(entity, Bomb):
-                    # Bombe évitée (sortie de l'écran)
                     self._on_bomb_removed()
                     if self.achievement_manager:
                         self.achievement_manager.on_bomb_avoided()
@@ -526,9 +618,12 @@ class GameScene(BaseScene):
     def _on_fruit_missed(self):
         """Appelé quand un fruit est raté."""
         if self.mode == 'challenge':
-            return  # Pas de pénalité en mode challenge
+            return
         
         self.hearts -= 1
+        
+        # Yoshi triste
+        self._on_heart_lost_yoshi()
         
         if self.achievement_manager:
             self.achievement_manager.on_heart_lost()
@@ -537,56 +632,53 @@ class GameScene(BaseScene):
             self._end_game()
     
     def _cleanup_entities(self):
-        """Supprime les entités sorties de la zone de jeu."""
+        """Supprime les entités sorties."""
         self.entities = [
             e for e in self.entities
             if not (e.missed or e.y > GameConfig.GAME_ZONE_BOTTOM)
         ]
     
-    # ==================== GESTION AUDIO BOMBES ====================
+    # ==================== AUDIO BOMBES ====================
     
     def _on_bomb_spawned(self):
         """Appelé quand une bombe apparaît."""
         self._bomb_count += 1
-        # Démarrer l'alerte si c'est la première bombe
         if self._bomb_count == 1:
             audio_manager.start_bomb_alert()
     
     def _on_bomb_removed(self):
-        """Appelé quand une bombe disparaît (tranchée ou sortie de l'écran)."""
+        """Appelé quand une bombe disparaît."""
         self._bomb_count = max(0, self._bomb_count - 1)
-        # Arrêter l'alerte si plus aucune bombe
         if self._bomb_count == 0:
             audio_manager.stop_bomb_alert()
     
     # ==================== FIN DE PARTIE ====================
     
     def _end_game(self):
-        """Termine la partie (sans explosion)."""
+        """Termine la partie."""
         self.game_over = True
         
-        # Arrêter l'alerte bombe si active
         audio_manager.stop_bomb_alert()
-        
-        # Jouer le SFX game over
         audio_manager.play_sfx('game_over')
         
-        # Finaliser les succès
         if self.achievement_manager:
             self.achievement_manager.end_game(self.exploded)
         
-        # Sauvegarder le score
         self.scene_manager.shared_data['last_score'] = self.scoring.score
         self.scene_manager.shared_data['exploded'] = self.exploded
         
-        # Transition vers game over
         self.scene_manager.change_scene('game_over')
+    
+    # ==================== RENDU ====================
     
     def render(self, screen: pygame.Surface):
         # Fond
         screen.blit(self.background, (0, 0))
         
-        # Définir la zone de clip pour les entités (zone de jeu uniquement)
+        # Yoshi (dans la zone de décor, pas clippé)
+        self._render_yoshi(screen)
+        
+        # Zone de jeu clippée
         game_zone_rect = pygame.Rect(
             GameConfig.GAME_ZONE_LEFT,
             GameConfig.GAME_ZONE_TOP,
@@ -595,39 +687,46 @@ class GameScene(BaseScene):
         )
         screen.set_clip(game_zone_rect)
         
-        # Éclaboussures (en arrière-plan des entités)
+        # Éclaboussures
         for splash in self.splashes:
             splash.render(screen)
         
-        # Entités (clippées à la zone de jeu)
+        # Entités
         for entity in self.entities:
             entity.render(screen, self.font_letter if self.input_handler.mode == "keyboard" else None)
         
-        # Traînée souris (clippée aussi)
+        # Traînée souris
         if self.input_handler.mode == "mouse" and self.input_handler.is_slicing():
             self._render_trail(screen)
         
-        # Retirer le clip pour le reste du HUD
         screen.set_clip(None)
         
-        # HUD (pas clippé)
+        # HUD
         self._render_hud(screen)
         
-        # Afficher les effets de transition par-dessus tout
+        # Transition
         self._render_transition(screen)
     
+    def _render_yoshi(self, screen: pygame.Surface):
+        """Affiche Yoshi avec son état actuel."""
+        current_state = self._get_current_yoshi_state()
+        
+        # Récupérer l'image correspondante
+        yoshi_img = self.yoshi_images.get(current_state)
+        
+        if yoshi_img:
+            yoshi_rect = yoshi_img.get_rect(center=Layout.GAME_YOSHI)
+            screen.blit(yoshi_img, yoshi_rect)
+    
     def _render_transition(self, screen: pygame.Surface):
-        """Affiche les effets de transition (flash blanc, fondu noir)."""
+        """Affiche les effets de transition."""
         if self.transition_state == 'flash':
-            # Flash blanc avec alpha décroissant
             progress = self.transition_timer / self.FLASH_DURATION
-            # Commencer à 255, puis diminuer rapidement
             alpha = int(255 * (1 - progress * 0.3))
             self.white_overlay.set_alpha(alpha)
             screen.blit(self.white_overlay, (0, 0))
         
         elif self.transition_state == 'fade_to_black':
-            # Fondu vers le noir
             progress = self.transition_timer / self.FADE_TO_BLACK_DURATION
             alpha = int(255 * progress)
             self.black_overlay.set_alpha(alpha)
@@ -639,33 +738,26 @@ class GameScene(BaseScene):
         if len(points) < 2:
             return
         
-        # Ligne blanche avec effet de fade
         for i in range(1, len(points)):
-            alpha = int(255 * (i / len(points)))
             color = (255, 255, 255)
             pygame.draw.line(screen, color, points[i-1], points[i], 3)
     
     def _render_hud(self, screen: pygame.Surface):
-        """Affiche le HUD (score, cœurs/timer, jauge, boutons)."""
-        # Score (haut gauche, justifié gauche depuis position 361)
+        """Affiche le HUD."""
         self._render_score(screen)
         
-        # Cœurs ou Timer (haut centre)
         if self.mode == 'challenge':
             self._render_timer(screen)
         else:
             self._render_hearts(screen)
         
-        # Boutons (haut droit)
         self.btn_gear.render(screen)
         self.btn_cross.render(screen)
         
-        # Jauge bonus (bas centre)
         self._render_gauge(screen)
     
     def _render_score(self, screen: pygame.Surface):
-        """Affiche le score avec multiplicateur si actif."""
-        # Format: "140387 x2 (10s)" ou juste "140387"
+        """Affiche le score."""
         score_text = f"{self.scoring.score}"
         
         if self.scoring.has_multiplier:
@@ -674,13 +766,11 @@ class GameScene(BaseScene):
             score_text += f" ({timer_left}s)"
         
         score_surface = self.font_score.render(score_text, True, TextColors.GAME_SCORE)
-        
-        # Même position pour classic et challenge (justifié gauche)
         score_rect = score_surface.get_rect(left=Layout.GAME_SCORE_POS_CLASSIC[0], centery=Layout.GAME_SCORE_POS_CLASSIC[1])
         screen.blit(score_surface, score_rect)
     
     def _render_hearts(self, screen: pygame.Surface):
-        """Affiche les 3 cœurs (mode classique)."""
+        """Affiche les 3 cœurs."""
         heart_positions = [
             Layout.GAME_HEART_1,
             Layout.GAME_HEART_2,
@@ -688,22 +778,16 @@ class GameScene(BaseScene):
         ]
         
         for i, pos in enumerate(heart_positions):
-            if i < self.hearts:
-                img = self.heart_full_img
-            else:
-                img = self.heart_empty_img
-            
+            img = self.heart_full_img if i < self.hearts else self.heart_empty_img
             rect = img.get_rect(center=pos)
             screen.blit(img, rect)
     
     def _render_timer(self, screen: pygame.Surface):
-        """Affiche le timer avec son cadre (mode challenge)."""
-        # Cadre du timer
+        """Affiche le timer."""
         if self.timer_frame_img:
             frame_rect = self.timer_frame_img.get_rect(center=Layout.GAME_TIMER)
             screen.blit(self.timer_frame_img, frame_rect)
         
-        # Texte du timer
         minutes = int(self.challenge_timer) // 60
         seconds = int(self.challenge_timer) % 60
         timer_text = f"{minutes}:{seconds:02d}"
@@ -713,12 +797,10 @@ class GameScene(BaseScene):
         screen.blit(timer_surface, timer_rect)
     
     def _render_gauge(self, screen: pygame.Surface):
-        """Affiche la jauge de bonus avec ses segments."""
-        # Fond de la jauge
+        """Affiche la jauge de bonus."""
         gauge_rect = self.gauge_img.get_rect(center=Layout.GAME_GAUGE)
         screen.blit(self.gauge_img, gauge_rect)
         
-        # Segments remplis selon le niveau de la jauge
         crans = self.bonus_gauge.crans
         for i in range(crans):
             if i < len(self.gauge_segments):
@@ -728,10 +810,8 @@ class GameScene(BaseScene):
                 screen.blit(segment_img, segment_rect)
     
     def cleanup(self):
-        """Nettoyage à la sortie de la scène."""
-        # Arrêter l'alerte bombe si active
+        """Nettoyage à la sortie."""
         audio_manager.stop_bomb_alert()
-        
         self.entities.clear()
         if self.input_handler:
             self.input_handler.reset()
