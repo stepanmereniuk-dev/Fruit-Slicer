@@ -46,10 +46,19 @@ class Spawner:
         self.next_spawn_delay = random.uniform(min_delay, max_delay)
     
     def _get_spawn_position(self) -> tuple:
-        """Retourne une position de spawn (bas de l'écran, centré horizontalement)."""
-        margin = WINDOW_WIDTH * GameConfig.SPAWN_MARGIN
-        x = random.uniform(margin, WINDOW_WIDTH - margin - GameConfig.FRUIT_SIZE)
-        y = WINDOW_HEIGHT  # Juste en dessous de l'écran
+        """Retourne une position de spawn (bas de la zone de jeu, centré horizontalement)."""
+        # Marge sur les côtés de la zone de jeu
+        zone_width = GameConfig.GAME_ZONE_SIZE[0]
+        margin = zone_width * GameConfig.SPAWN_MARGIN
+        
+        # Position X dans la zone de jeu
+        min_x = GameConfig.GAME_ZONE_LEFT + margin
+        max_x = GameConfig.GAME_ZONE_RIGHT - margin - GameConfig.FRUIT_SIZE
+        x = random.uniform(min_x, max_x)
+        
+        # Position Y : juste en dessous de la zone de jeu
+        y = GameConfig.GAME_ZONE_BOTTOM
+        
         return x, y
     
     def _get_velocity(self) -> tuple:

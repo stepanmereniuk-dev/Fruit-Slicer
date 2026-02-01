@@ -44,6 +44,7 @@ class GameScene(BaseScene):
         self.heart_empty_img = None
         self.gauge_img = None
         self.gauge_segments = []  # [jaune, orange, rouge, violet, bleu]
+        self.timer_frame_img = None  # Cadre du timer (challenge)
         
         # Boutons
         self.btn_gear: Optional[ImageButton] = None
@@ -143,6 +144,12 @@ class GameScene(BaseScene):
         for path in segment_paths:
             img = pygame.image.load(os.path.join(IMAGES_DIR, path)).convert_alpha()
             self.gauge_segments.append(img)
+        
+        # Cadre du timer (mode challenge uniquement)
+        if self.mode == 'challenge':
+            self.timer_frame_img = pygame.image.load(
+                os.path.join(IMAGES_DIR, Images.CHALLENGE_TIMER_FRAME)
+            ).convert_alpha()
         
         # Boutons (engrenage et croix)
         self.btn_gear = ImageButton(
@@ -332,12 +339,13 @@ class GameScene(BaseScene):
             self.scoring.activate_multiplier(2, BonusGauge.MULTIPLIER_DURATION)
     
     def _check_missed_entities(self):
-        """Vérifie les entités sorties par le bas."""
+        """Vérifie les entités sorties par le bas de la zone de jeu."""
         for entity in self.entities:
             if entity.sliced or entity.missed:
                 continue
             
-            if entity.is_off_screen(WINDOW_HEIGHT):
+            # Un fruit est raté s'il sort par le bas de la zone de jeu
+            if entity.y > GameConfig.GAME_ZONE_BOTTOM:
                 entity.missed = True
                 
                 if isinstance(entity, Fruit):
@@ -361,10 +369,10 @@ class GameScene(BaseScene):
             self._end_game()
     
     def _cleanup_entities(self):
-        """Supprime les entités mortes."""
+        """Supprime les entités sorties de la zone de jeu."""
         self.entities = [
             e for e in self.entities
-            if not (e.missed or (e.sliced and e.is_off_screen(WINDOW_HEIGHT)))
+            if not (e.missed or e.y > GameConfig.GAME_ZONE_BOTTOM)
         ]
     
     def _end_game(self):
@@ -387,15 +395,27 @@ class GameScene(BaseScene):
         # Fond
         screen.blit(self.background, (0, 0))
         
-        # Entités
+        # Définir la zone de clip pour les entités (zone de jeu uniquement)
+        game_zone_rect = pygame.Rect(
+            GameConfig.GAME_ZONE_LEFT,
+            GameConfig.GAME_ZONE_TOP,
+            GameConfig.GAME_ZONE_SIZE[0],
+            GameConfig.GAME_ZONE_SIZE[1]
+        )
+        screen.set_clip(game_zone_rect)
+        
+        # Entités (clippées à la zone de jeu)
         for entity in self.entities:
             entity.render(screen, self.font_letter if self.input_handler.mode == "keyboard" else None)
         
-        # Traînée souris
+        # Traînée souris (clippée aussi)
         if self.input_handler.mode == "mouse" and self.input_handler.is_slicing():
             self._render_trail(screen)
         
-        # HUD
+        # Retirer le clip pour le reste du HUD
+        screen.set_clip(None)
+        
+        # HUD (pas clippé)
         self._render_hud(screen)
         
         # Effet freeze
@@ -443,9 +463,9 @@ class GameScene(BaseScene):
             score_text += f" ({timer_left}s)"
         
         score_surface = self.font_score.render(score_text, True, TextColors.GAME_SCORE)
-        # Justifié gauche depuis la position x=361
-        # La position donnée est le centre, donc on place le left là
-        score_rect = score_surface.get_rect(left=100, centery=Layout.GAME_SCORE_POS[1])
+        
+        # Même position pour classic et challenge (justifié gauche)
+        score_rect = score_surface.get_rect(left=Layout.GAME_SCORE_POS_CLASSIC[0], centery=Layout.GAME_SCORE_POS_CLASSIC[1])
         screen.blit(score_surface, score_rect)
     
     def _render_hearts(self, screen: pygame.Surface):
@@ -466,13 +486,19 @@ class GameScene(BaseScene):
             screen.blit(img, rect)
     
     def _render_timer(self, screen: pygame.Surface):
-        """Affiche le timer (mode challenge)."""
+        """Affiche le timer avec son cadre (mode challenge)."""
+        # Cadre du timer
+        if self.timer_frame_img:
+            frame_rect = self.timer_frame_img.get_rect(center=Layout.GAME_TIMER)
+            screen.blit(self.timer_frame_img, frame_rect)
+        
+        # Texte du timer
         minutes = int(self.challenge_timer) // 60
         seconds = int(self.challenge_timer) % 60
         timer_text = f"{minutes}:{seconds:02d}"
         
         timer_surface = self.font_score.render(timer_text, True, TextColors.GAME_SCORE)
-        timer_rect = timer_surface.get_rect(center=(WINDOW_WIDTH // 2, Layout.GAME_SCORE_POS[1]))
+        timer_rect = timer_surface.get_rect(center=Layout.GAME_TIMER)
         screen.blit(timer_surface, timer_rect)
     
     def _render_gauge(self, screen: pygame.Surface):

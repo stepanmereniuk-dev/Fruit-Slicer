@@ -134,6 +134,9 @@ class Images:
     GAUGE_PURPLE = "scenes/game_scene/violet gamescene 81 x 36.png"
     GAUGE_BLUE = "scenes/game_scene/bleu gamescene 81 x 36.png"
     
+    # Challenge Scene
+    CHALLENGE_TIMER_FRAME = "scenes/challenge_scene/timer challenge 371x183.png"
+    
     # Player Select Scene
     PSS_BG = "scenes/player_select_scene/background pss 1920x1080.png"
     PSS_PSEUDO_FIELD = "scenes/player_select_scene/Bouton tapez votre pseudo pss 599x88.png"
@@ -227,13 +230,15 @@ class Layout:
     TUTO_BTN_NEXT = (1214, 787)
     TUTO_BTN_PLAY = (1214, 787)  # Même position que suivant
     
-    # Game Scene (centre des éléments)
-    GAME_SCORE_POS = (361, 84)        # Position du texte score (justifié gauche)
+    # Game Scene (positions des éléments)
+    GAME_SCORE_POS_CLASSIC = (171, 84)    # Point de justification gauche (classique)
+    GAME_SCORE_POS_CHALLENGE = (361, 84)  # Point de justification gauche (challenge)
     GAME_HEART_1 = (878, 84)
     GAME_HEART_2 = (960, 84)
     GAME_HEART_3 = (1041, 84)
     GAME_GEAR = (1624, 84)
     GAME_CROSS = (1765, 84)
+    GAME_TIMER = (960, 106)               # Timer challenge (centre)
     GAME_GAUGE = (960, 1016)
     GAME_GAUGE_SEGMENTS = [
         (763, 1016),   # Jaune
@@ -251,9 +256,15 @@ class GameConfig:
     FRUIT_SIZE = 223
     FRUIT_TYPES = ['apple', 'banana', 'grape', 'melon', 'watermelon']
     
-    # Zone de jeu active
-    GAME_ZONE = (1260, 770)
-    SPAWN_MARGIN = 0.15  # 15% marge sur les côtés
+    # Zone de jeu active (centre 960x535, taille 1260x770)
+    GAME_ZONE_CENTER = (960, 535)
+    GAME_ZONE_SIZE = (1260, 770)
+    GAME_ZONE_LEFT = 960 - 630  # 330
+    GAME_ZONE_RIGHT = 960 + 630  # 1590
+    GAME_ZONE_TOP = 535 - 385  # 150
+    GAME_ZONE_BOTTOM = 535 + 385  # 920
+    
+    SPAWN_MARGIN = 0.10  # 10% marge sur les côtés de la zone
     
     # Jauge bonus
     BONUS_MAX_CRANS = 5
@@ -268,9 +279,9 @@ class GameConfig:
 
 DIFFICULTY = {
     'easy': {
-        'speed_y': (-500, -400),
-        'speed_x': (-50, 50),
-        'gravity': 400,
+        'speed_y': (-1000, -850),    # Monte ~500-625 px
+        'speed_x': (-60, 60),
+        'gravity': 700,
         'spawn_delay': (1.5, 2.0),
         'fruits_per_spawn': (1, 2),
         'bomb_chance': 0.05,
@@ -278,9 +289,9 @@ DIFFICULTY = {
         'freeze_duration': 5.0,
     },
     'normal': {
-        'speed_y': (-600, -500),
-        'speed_x': (-100, 100),
-        'gravity': 500,
+        'speed_y': (-1100, -950),    # Monte ~550-700 px
+        'speed_x': (-80, 80),
+        'gravity': 750,
         'spawn_delay': (1.0, 1.5),
         'fruits_per_spawn': (1, 3),
         'bomb_chance': 0.10,
@@ -288,9 +299,9 @@ DIFFICULTY = {
         'freeze_duration': 4.0,
     },
     'hard': {
-        'speed_y': (-750, -600),
-        'speed_x': (-150, 150),
-        'gravity': 600,
+        'speed_y': (-1150, -950),    # Monte ~550-680 px
+        'speed_x': (-100, 100),
+        'gravity': 800,
         'spawn_delay': (0.6, 1.0),
         'fruits_per_spawn': (2, 4),
         'bomb_chance': 0.15,
@@ -298,9 +309,9 @@ DIFFICULTY = {
         'freeze_duration': 3.0,
     },
     'challenge': {
-        'speed_y': (-600, -500),
-        'speed_x': (-100, 100),
-        'gravity': 500,
+        'speed_y': (-1100, -950),
+        'speed_x': (-80, 80),
+        'gravity': 750,
         'duration': 60,
         'spawn_delay': (0.8, 1.2),
         'fruits_per_spawn': (1, 3),
