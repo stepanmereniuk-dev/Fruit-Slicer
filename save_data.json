@@ -83,6 +83,28 @@
       },
       "tutorial_seen": true,
       "total_games": 0
+    },
+    "ok": {
+      "pseudo": "ok",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "af": {
+      "pseudo": "af",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
     }
   }
 }

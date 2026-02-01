@@ -5,12 +5,12 @@ Gère le gameplay : fruits, bombes, glaçons, score, cœurs, freeze.
 
 import pygame
 import os
-from typing import List, Union
+from typing import List, Union, Optional
 
 from scenes.base_scene import BaseScene
 from config import (
     IMAGES_DIR, FONTS_DIR, WINDOW_WIDTH, WINDOW_HEIGHT,
-    Images, GameConfig, DIFFICULTY, FONT_FILE, FONT_SIZE
+    Images, Layout, TextColors, GameConfig, DIFFICULTY, FONT_FILE
 )
 from core import lang_manager
 from core.scoring import ScoringManager, BonusGauge
@@ -18,6 +18,7 @@ from core.spawner import Spawner
 from core.input_handler import InputHandler
 from core.achievements import AchievementManager
 from entities import Fruit, Bomb, Ice
+from ui.buttons import ImageButton
 
 
 Entity = Union[Fruit, Bomb, Ice]
@@ -26,20 +27,27 @@ Entity = Union[Fruit, Bomb, Ice]
 class GameScene(BaseScene):
     """Scène de jeu - mode classique et challenge."""
     
+    # Taille de police pour le score
+    SCORE_FONT_SIZE = 40
+    
     def __init__(self, scene_manager):
         super().__init__(scene_manager)
         
         # Ressources
         self.background = None
-        self.font = None
-        self.font_small = None
+        self.font_score = None
+        self.font_letter = None
         
-        # Images UI
-        self.heart_full = None
-        self.heart_empty = None
+        # Images HUD
+        self.coin_img = None  # TODO: ajouter l'image de la pièce
+        self.heart_full_img = None
+        self.heart_empty_img = None
         self.gauge_img = None
-        self.gear_img = None
-        self.cross_img = None
+        self.gauge_segments = []  # [jaune, orange, rouge, violet, bleu]
+        
+        # Boutons
+        self.btn_gear: Optional[ImageButton] = None
+        self.btn_cross: Optional[ImageButton] = None
         
         # Composants
         self.scoring = ScoringManager()
@@ -107,42 +115,75 @@ class GameScene(BaseScene):
         
         # Polices
         font_path = os.path.join(FONTS_DIR, FONT_FILE)
-        self.font = pygame.font.Font(font_path, FONT_SIZE)
-        self.font_small = pygame.font.Font(font_path, 24)
+        self.font_score = pygame.font.Font(font_path, self.SCORE_FONT_SIZE)
+        self.font_letter = pygame.font.Font(font_path, 24)
         
-        # UI
-        self.heart_full = pygame.image.load(
+        # Cœurs
+        self.heart_full_img = pygame.image.load(
             os.path.join(IMAGES_DIR, Images.HEART_FULL)
         ).convert_alpha()
-        self.heart_empty = pygame.image.load(
+        self.heart_empty_img = pygame.image.load(
             os.path.join(IMAGES_DIR, Images.HEART_EMPTY)
         ).convert_alpha()
+        
+        # Jauge
         self.gauge_img = pygame.image.load(
             os.path.join(IMAGES_DIR, Images.GAUGE)
         ).convert_alpha()
-        self.gear_img = pygame.image.load(
-            os.path.join(IMAGES_DIR, Images.GEAR)
-        ).convert_alpha()
-        self.cross_img = pygame.image.load(
-            os.path.join(IMAGES_DIR, Images.CROSS)
-        ).convert_alpha()
+        
+        # Segments de la jauge
+        segment_paths = [
+            Images.GAUGE_YELLOW,
+            Images.GAUGE_ORANGE,
+            Images.GAUGE_RED,
+            Images.GAUGE_PURPLE,
+            Images.GAUGE_BLUE,
+        ]
+        self.gauge_segments = []
+        for path in segment_paths:
+            img = pygame.image.load(os.path.join(IMAGES_DIR, path)).convert_alpha()
+            self.gauge_segments.append(img)
+        
+        # Boutons (engrenage et croix)
+        self.btn_gear = ImageButton(
+            image_path=Images.GEAR,
+            center=Layout.GAME_GEAR,
+            on_click=self._on_settings
+        )
+        self.btn_cross = ImageButton(
+            image_path=Images.CROSS,
+            center=Layout.GAME_CROSS,
+            on_click=self._on_quit
+        )
     
     def set_achievement_manager(self, manager: AchievementManager):
         """Définit le gestionnaire de succès."""
         self.achievement_manager = manager
+    
+    # Callbacks boutons
+    def _on_settings(self):
+        # TODO: ouvrir les paramètres en pause
+        pass
+    
+    def _on_quit(self):
+        # Retour au menu
+        self.scene_manager.change_scene('menu')
     
     def handle_events(self, events: List[pygame.event.Event]):
         if self.game_over:
             return
         
         for event in events:
-            # Bouton quitter (croix)
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                # TODO: vérifier clic sur croix/engrenage
-                pass
+            # Boutons HUD
+            self.btn_gear.handle_event(event)
+            self.btn_cross.handle_event(event)
             
             # Transmettre à l'input handler
             self.input_handler.handle_event(event)
+            
+            # Raccourci Échap pour quitter
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self._on_quit()
     
     def update(self, dt: float):
         if self.game_over:
@@ -252,6 +293,10 @@ class GameScene(BaseScene):
     
     def _on_ice_sliced(self):
         """Appelé quand un glaçon est tranché."""
+        # Récupérer la durée du freeze selon la difficulté
+        if self.mode == 'challenge':
+            return  # Pas de glaçons en mode challenge
+        
         freeze_duration = DIFFICULTY.get(self.difficulty, DIFFICULTY['normal']).get('freeze_duration', 4.0)
         self._freeze_all(freeze_duration)
         
@@ -332,6 +377,7 @@ class GameScene(BaseScene):
         
         # Sauvegarder le score
         self.scene_manager.shared_data['last_score'] = self.scoring.score
+        self.scene_manager.shared_data['exploded'] = self.exploded
         # TODO: vérifier si nouveau record
         
         # Transition vers game over
@@ -343,7 +389,7 @@ class GameScene(BaseScene):
         
         # Entités
         for entity in self.entities:
-            entity.render(screen, self.font_small if self.input_handler.mode == "keyboard" else None)
+            entity.render(screen, self.font_letter if self.input_handler.mode == "keyboard" else None)
         
         # Traînée souris
         if self.input_handler.mode == "mouse" and self.input_handler.is_slicing():
@@ -369,43 +415,80 @@ class GameScene(BaseScene):
             pygame.draw.line(screen, color, points[i-1], points[i], 3)
     
     def _render_hud(self, screen: pygame.Surface):
-        """Affiche le HUD (score, cœurs, timer, jauge)."""
-        # Score (haut gauche)
+        """Affiche le HUD (score, cœurs/timer, jauge, boutons)."""
+        # Score (haut gauche, justifié gauche depuis position 361)
+        self._render_score(screen)
+        
+        # Cœurs ou Timer (haut centre)
+        if self.mode == 'challenge':
+            self._render_timer(screen)
+        else:
+            self._render_hearts(screen)
+        
+        # Boutons (haut droit)
+        self.btn_gear.render(screen)
+        self.btn_cross.render(screen)
+        
+        # Jauge bonus (bas centre)
+        self._render_gauge(screen)
+    
+    def _render_score(self, screen: pygame.Surface):
+        """Affiche le score avec multiplicateur si actif."""
+        # Format: "140387 x2 (10s)" ou juste "140387"
         score_text = f"{self.scoring.score}"
+        
         if self.scoring.has_multiplier:
             score_text += f" x{self.scoring.multiplier}"
             timer_left = int(self.scoring.multiplier_timer)
             score_text += f" ({timer_left}s)"
         
-        score_surface = self.font.render(score_text, True, (255, 255, 255))
-        screen.blit(score_surface, (50, 30))
+        score_surface = self.font_score.render(score_text, True, TextColors.GAME_SCORE)
+        # Justifié gauche depuis la position x=361
+        # La position donnée est le centre, donc on place le left là
+        score_rect = score_surface.get_rect(left=100, centery=Layout.GAME_SCORE_POS[1])
+        screen.blit(score_surface, score_rect)
+    
+    def _render_hearts(self, screen: pygame.Surface):
+        """Affiche les 3 cœurs (mode classique)."""
+        heart_positions = [
+            Layout.GAME_HEART_1,
+            Layout.GAME_HEART_2,
+            Layout.GAME_HEART_3,
+        ]
         
-        # Cœurs ou Timer (haut centre)
-        if self.mode == 'challenge':
-            # Timer
-            minutes = int(self.challenge_timer) // 60
-            seconds = int(self.challenge_timer) % 60
-            timer_text = f"{minutes}:{seconds:02d}"
-            timer_surface = self.font.render(timer_text, True, (255, 255, 255))
-            timer_rect = timer_surface.get_rect(centerx=WINDOW_WIDTH // 2, top=30)
-            screen.blit(timer_surface, timer_rect)
-        else:
-            # Cœurs
-            heart_y = 30
-            heart_spacing = 85
-            start_x = WINDOW_WIDTH // 2 - (heart_spacing * GameConfig.MAX_HEARTS) // 2
+        for i, pos in enumerate(heart_positions):
+            if i < self.hearts:
+                img = self.heart_full_img
+            else:
+                img = self.heart_empty_img
             
-            for i in range(GameConfig.MAX_HEARTS):
-                heart_img = self.heart_full if i < self.hearts else self.heart_empty
-                screen.blit(heart_img, (start_x + i * heart_spacing, heart_y))
+            rect = img.get_rect(center=pos)
+            screen.blit(img, rect)
+    
+    def _render_timer(self, screen: pygame.Surface):
+        """Affiche le timer (mode challenge)."""
+        minutes = int(self.challenge_timer) // 60
+        seconds = int(self.challenge_timer) % 60
+        timer_text = f"{minutes}:{seconds:02d}"
         
-        # Boutons (haut droit)
-        screen.blit(self.gear_img, (WINDOW_WIDTH - 200, 20))
-        screen.blit(self.cross_img, (WINDOW_WIDTH - 100, 20))
-        
-        # Jauge bonus (bas centre)
-        gauge_rect = self.gauge_img.get_rect(centerx=WINDOW_WIDTH // 2, bottom=WINDOW_HEIGHT - 20)
+        timer_surface = self.font_score.render(timer_text, True, TextColors.GAME_SCORE)
+        timer_rect = timer_surface.get_rect(center=(WINDOW_WIDTH // 2, Layout.GAME_SCORE_POS[1]))
+        screen.blit(timer_surface, timer_rect)
+    
+    def _render_gauge(self, screen: pygame.Surface):
+        """Affiche la jauge de bonus avec ses segments."""
+        # Fond de la jauge
+        gauge_rect = self.gauge_img.get_rect(center=Layout.GAME_GAUGE)
         screen.blit(self.gauge_img, gauge_rect)
+        
+        # Segments remplis selon le niveau de la jauge
+        crans = self.bonus_gauge.crans
+        for i in range(crans):
+            if i < len(self.gauge_segments):
+                segment_img = self.gauge_segments[i]
+                segment_pos = Layout.GAME_GAUGE_SEGMENTS[i]
+                segment_rect = segment_img.get_rect(center=segment_pos)
+                screen.blit(segment_img, segment_rect)
     
     def _render_freeze_effect(self, screen: pygame.Surface):
         """Affiche un effet visuel pendant le freeze."""
@@ -414,13 +497,14 @@ class GameScene(BaseScene):
         overlay.fill((100, 200, 255, 50))
         screen.blit(overlay, (0, 0))
         
-        # Texte FREEZE
+        # Texte FREEZE au centre
         freeze_text = lang_manager.get("game.freeze_text")
-        text_surface = self.font.render(freeze_text, True, (100, 200, 255))
+        text_surface = self.font_score.render(freeze_text, True, (100, 200, 255))
         text_rect = text_surface.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
         screen.blit(text_surface, text_rect)
     
     def cleanup(self):
         """Nettoyage à la sortie de la scène."""
         self.entities.clear()
-        self.input_handler.reset()
+        if self.input_handler:
+            self.input_handler.reset()

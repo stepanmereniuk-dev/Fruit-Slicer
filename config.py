@@ -58,6 +58,9 @@ class TextColors:
     TUTO_PREVIOUS = (202, 181, 155)  # #cab59b
     TUTO_NEXT = (255, 255, 255)      # #ffffff
     TUTO_PLAY = (254, 237, 142)      # #feed8e
+    
+    # Game Scene
+    GAME_SCORE = (254, 237, 142)     # #feed8e
 
 
 # ==================== IMAGES ====================
@@ -223,6 +226,22 @@ class Layout:
     TUTO_BTN_PREV = (706, 787)
     TUTO_BTN_NEXT = (1214, 787)
     TUTO_BTN_PLAY = (1214, 787)  # Même position que suivant
+    
+    # Game Scene (centre des éléments)
+    GAME_SCORE_POS = (361, 84)        # Position du texte score (justifié gauche)
+    GAME_HEART_1 = (878, 84)
+    GAME_HEART_2 = (960, 84)
+    GAME_HEART_3 = (1041, 84)
+    GAME_GEAR = (1624, 84)
+    GAME_CROSS = (1765, 84)
+    GAME_GAUGE = (960, 1016)
+    GAME_GAUGE_SEGMENTS = [
+        (763, 1016),   # Jaune
+        (862, 1016),   # Orange
+        (960, 1016),   # Rouge
+        (1058, 1016),  # Violet
+        (1157, 1016),  # Bleu
+    ]
 
 
 # ==================== GAMEPLAY ====================
