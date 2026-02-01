@@ -48,13 +48,14 @@ class SceneManager:
         from scenes.menu_scene import MenuScene
         from scenes.game_scene import GameScene
         from scenes.player_select_scene import PlayerSelectScene
+        from scenes.tutorial_scene import TutorialScene
         
         self.scenes = {
             'menu': MenuScene(self),
             'game': GameScene(self),
             'player_select': PlayerSelectScene(self),
+            'tutorial': TutorialScene(self),
             # TODO: Ajouter les autres scènes quand elles seront prêtes
-            # 'tutorial': TutorialScene(self),
             # 'game_over': GameOverScene(self),
             # 'settings': SettingsScene(self),
             # 'ranking': RankingScene(self),
@@ -64,8 +65,9 @@ class SceneManager:
         # Passer le gestionnaire de succès aux scènes qui en ont besoin
         self.scenes['game'].set_achievement_manager(self.achievement_manager)
         
-        # Passer le gestionnaire de joueurs à PlayerSelectScene
+        # Passer le gestionnaire de joueurs aux scènes qui en ont besoin
         self.scenes['player_select'].set_player_manager(self.player_manager)
+        self.scenes['tutorial'].set_player_manager(self.player_manager)
     
     def change_scene(self, scene_name: str):
         """

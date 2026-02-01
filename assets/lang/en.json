@@ -44,22 +44,55 @@
   },
 
   "tutorial": {
-    "screen_1_title": "Welcome!",
-    "screen_1_text": "Yoshi is starving and needs your help!\nSlice the fruits to feed him.",
-    "screen_2_title": "Controls",
-    "screen_2_text_keyboard": "Each fruit shows a letter.\nPress the matching key to slice it!",
-    "screen_2_text_mouse": "Hold left click and drag across\nthe fruits to slice them!",
-    "screen_3_title": "Hearts",
-    "screen_3_text": "You have 3 hearts.\nEach missed fruit costs you one heart.\n3 missed fruits = Game Over!",
-    "screen_4_title": "Watch out for Bob-ombs!",
-    "screen_4_text": "Bob-ombs are dangerous!\nSlice one and it's instant Game Over!",
-    "screen_5_title": "Ice Flower",
-    "screen_5_text": "The Ice Flower freezes time!\nAll fruits stop for a few seconds.",
-    "screen_6_title": "Combos and bonus",
-    "screen_6_text": "Slice multiple fruits at once for combos!\nSlice 2 identical fruits to fill the bonus gauge.",
-    "skip_button": "Skip",
-    "next_button": "Next",
-    "start_button": "Start!"
+    "previous": "Previous",
+    "next": "Next",
+    "play": "Play",
+    
+    "classic": {
+      "screen1": {
+        "title": "Game objective",
+        "text": "Slice the fruits to feed Yoshi!"
+      },
+      "screen2": {
+        "title": "Controls",
+        "text": "Keyboard or mouse,\ndepending on current setting"
+      },
+      "screen3": {
+        "title": "Hearts",
+        "text": "3 missed fruits = Game Over"
+      },
+      "screen4": {
+        "title": "Bob-ombs",
+        "text": "Avoid the Bob-ombs!"
+      },
+      "screen5": {
+        "title": "Ice Flower",
+        "text": "The Ice Flower freezes fruits"
+      },
+      "screen6": {
+        "title": "Combos and bonus",
+        "text": "Slice identical fruits\nto multiply your score"
+      }
+    },
+    
+    "challenge": {
+      "screen1": {
+        "title": "Challenge Mode",
+        "text": "Score as much as you can in 60 seconds!"
+      },
+      "screen2": {
+        "title": "Controls",
+        "text": "Keyboard or mouse,\ndepending on current setting"
+      },
+      "screen3": {
+        "title": "Bob-ombs",
+        "text": "Bob-ombs remove 10 points"
+      },
+      "screen4": {
+        "title": "Combos and bonus",
+        "text": "Slice identical fruits\nto multiply your score"
+      }
+    }
   },
 
   "game": {

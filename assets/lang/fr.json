@@ -44,22 +44,55 @@
   },
 
   "tutorial": {
-    "screen_1_title": "Bienvenue !",
-    "screen_1_text": "Yoshi est affamé et compte sur toi pour le nourrir !\nTranche les fruits pour lui donner à manger.",
-    "screen_2_title": "Les contrôles",
-    "screen_2_text_keyboard": "Chaque fruit affiche une lettre.\nAppuie sur la touche correspondante pour le trancher !",
-    "screen_2_text_mouse": "Maintiens le clic gauche et trace une trajectoire\nà travers les fruits pour les trancher !",
-    "screen_3_title": "Les cœurs",
-    "screen_3_text": "Tu as 3 cœurs.\nChaque fruit raté te fait perdre un cœur.\n3 fruits ratés = Game Over !",
-    "screen_4_title": "Attention aux Bob-ombs !",
-    "screen_4_text": "Les Bob-ombs sont dangereuses !\nSi tu en tranches une, c'est le Game Over instantané !",
-    "screen_5_title": "La Fleur de glace",
-    "screen_5_text": "La Fleur de glace fige le temps !\nTous les fruits s'arrêtent pendant quelques secondes.",
-    "screen_6_title": "Combos et bonus",
-    "screen_6_text": "Tranche plusieurs fruits d'un coup pour des combos !\nTranche 2 fruits identiques pour remplir la jauge bonus.",
-    "skip_button": "Passer",
-    "next_button": "Suivant",
-    "start_button": "Commencer !"
+    "previous": "Précédent",
+    "next": "Suivant",
+    "play": "Jouer",
+    
+    "classic": {
+      "screen1": {
+        "title": "Objectif du jeu",
+        "text": "Tranche les fruits pour nourrir Yoshi !"
+      },
+      "screen2": {
+        "title": "Les contrôles",
+        "text": "Clavier ou souris,\nselon le paramètre actuel"
+      },
+      "screen3": {
+        "title": "Les cœurs",
+        "text": "3 fruits ratés = Game Over"
+      },
+      "screen4": {
+        "title": "Les Bob-ombs",
+        "text": "Évite les Bob-ombs !"
+      },
+      "screen5": {
+        "title": "La Fleur de glace",
+        "text": "La Fleur de glace fige les fruits"
+      },
+      "screen6": {
+        "title": "Combos et bonus",
+        "text": "Tranche des fruits identiques\npour multiplier ton score"
+      }
+    },
+    
+    "challenge": {
+      "screen1": {
+        "title": "Mode Challenge",
+        "text": "Score un maximum en 60 secondes !"
+      },
+      "screen2": {
+        "title": "Les contrôles",
+        "text": "Clavier ou souris,\nselon le paramètre actuel"
+      },
+      "screen3": {
+        "title": "Les Bob-ombs",
+        "text": "Les Bob-ombs retirent 10 points"
+      },
+      "screen4": {
+        "title": "Combos et bonus",
+        "text": "Tranche des fruits identiques\npour multiplier ton score"
+      }
+    }
   },
 
   "game": {
@@ -67,11 +100,13 @@
     "combo_text": "COMBO x{count}",
     "freeze_text": "FREEZE !",
     "new_record": "Nouveau record !",
+    "paused": "Pause",
+    "resume": "Reprendre",
     "quit_confirm": "Quitter la partie ?"
   },
 
   "game_over": {
-    "title_classic": "Défaite",
+    "title_classic": "Game Over",
     "title_challenge": "Temps écoulé !",
     "score_label": "Score final",
     "best_score_label": "Meilleur score",

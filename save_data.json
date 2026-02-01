@@ -1,14 +1,87 @@
 {
+  "achievements": {
+    "premier_repas": false,
+    "appetit_croissant": false,
+    "glouton_vert": false,
+    "estomac_sans_fond": false,
+    "legende_ile": false,
+    "maitre_gourmet": false,
+    "bebe_yoshi": false,
+    "yoshi_junior": false,
+    "yoshi_confirme": false,
+    "super_yoshi": false,
+    "yoshi_superstar": false,
+    "yoshi_legendaire": false,
+    "langue_agile": false,
+    "langue_eclair": false,
+    "langue_divine": false,
+    "combo_addict": false,
+    "combo_master": false,
+    "fraicheur_bienvenue": false,
+    "maitre_givre": false,
+    "roi_glace": false,
+    "freeze_stratege": false,
+    "coeur_intact": false,
+    "prudence": false,
+    "survivant": false,
+    "perseverant": false,
+    "increvable": false,
+    "oups": false,
+    "demineur_amateur": false,
+    "expert_explosifs": false,
+    "accident_travail": false,
+    "bienvenue": true,
+    "explorateur": false,
+    "indecis": false,
+    "speed_runner": false,
+    "marathon": false,
+    "parfait": false,
+    "virtuose_clavier": false,
+    "ninja_souris": false
+  },
+  "global_stats": {
+    "total_fruits_sliced": 3,
+    "total_games_played": 1,
+    "total_combos": 0,
+    "total_ice_sliced": 0,
+    "total_bomb_explosions": 0,
+    "total_bombs_avoided": 0,
+    "mode_switches": 0,
+    "success_screen_visited": false,
+    "first_launch": false
+  },
   "players": {
-    "Massilia": {
-      "pseudo": "Massilia",
+    "mass": {
+      "pseudo": "mass",
       "high_scores": {
         "classic_easy": 0,
         "classic_normal": 0,
         "classic_hard": 0,
         "challenge": 0
       },
-      "tutorial_seen": false,
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "mas": {
+      "pseudo": "mas",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
+      "total_games": 0
+    },
+    "ali": {
+      "pseudo": "ali",
+      "high_scores": {
+        "classic_easy": 0,
+        "classic_normal": 0,
+        "classic_hard": 0,
+        "challenge": 0
+      },
+      "tutorial_seen": true,
       "total_games": 0
     }
   }

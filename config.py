@@ -51,6 +51,13 @@ class TextColors:
     PSS_NORMAL = (255, 176, 110)     # #ffb06e
     PSS_HARD = (255, 119, 119)       # #ff7777
     PSS_START = (254, 237, 142)      # #feed8e
+    
+    # Tutorial Scene
+    TUTO_TITLE = (255, 176, 110)     # #ffb06e
+    TUTO_TEXT = (254, 237, 142)      # #feed8e
+    TUTO_PREVIOUS = (202, 181, 155)  # #cab59b
+    TUTO_NEXT = (255, 255, 255)      # #ffffff
+    TUTO_PLAY = (254, 237, 142)      # #feed8e
 
 
 # ==================== IMAGES ====================
@@ -134,6 +141,56 @@ class Images:
     PSS_BTN_START = "scenes/player_select_scene/Bouton c_est parti pss 558x89.png"
     PSS_GEAR = "scenes/player_select_scene/Engrenage pss 104x77.png"
     PSS_CROSS = "scenes/player_select_scene/Croix pss 151x78.png"
+    
+    # Tutorial Scene - Classic
+    TUTO_CLASSIC_BG = "scenes/tutorial_scene/classic/Background tuto classic 1920x1080.png"
+    TUTO_CLASSIC_BLOCKS = [
+        "scenes/tutorial_scene/classic/Bloc tuto 1 classic 1049x964.png",
+        "scenes/tutorial_scene/classic/Bloc tuto 2 classic 1049x964.png",
+        "scenes/tutorial_scene/classic/Bloc tuto 3 classic 1049x964.png",
+        "scenes/tutorial_scene/classic/Bloc tuto 4 classic 1049x964.png",
+        "scenes/tutorial_scene/classic/Bloc tuto 5 classic 1049x964.png",
+        "scenes/tutorial_scene/classic/Bloc tuto 6 classic 1049x964.png",
+    ]
+    TUTO_CLASSIC_BTN_PREV = [
+        None,  # Écran 1 : pas de bouton précédent
+        "scenes/tutorial_scene/classic/Bouton précédent tuto 2 classic 285x73.png",
+        "scenes/tutorial_scene/classic/Bouton précédent tuto 3 classic 285x73.png",
+        "scenes/tutorial_scene/classic/Bouton précédent tuto 4 classic 285x73.png",
+        "scenes/tutorial_scene/classic/Bouton précédent tuto 5 classic 285x73.png",
+        "scenes/tutorial_scene/classic/Bouton précédent tuto 6 classic 285x73.png",
+    ]
+    TUTO_CLASSIC_BTN_NEXT = [
+        "scenes/tutorial_scene/classic/Bouton suivant tuto 1 classic 285x73.png",
+        "scenes/tutorial_scene/classic/Bouton suivant tuto 2 classic 285x73.png",
+        "scenes/tutorial_scene/classic/Bouton suivant tuto 3 classic 285x73.png",
+        "scenes/tutorial_scene/classic/Bouton suivant tuto 4 classic 285x73.png",
+        "scenes/tutorial_scene/classic/Bouton suivant tuto 5 classic 285x73.png",
+        None,  # Écran 6 : bouton jouer à la place
+    ]
+    TUTO_CLASSIC_BTN_PLAY = "scenes/tutorial_scene/classic/Bouton jouer tuto 6 classic 285x73.png"
+    
+    # Tutorial Scene - Challenge
+    TUTO_CHALLENGE_BG = "scenes/tutorial_scene/challenge/Background tuto challenge 1920x1080.png"
+    TUTO_CHALLENGE_BLOCKS = [
+        "scenes/tutorial_scene/challenge/Bloc tuto 1 challenge 1049x964.png",
+        "scenes/tutorial_scene/challenge/Bloc tuto 2 challenge 1049x964 - Copie.png",
+        "scenes/tutorial_scene/challenge/Bloc tuto 3 challenge 1049x964 - Copie.png",
+        "scenes/tutorial_scene/challenge/Bloc tuto 4 challenge 1049x964.png",
+    ]
+    TUTO_CHALLENGE_BTN_PREV = [
+        None,  # Écran 1 : pas de bouton précédent
+        "scenes/tutorial_scene/challenge/Bouton précédent tuto 2 challenge 285x73.png",
+        "scenes/tutorial_scene/challenge/Bouton précédent tuto 3 challenge 285x73.png",
+        "scenes/tutorial_scene/challenge/Bouton précédent tuto 4 challenge 285x73.png",
+    ]
+    TUTO_CHALLENGE_BTN_NEXT = [
+        "scenes/tutorial_scene/challenge/Bouton suivant tuto 1 challenge 285x73.png",
+        "scenes/tutorial_scene/challenge/Bouton suivant tuto 2 challenge 285x73.png",
+        "scenes/tutorial_scene/challenge/Bouton suivant tuto 3 challenge 285x73.png",
+        None,  # Écran 4 : bouton jouer à la place
+    ]
+    TUTO_CHALLENGE_BTN_PLAY = "scenes/tutorial_scene/challenge/Bouton jouer tuto 4 challenge 285x73.png"
 
 
 # ==================== POSITIONS (centre des éléments) ====================
@@ -158,6 +215,14 @@ class Layout:
     PSS_BTN_NORMAL = (960, 699)
     PSS_BTN_HARD = (1335, 699)
     PSS_BTN_START = (960, 876)
+    
+    # Tutorial Scene (centre des éléments)
+    TUTO_BLOCK = (960, 535)
+    TUTO_TITLE = (960, 164)
+    TUTO_TEXT = (960, 653)
+    TUTO_BTN_PREV = (706, 787)
+    TUTO_BTN_NEXT = (1214, 787)
+    TUTO_BTN_PLAY = (1214, 787)  # Même position que suivant
 
 
 # ==================== GAMEPLAY ====================
