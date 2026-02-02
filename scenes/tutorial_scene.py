@@ -62,6 +62,7 @@ class TutorialScene(BaseScene):
         self.mode = 'classic'  # 'classic' ou 'challenge'
         self.current_screen = 0
         self.total_screens = 6
+        self.from_settings = False  # True si on vient des paramètres
         
         # Player manager
         self.player_manager: Optional[PlayerManager] = None
@@ -71,6 +72,9 @@ class TutorialScene(BaseScene):
         # Récupérer le mode
         self.mode = self.scene_manager.shared_data.get('mode', 'classic')
         self.current_screen = 0
+        
+        # Savoir si on vient des paramètres
+        self.from_settings = self.scene_manager.shared_data.get('tutorial_from_settings', False)
         
         # Nombre d'écrans selon le mode
         if self.mode == 'challenge':
@@ -136,16 +140,23 @@ class TutorialScene(BaseScene):
         else:
             self.btn_prev = None
         
-        # Bouton Suivant ou Jouer
+        # Bouton Suivant ou Jouer/Quitter
         is_last_screen = screen == self.total_screens - 1
         
         if is_last_screen:
-            # Dernier écran : bouton Jouer
+            # Dernier écran : bouton Jouer ou Quitter selon d'où on vient
             self.btn_next = None
+            
+            # Texte différent si on vient des paramètres
+            if self.from_settings:
+                btn_text = lang_manager.get("general.quit")  # "Quitter"
+            else:
+                btn_text = lang_manager.get("tutorial.play")  # "Jouer"
+            
             self.btn_play = Button(
                 image_path=play_path,
                 center=Layout.TUTO_BTN_PLAY,
-                text=lang_manager.get("tutorial.play"),
+                text=btn_text,
                 text_color=TextColors.TUTO_PLAY,
                 on_click=self._on_play
             )
@@ -181,13 +192,18 @@ class TutorialScene(BaseScene):
             self._setup_buttons()
     
     def _on_play(self):
-        """Lance le jeu."""
+        """Lance le jeu ou retourne aux paramètres."""
         # Marquer le tutoriel comme vu
         if self.player_manager:
             self.player_manager.mark_tutorial_seen()
         
-        # Lancer le jeu
-        self.scene_manager.change_scene('game')
+        # Retourner aux paramètres ou lancer le jeu
+        if self.from_settings:
+            # Reset le flag
+            self.scene_manager.shared_data['tutorial_from_settings'] = False
+            self.scene_manager.change_scene('settings')
+        else:
+            self.scene_manager.change_scene('game')
     
     def handle_events(self, events: List[pygame.event.Event]):
         for event in events:
@@ -214,8 +230,12 @@ class TutorialScene(BaseScene):
                     else:
                         self._on_next()
                 elif event.key == pygame.K_ESCAPE:
-                    # Retour au menu (annuler le tutoriel)
-                    self.scene_manager.change_scene('menu')
+                    # Retour au menu ou aux paramètres selon d'où on vient
+                    if self.from_settings:
+                        self.scene_manager.shared_data['tutorial_from_settings'] = False
+                        self.scene_manager.change_scene('settings')
+                    else:
+                        self.scene_manager.change_scene('menu')
     
     def update(self, dt: float):
         pass
@@ -295,4 +315,5 @@ class TutorialScene(BaseScene):
     
     def cleanup(self):
         """Nettoyage à la sortie de la scène."""
-        pass
+        # Reset le flag si on quitte autrement (Échap par exemple)
+        self.scene_manager.shared_data['tutorial_from_settings'] = False

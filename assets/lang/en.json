@@ -2,7 +2,7 @@
   "_meta": {
     "language": "English",
     "code": "en",
-    "version": "1.1"
+    "version": "1.2"
   },
 
   "general": {
@@ -107,22 +107,23 @@
     "score_label": "Final score",
     "best_score_label": "Best score",
     "new_record": "New record!",
-    "achievements_unlocked": "{count} achievement(s) unlocked",
+    "achievements_unlocked": "achievement(s) unlocked",
     "retry_button": "Retry",
     "menu_button": "Menu"
   },
 
   "settings": {
     "title": "Settings",
-    "control_mode": "Control mode",
-    "control_keyboard": "Keyboard",
-    "control_mouse": "Mouse",
-    "music_volume": "Music",
-    "sfx_volume": "Sound effects",
+    "control_mode": "control mode",
+    "control_keyboard": "keyboard",
+    "control_mouse": "mouse",
+    "music_volume": "music volume",
+    "sfx_volume": "sound volume",
     "language": "Language",
     "language_fr": "Français",
     "language_en": "English",
-    "tutorial_replay": "Replay tutorial",
+    "tutorial_replay": "review tutorial",
+    "global_info": "Settings are global",
     "back_button": "Back"
   },
 

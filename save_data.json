@@ -6,7 +6,7 @@
         "classic_easy": 84,
         "classic_normal": 122,
         "classic_hard": 21,
-        "challenge": 188
+        "challenge": 248
       },
       "tutorial_seen": true,
       "total_games": 0,
@@ -30,17 +30,23 @@
         "yoshi_superstar": true,
         "glouton_vert": true,
         "maitre_givre": true,
-        "combo_addict": true
+        "combo_addict": true,
+        "explorateur": true,
+        "parfait": true,
+        "yoshi_legendaire": true,
+        "estomac_sans_fond": true,
+        "coeur_intact": true,
+        "prudence": true
       },
       "stats": {
-        "total_fruits_sliced": 223,
-        "total_games_played": 6,
-        "total_combos": 14,
+        "total_fruits_sliced": 331,
+        "total_games_played": 7,
+        "total_combos": 26,
         "total_ice_sliced": 17,
         "total_bomb_explosions": 4,
-        "total_bombs_avoided": 27,
+        "total_bombs_avoided": 41,
         "mode_switches": 0,
-        "success_screen_visited": false,
+        "success_screen_visited": true,
         "first_launch": false
       }
     },

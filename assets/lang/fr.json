@@ -2,7 +2,7 @@
   "_meta": {
     "language": "Français",
     "code": "fr",
-    "version": "1.1"
+    "version": "1.2"
   },
 
   "general": {
@@ -113,15 +113,16 @@
 
   "settings": {
     "title": "Paramètres",
-    "control_mode": "Mode de contrôle",
-    "control_keyboard": "Clavier",
-    "control_mouse": "Souris",
-    "music_volume": "Musique",
-    "sfx_volume": "Effets sonores",
+    "control_mode": "mode contrôle",
+    "control_keyboard": "clavier",
+    "control_mouse": "souris",
+    "music_volume": "volume musique",
+    "sfx_volume": "volume sonore",
     "language": "Langue",
     "language_fr": "Français",
     "language_en": "English",
-    "tutorial_replay": "Revoir le tutoriel",
+    "tutorial_replay": "revoir le tutoriel",
+    "global_info": "Les paramètres sont globaux",
     "back_button": "Retour"
   },
 

@@ -40,6 +40,7 @@ class SceneManager:
             'control_mode': self.settings_manager.control_mode,
             'last_score': 0,
             'is_new_record': False,
+            'achievements_count': 0,
         }
         
         self._init_scenes()
@@ -55,6 +56,7 @@ class SceneManager:
         from scenes.game_over_scene import GameOverScene
         from scenes.ranking_scene import RankingScene
         from scenes.success_scene import SuccessScene
+        from scenes.settings_scene import SettingsScene
         
         self.scenes = {
             'menu': MenuScene(self),
@@ -64,6 +66,7 @@ class SceneManager:
             'game_over': GameOverScene(self),
             'ranking': RankingScene(self),
             'success': SuccessScene(self),
+            'settings': SettingsScene(self),
         }
         
         # Passer le gestionnaire de succès aux scènes qui en ont besoin
@@ -75,8 +78,6 @@ class SceneManager:
         self.scenes['tutorial'].set_player_manager(self.player_manager)
         self.scenes['ranking'].set_player_manager(self.player_manager)
         self.scenes['success'].set_player_manager(self.player_manager)
-        
-        # Passer le gestionnaire de paramètres
     
     def on_player_selected(self, pseudo: str):
         """

@@ -89,6 +89,15 @@ class TextColors:
     SUCCESS_DESC_LOCKED = (150, 150, 150)      # gris
     SUCCESS_PROGRESS = (255, 255, 255)         # #ffffff
 
+        # Settings Scene (Paramètres)
+    SETTINGS_LABEL = (254, 237, 142)           # #feed8e - labels
+    SETTINGS_PARAM = (202, 181, 155)           # #cab59b - titre "paramètre"
+    SETTINGS_CONTROL = (202, 181, 155)         # #cab59b - clavier/souris
+    SETTINGS_LANG = (202, 181, 155)            # #cab59b - français/anglais
+    SETTINGS_TUTORIAL = (202, 181, 155)        # #cab59b - revoir le tutoriel
+    SETTINGS_GAUGE_DARK = (134, 85, 148)       # #865594 - violet foncé jauge
+    SETTINGS_GAUGE_LIGHT = (203, 108, 230)     # #cb6ce6 - violet clair jauge
+
 
 # ==================== IMAGES ====================
 
@@ -289,6 +298,18 @@ class Images:
     SUCCESS_ARROW_UP_RIGHT = "scenes/success_scene/Fleche vers le haut de droite succes 170x57 - Copie.png"
     SUCCESS_ARROW_DOWN_RIGHT = "scenes/success_scene/Fleche vers le bas de droite succes 170x55 - Copie.png"
 
+    # Settings Scene (Paramètres)
+    SETTINGS_BG = "scenes/settings_scene/Background parametres.png"
+    SETTINGS_BLOCK_PARAMS = "scenes/settings_scene/Bloc parametres.png"
+    SETTINGS_BTN_CLAVIER = "scenes/settings_scene/Bouton clavier paramètres 285x73.png"
+    SETTINGS_BTN_SOURIS = "scenes/settings_scene/Bouton souris paramètres 285x73.png"
+    SETTINGS_BTN_FRANCAIS = "scenes/settings_scene/Bouton Francais paramètres 285x73.png"
+    SETTINGS_BTN_ANGLAIS = "scenes/settings_scene/Bouton Anglais paramètres 285x73.png"
+    SETTINGS_BTN_TUTORIAL = "scenes/settings_scene/Bouton revoir le tutoriel parametres 458x89.png"
+    SETTINGS_BLOCK_TUTORIAL = "scenes/settings_scene/Bouton parametres parametres 458x89.png"
+    SETTINGS_GEAR = "scenes/settings_scene/Engrenage paramètres 104x77.png"
+    SETTINGS_CROSS = "scenes/settings_scene/Croix paramètres151x78.png"
+
 
 # ==================== POSITIONS (centre des éléments) ====================
 
@@ -413,6 +434,42 @@ class Layout:
     SUCCESS_ACHIEVEMENT_DESC_X = 932           # Centre X de la description
     SUCCESS_PROGRESS_RIGHT = 1416              # Bord droit de la progression
 
+        # Settings Scene (Paramètres)
+    SETTINGS_GEAR = (1624, 84)
+    SETTINGS_CROSS = (1765, 84)
+    SETTINGS_BLOCK_PARAMS = (960, 581)         # Centre du bloc principal
+    SETTINGS_BLOCK_TUTORIAL = (960, 740)       # Centre du bloc tutoriel
+    SETTINGS_TITLE = (960, 200)                # Centre du titre "paramètre"
+    
+    # Labels (justifiés à gauche, donc X = position gauche)
+    SETTINGS_LABEL_CONTROL = (439, 380)        # "mode controle"
+    SETTINGS_LABEL_MUSIC = (439, 458)          # "volume musique"
+    SETTINGS_LABEL_SFX = (439, 536)            # "volume sonore"
+    SETTINGS_LABEL_LANG = (439, 627)           # "Langue"
+    
+    # Boutons mode de contrôle (centre)
+    SETTINGS_BTN_CLAVIER = (963, 377)
+    SETTINGS_BTN_SOURIS = (1306, 377)
+    
+    # Jauges volume (centre des jauges 540x22)
+    SETTINGS_GAUGE_MUSIC = (1122, 458)
+    SETTINGS_GAUGE_SFX = (1122, 536)
+    
+    # Textes volume (positions pour 0% et 100%)
+    SETTINGS_VOL_MUSIC_0 = (837, 458)          # 0% musique (justifié droite)
+    SETTINGS_VOL_MUSIC_100 = (1406, 458)       # 100% musique (justifié gauche)
+    SETTINGS_VOL_SFX_0 = (837, 536)            # 0% sonore (justifié droite)
+    SETTINGS_VOL_SFX_100 = (1406, 536)         # 100% sonore (justifié gauche)
+    
+    # Boutons langue (centre)
+    SETTINGS_BTN_FRANCAIS = (963, 627)
+    SETTINGS_BTN_ANGLAIS = (1306, 627)
+    
+    # Bouton tutoriel (centre)
+    SETTINGS_BTN_TUTORIAL = (960, 740)
+    
+    # Info en bas
+    SETTINGS_INFO = (960, 831)                 # "Les paramètres sont globaux"
 
 # ==================== GAMEPLAY ====================
 
