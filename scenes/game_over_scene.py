@@ -28,7 +28,7 @@ class GameOverScene(BaseScene):
     """Scène de fin de partie."""
     
     # Tailles de police selon le tableau de specs
-    SCORE_FONT_SIZE = 30       # Score final et meilleur score
+    SCORE_FONT_SIZE = 36       # Score final et meilleur score
     RECORD_FONT_SIZE = 36      # Nouveau record
     BUTTON_FONT_SIZE = 36      # Texte des boutons
     SUCCES_FONT_SIZE = 24      # Texte succès débloqués
@@ -100,12 +100,7 @@ class GameOverScene(BaseScene):
     
     def _count_achievements_unlocked(self):
         """Compte les succès débloqués pendant cette partie."""
-        achievement_manager = self.scene_manager.achievement_manager
-        if achievement_manager:
-            # Utiliser get_pending_count pour ne pas vider la liste
-            self.achievements_unlocked = achievement_manager.get_pending_count()
-        else:
-            self.achievements_unlocked = 0
+        self.achievements_unlocked = self.scene_manager.shared_data.get('achievements_count', 0)
     
     def _get_background_path(self) -> str:
         """Retourne le chemin du background selon le type et la langue."""

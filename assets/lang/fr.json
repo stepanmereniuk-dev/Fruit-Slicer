@@ -2,7 +2,7 @@
   "_meta": {
     "language": "Français",
     "code": "fr",
-    "version": "1.0"
+    "version": "1.1"
   },
 
   "general": {
@@ -138,6 +138,10 @@
     "back_button": "Retour"
   },
 
+  "success": {
+    "title": "Succès"
+  },
+
   "achievements": {
     "title": "Succès de Yoshi",
     "category_all": "Tous",
@@ -234,5 +238,46 @@
     "parfait": "Une partie parfaite pour Yoshi !",
     "virtuose_clavier": "Les doigts de feu au service de Yoshi !",
     "ninja_souris": "Un vrai ninja du slice !"
+  },
+
+  "achievement_conditions": {
+    "premier_repas": "Trancher 10 fruits au total",
+    "appetit_croissant": "Trancher 50 fruits au total",
+    "glouton_vert": "Trancher 100 fruits au total",
+    "estomac_sans_fond": "Trancher 250 fruits au total",
+    "legende_ile": "Trancher 500 fruits au total",
+    "maitre_gourmet": "Trancher 1000 fruits au total",
+    "bebe_yoshi": "Atteindre 10 points en une partie",
+    "yoshi_junior": "Atteindre 25 points en une partie",
+    "yoshi_confirme": "Atteindre 50 points en une partie",
+    "super_yoshi": "Atteindre 75 points en une partie",
+    "yoshi_superstar": "Atteindre 100 points en une partie",
+    "yoshi_legendaire": "Atteindre 150 points en une partie",
+    "langue_agile": "Réaliser un combo de 3 fruits",
+    "langue_eclair": "Réaliser un combo de 4 fruits",
+    "langue_divine": "Réaliser un combo de 5+ fruits",
+    "combo_addict": "Réaliser 10 combos au total",
+    "combo_master": "Réaliser 50 combos au total",
+    "fraicheur_bienvenue": "Trancher 1 glaçon",
+    "maitre_givre": "Trancher 10 glaçons au total",
+    "roi_glace": "Trancher 25 glaçons au total",
+    "freeze_stratege": "Trancher 3 glaçons en une partie",
+    "coeur_intact": "Terminer une partie sans perdre de cœur",
+    "prudence": "Terminer avec au moins 2 cœurs",
+    "survivant": "Jouer 10 parties",
+    "perseverant": "Jouer 25 parties",
+    "increvable": "Jouer 50 parties",
+    "oups": "Se faire exploser par une Bob-omb",
+    "demineur_amateur": "Éviter 10 Bob-ombs en une partie",
+    "expert_explosifs": "Éviter 25 Bob-ombs en une partie",
+    "accident_travail": "Se faire exploser 10 fois au total",
+    "bienvenue": "Lancer le jeu pour la première fois",
+    "explorateur": "Visiter l'écran des succès",
+    "indecis": "Changer de mode de contrôle 5 fois",
+    "speed_runner": "Atteindre 20 points en moins de 30 secondes",
+    "marathon": "Jouer une partie de plus de 2 minutes",
+    "parfait": "Atteindre 50 points sans perdre de cœur",
+    "virtuose_clavier": "Atteindre 50 points en mode clavier",
+    "ninja_souris": "Atteindre 50 points en mode souris"
   }
 }

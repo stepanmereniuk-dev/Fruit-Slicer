@@ -54,6 +54,7 @@ class SceneManager:
         from scenes.tutorial_scene import TutorialScene
         from scenes.game_over_scene import GameOverScene
         from scenes.ranking_scene import RankingScene
+        from scenes.success_scene import SuccessScene
         
         self.scenes = {
             'menu': MenuScene(self),
@@ -62,18 +63,20 @@ class SceneManager:
             'tutorial': TutorialScene(self),
             'game_over': GameOverScene(self),
             'ranking': RankingScene(self),
-            # TODO: Ajouter les autres scènes quand elles seront prêtes
-            # 'settings': SettingsScene(self),
-            # 'success': SuccessScene(self),
+            'success': SuccessScene(self),
         }
         
         # Passer le gestionnaire de succès aux scènes qui en ont besoin
         self.scenes['game'].set_achievement_manager(self.achievement_manager)
+        self.scenes['success'].set_achievement_manager(self.achievement_manager)
         
         # Passer le gestionnaire de joueurs aux scènes qui en ont besoin
         self.scenes['player_select'].set_player_manager(self.player_manager)
         self.scenes['tutorial'].set_player_manager(self.player_manager)
         self.scenes['ranking'].set_player_manager(self.player_manager)
+        self.scenes['success'].set_player_manager(self.player_manager)
+        
+        # Passer le gestionnaire de paramètres
     
     def on_player_selected(self, pseudo: str):
         """

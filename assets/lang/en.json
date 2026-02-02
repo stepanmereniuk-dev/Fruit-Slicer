@@ -2,7 +2,7 @@
   "_meta": {
     "language": "English",
     "code": "en",
-    "version": "1.0"
+    "version": "1.1"
   },
 
   "general": {
@@ -139,6 +139,10 @@
     "back_button": "Back"
   },
 
+  "success": {
+    "title": "Achievements"
+  },
+
   "achievements": {
     "title": "Yoshi's Achievements",
     "category_all": "All",
@@ -235,5 +239,46 @@
     "parfait": "A perfect game for Yoshi!",
     "virtuose_clavier": "Fingers of fire at Yoshi's service!",
     "ninja_souris": "A true slice ninja!"
+  },
+
+  "achievement_conditions": {
+    "premier_repas": "Slice 10 fruits total",
+    "appetit_croissant": "Slice 50 fruits total",
+    "glouton_vert": "Slice 100 fruits total",
+    "estomac_sans_fond": "Slice 250 fruits total",
+    "legende_ile": "Slice 500 fruits total",
+    "maitre_gourmet": "Slice 1000 fruits total",
+    "bebe_yoshi": "Reach 10 points in one game",
+    "yoshi_junior": "Reach 25 points in one game",
+    "yoshi_confirme": "Reach 50 points in one game",
+    "super_yoshi": "Reach 75 points in one game",
+    "yoshi_superstar": "Reach 100 points in one game",
+    "yoshi_legendaire": "Reach 150 points in one game",
+    "langue_agile": "Perform a 3-fruit combo",
+    "langue_eclair": "Perform a 4-fruit combo",
+    "langue_divine": "Perform a 5+ fruit combo",
+    "combo_addict": "Perform 10 combos total",
+    "combo_master": "Perform 50 combos total",
+    "fraicheur_bienvenue": "Slice 1 ice flower",
+    "maitre_givre": "Slice 10 ice flowers total",
+    "roi_glace": "Slice 25 ice flowers total",
+    "freeze_stratege": "Slice 3 ice flowers in one game",
+    "coeur_intact": "Finish a game without losing any heart",
+    "prudence": "Finish with at least 2 hearts",
+    "survivant": "Play 10 games",
+    "perseverant": "Play 25 games",
+    "increvable": "Play 50 games",
+    "oups": "Get blown up by a Bob-omb",
+    "demineur_amateur": "Avoid 10 Bob-ombs in one game",
+    "expert_explosifs": "Avoid 25 Bob-ombs in one game",
+    "accident_travail": "Get blown up 10 times total",
+    "bienvenue": "Launch the game for the first time",
+    "explorateur": "Visit the achievements screen",
+    "indecis": "Switch control mode 5 times",
+    "speed_runner": "Reach 20 points in under 30 seconds",
+    "marathon": "Play a game for more than 2 minutes",
+    "parfait": "Reach 50 points without losing any heart",
+    "virtuose_clavier": "Reach 50 points in keyboard mode",
+    "ninja_souris": "Reach 50 points in mouse mode"
   }
 }

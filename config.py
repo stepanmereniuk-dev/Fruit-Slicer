@@ -78,6 +78,16 @@ class TextColors:
     RANKING_TAB_CHALLENGE = (239, 183, 255) # #efb7ff
     RANKING_HEADER = (254, 237, 142)       # #feed8e
     RANKING_DATA = (254, 237, 142)         # #feed8e
+    
+    # Success Scene (Succès)
+    SUCCESS_TITLE = (202, 181, 155)            # #cab59b
+    SUCCESS_PSEUDO = (255, 176, 110)           # #ffb06e
+    SUCCESS_NAME_UNLOCKED = (254, 237, 142)    # #feed8e (jaune - débloqué)
+    SUCCESS_NAME_LOCKED = (180, 180, 180)      # gris clair (verrouillé)
+    SUCCESS_CONDITION = (255, 255, 255)        # #ffffff
+    SUCCESS_DESC_UNLOCKED = (254, 237, 142)    # #feed8e
+    SUCCESS_DESC_LOCKED = (150, 150, 150)      # gris
+    SUCCESS_PROGRESS = (255, 255, 255)         # #ffffff
 
 
 # ==================== IMAGES ====================
@@ -263,6 +273,21 @@ class Images:
     RANKING_BTN_CHALLENGE = "scenes/ranking_scene/Bouton challenge classement 281x74.png"
     RANKING_GEAR = "scenes/ranking_scene/Engrenage claassement 104x77.png"
     RANKING_CROSS = "scenes/ranking_scene/Croix classement 151x78.png"
+    
+    # Success Scene (Succès)
+    SUCCESS_BG = "scenes/success_scene/background succes.png"
+    SUCCESS_TITLE_BTN = "scenes/success_scene/bouton succes succes 458x89.png"
+    SUCCESS_BLOC = "scenes/success_scene/Bloc succes 1511x991.png"
+    SUCCESS_PSEUDO_BTN = "scenes/success_scene/Pseudo 1 succes 285x13.png"
+    SUCCESS_PSEUDO_USER = "scenes/success_scene/Pseudo utilisateur succes 285x13.png"
+    SUCCESS_CADRE_OR = "scenes/success_scene/cadre or succes 784x316.png"
+    SUCCESS_CADRE_GRIS = "scenes/success_scene/cadre gris succes 784x316.png"
+    SUCCESS_CROSS = "scenes/success_scene/Croix succes 151x78.png"
+    SUCCESS_GEAR = "scenes/success_scene/Engrenage succes 104x77.png"
+    SUCCESS_ARROW_UP_LEFT = "scenes/success_scene/Fleche vers le haut de gauche succes 170x57.png"
+    SUCCESS_ARROW_DOWN_LEFT = "scenes/success_scene/Fleche vers le bas de gauche succes 170x55.png"
+    SUCCESS_ARROW_UP_RIGHT = "scenes/success_scene/Fleche vers le haut de droite succes 170x57 - Copie.png"
+    SUCCESS_ARROW_DOWN_RIGHT = "scenes/success_scene/Fleche vers le bas de droite succes 170x55 - Copie.png"
 
 
 # ==================== POSITIONS (centre des éléments) ====================
@@ -360,6 +385,33 @@ class Layout:
     RANKING_DATA_RANK_X = 510
     RANKING_DATA_PSEUDO_X = 810
     RANKING_DATA_SCORE_X = 1266
+    
+    # Success Scene (Succès)
+    SUCCESS_TITLE = (960, 121)
+    SUCCESS_BLOC = (963, 585)
+    SUCCESS_CROSS = (1624, 84)
+    SUCCESS_GEAR = (1765, 84)
+    
+    # Colonne gauche - Pseudos
+    SUCCESS_PSEUDO_X = 526                     # Centre X des boutons pseudo
+    SUCCESS_PSEUDO_POSITIONS = [               # Positions Y des 7 boutons pseudo
+        334, 421, 513, 602, 693, 782, 870
+    ]
+    SUCCESS_ARROW_UP_LEFT = (713, 835)
+    SUCCESS_ARROW_DOWN_LEFT = (713, 890)
+    
+    # Colonne droite - Pseudo sélectionné + Succès
+    SUCCESS_PSEUDO_USER = (1117, 334)
+    SUCCESS_CADRE_X = 1117                     # Centre X des cadres succès
+    SUCCESS_CADRE_POSITIONS = [489, 760]       # Positions Y des 2 cadres
+    SUCCESS_ARROW_UP_RIGHT = (1516, 835)
+    SUCCESS_ARROW_DOWN_RIGHT = (1516, 890)
+    
+    # Positions des textes dans les cadres succès
+    SUCCESS_ACHIEVEMENT_NAME_X = 700          # Centre X du nom
+    SUCCESS_ACHIEVEMENT_CONDITION_X = 932      # Centre X de la condition
+    SUCCESS_ACHIEVEMENT_DESC_X = 932           # Centre X de la description
+    SUCCESS_PROGRESS_RIGHT = 1416              # Bord droit de la progression
 
 
 # ==================== GAMEPLAY ====================

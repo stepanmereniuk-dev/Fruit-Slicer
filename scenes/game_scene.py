@@ -677,6 +677,7 @@ class GameScene(BaseScene):
         
         if self.achievement_manager:
             self.achievement_manager.end_game(self.exploded)
+            self.scene_manager.shared_data['achievements_count'] = self.achievement_manager.get_pending_count()
         
         self.scene_manager.shared_data['last_score'] = self.scoring.score
         self.scene_manager.shared_data['exploded'] = self.exploded
